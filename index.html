@@ -9,16 +9,15 @@
 :root{
   --navy:#0a1628;--navy-mid:#112240;--navy-light:#1a3460;
   --gold:#c9a84c;--gold-light:#e8c46a;--gold-dim:#8a6f2e;
-  --white:#f4f6fa;--gray:#8a9ab5;--gray-light:#c8d0df;
-  --red:#c0392b;--success:#27ae60;--warn:#e67e22;
-  --border:rgba(201,168,76,0.22);--input-bg:rgba(255,255,255,0.04);
+  --bg:#f4f6fa;--surface:#ffffff;--surface2:#f0f2f8;--surface3:#e8ecf4;
+  --text:#1a2340;--text2:#374060;--text3:#6b7a99;
+  --border-l:#dde2ed;--red:#c0392b;--success:#27ae60;--warn:#e67e22;
+  /* legacy aliases */
+  --white:#ffffff;--gray:#6b7a99;--gray-light:#374060;
+  --border:rgba(201,168,76,0.3);--input-bg:#ffffff;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--navy);color:var(--white);font-family:'Barlow',sans-serif;min-height:100vh;overflow-x:hidden;}
-body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-  background:radial-gradient(ellipse at 15% 50%,rgba(201,168,76,.05) 0%,transparent 55%),
-  repeating-linear-gradient(0deg,transparent,transparent 70px,rgba(255,255,255,.007) 70px,rgba(255,255,255,.007) 71px),
-  repeating-linear-gradient(90deg,transparent,transparent 70px,rgba(255,255,255,.007) 70px,rgba(255,255,255,.007) 71px);}
+body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh;overflow-x:hidden;}
 
 /* PAGE SYSTEM */
 .page{display:none;min-height:100vh;position:relative;z-index:1;flex-direction:column;}
@@ -26,54 +25,54 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .page-fade{animation:fadeIn .3s ease;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
-/* HEADER */
-.site-header{background:rgba(10,22,40,.97);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:68px;flex-shrink:0;position:sticky;top:0;z-index:200;}
+/* HEADER — stays dark */
+.site-header{background:var(--navy);border-bottom:1px solid rgba(201,168,76,0.25);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:68px;flex-shrink:0;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,0.25);}
 .logo-area{display:flex;align-items:center;gap:12px;cursor:pointer;}
-.brand-name{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;color:var(--white);line-height:1;}
+.brand-name{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;color:#fff;line-height:1;}
 .brand-tag{font-family:'Barlow Condensed',sans-serif;font-size:.58rem;letter-spacing:3px;color:var(--gold);text-transform:uppercase;}
-.hq-info{font-family:'Barlow Condensed',sans-serif;font-size:.78rem;color:var(--gray);text-align:right;line-height:1.5;}
+.hq-info{font-family:'Barlow Condensed',sans-serif;font-size:.78rem;color:#8a9ab5;text-align:right;line-height:1.5;}
 .hq-info strong{color:var(--gold);}
 .header-user{display:flex;align-items:center;gap:12px;}
-.header-user-name{font-family:'Barlow Condensed',sans-serif;font-size:.8rem;letter-spacing:1px;color:var(--gray-light);}
+.header-user-name{font-family:'Barlow Condensed',sans-serif;font-size:.8rem;letter-spacing:1px;color:#c8d0df;}
 .header-user-name strong{color:var(--gold);}
-.header-nav-btn{background:transparent;border:1px solid rgba(201,168,76,.2);color:var(--gray);padding:5px 14px;border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .2s;}
-.header-nav-btn:hover{color:var(--white);border-color:var(--gold);}
+.header-nav-btn{background:transparent;border:1px solid rgba(201,168,76,.3);color:#c8d0df;padding:5px 14px;border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.header-nav-btn:hover{color:#fff;border-color:var(--gold);}
 
-/* PROGRESS */
-.progress-wrap{background:rgba(10,22,40,.9);border-bottom:1px solid var(--border);padding:1rem 2rem;flex-shrink:0;}
+/* PROGRESS BAR — light bg */
+.progress-wrap{background:var(--surface);border-bottom:1px solid var(--border-l);padding:1rem 2rem;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,.06);}
 .progress-inner{max-width:800px;margin:0 auto;display:flex;align-items:center;justify-content:center;}
-.prog-step{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:default;}
-.prog-circle{width:34px;height:34px;border-radius:50%;border:2px solid var(--navy-light);background:var(--navy);color:var(--gray);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:.82rem;font-weight:700;transition:all .3s;}
+.prog-step{display:flex;flex-direction:column;align-items:center;gap:5px;}
+.prog-circle{width:36px;height:36px;border-radius:50%;border:2px solid var(--border-l);background:var(--bg);color:var(--text3);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:.82rem;font-weight:700;transition:all .3s;}
 .prog-circle.done{background:var(--success);border-color:var(--success);color:#fff;}
 .prog-circle.active{background:var(--gold);border-color:var(--gold);color:var(--navy);}
-.prog-label{font-family:'Barlow Condensed',sans-serif;font-size:.6rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);white-space:nowrap;}
-.prog-line{flex:1;height:2px;background:var(--navy-light);margin:0 6px;min-width:24px;transition:background .3s;}
+.prog-label{font-family:'Barlow Condensed',sans-serif;font-size:.6rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);white-space:nowrap;}
+.prog-line{flex:1;height:2px;background:var(--border-l);margin:0 6px;min-width:24px;transition:background .3s;}
 .prog-line.done{background:var(--success);}
 
-/* PAGE TITLE */
-.page-title-bar{background:linear-gradient(90deg,var(--navy-mid) 0%,var(--navy-light) 100%);border-bottom:2px solid var(--gold);padding:1.25rem 2rem;flex-shrink:0;}
-.page-title-bar h1{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:3px;}
-.page-title-bar p{font-size:.78rem;color:var(--gold);font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;margin-top:2px;}
+/* PAGE TITLE BAR — dark hero */
+.page-title-bar{background:linear-gradient(90deg,var(--navy-mid) 0%,var(--navy-light) 100%);border-bottom:3px solid var(--gold);padding:1.5rem 2rem;flex-shrink:0;}
+.page-title-bar h1{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:3px;color:#fff;}
+.page-title-bar p{font-size:.8rem;color:var(--gold);font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;margin-top:2px;}
 
 /* FOOTER */
-.site-footer{background:rgba(10,22,40,.95);border-top:1px solid var(--border);padding:1.25rem 2rem;text-align:center;font-size:.7rem;color:var(--gray);font-family:'Barlow Condensed',sans-serif;line-height:1.8;flex-shrink:0;margin-top:auto;}
+.site-footer{background:var(--navy);border-top:1px solid rgba(201,168,76,0.2);padding:1.25rem 2rem;text-align:center;font-size:.7rem;color:#8a9ab5;font-family:'Barlow Condensed',sans-serif;line-height:1.8;flex-shrink:0;margin-top:auto;}
 .site-footer strong{color:var(--gold);}
-.site-footer a{color:var(--gray);text-decoration:none;}
+.site-footer a{color:#8a9ab5;text-decoration:none;}
 .site-footer a:hover{color:var(--gold);}
 
 /* SCROLLABLE MAIN */
 .main-scroll{flex:1;overflow-y:auto;}
 .main{max-width:900px;margin:2rem auto;padding:0 1.25rem 4rem;}
 
-/* INPUTS */
+/* ALL INPUTS — light */
 input[type=text],input[type=email],input[type=tel],input[type=number],select,textarea{
-  background:var(--input-bg);border:1px solid rgba(201,168,76,.2);border-radius:3px;
-  color:var(--white);font-family:'Barlow',sans-serif;font-size:.88rem;padding:9px 12px;
-  outline:none;width:100%;transition:border-color .2s,background .2s;appearance:none;-webkit-appearance:none;}
-input:focus,select:focus,textarea:focus{border-color:var(--gold);background:rgba(201,168,76,.05);}
-input::placeholder,textarea::placeholder{color:rgba(138,154,181,.4);font-weight:300;}
-select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23c9a84c' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;cursor:pointer;}
-select option{background:var(--navy-mid);}
+  background:#fff;border:1px solid var(--border-l);border-radius:4px;
+  color:var(--text);font-family:'Barlow',sans-serif;font-size:.9rem;padding:10px 13px;
+  outline:none;width:100%;transition:border-color .2s,box-shadow .2s;appearance:none;-webkit-appearance:none;}
+input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,0.12);}
+input::placeholder,textarea::placeholder{color:#aab2c8;}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23c9a84c' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;cursor:pointer;background-color:#fff;}
+select option{background:#fff;color:var(--text);}
 textarea{resize:vertical;min-height:90px;line-height:1.6;}
 
 /* LAYOUT GRIDS */
@@ -83,29 +82,29 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
 
 /* FIELD */
 .field{display:flex;flex-direction:column;gap:5px;}
-.field>label{font-family:'Barlow Condensed',sans-serif;font-size:.67rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold);font-weight:600;}
+.field>label{font-family:'Barlow Condensed',sans-serif;font-size:.68rem;letter-spacing:2px;text-transform:uppercase;color:var(--navy-mid);font-weight:700;}
 .field>label .req{color:var(--red);margin-left:2px;}
 
 /* SECTION BLOCK */
-.section-block{background:rgba(17,34,64,.55);border:1px solid var(--border);border-radius:4px;overflow:hidden;margin-bottom:1.5rem;backdrop-filter:blur(6px);}
-.section-head{background:rgba(201,168,76,.1);border-bottom:1px solid var(--border);padding:.75rem 1.25rem;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;color:var(--gold);}
-.section-body{padding:1.25rem;}
-.section-note{font-size:.78rem;color:var(--gray);margin-bottom:1rem;line-height:1.6;font-style:italic;}
+.section-block{background:var(--surface);border:1px solid var(--border-l);border-radius:6px;overflow:hidden;margin-bottom:1.5rem;box-shadow:0 1px 6px rgba(0,0,0,.06);}
+.section-head{background:var(--navy);border-bottom:1px solid rgba(201,168,76,0.25);padding:.8rem 1.25rem;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;color:var(--gold);}
+.section-body{padding:1.5rem;}
+.section-note{font-size:.8rem;color:var(--text3);margin-bottom:1rem;line-height:1.6;font-style:italic;}
 
 /* RADIO */
 .radio-inline{display:flex;gap:1.5rem;align-items:center;flex-wrap:wrap;padding-top:4px;}
-.radio-inline label{display:flex;align-items:center;gap:7px;font-size:.85rem;color:var(--gray-light);cursor:pointer;font-weight:400;}
-.radio-inline input[type=radio]{width:15px;height:15px;accent-color:var(--gold);cursor:pointer;padding:0;}
+.radio-inline label{display:flex;align-items:center;gap:7px;font-size:.88rem;color:var(--text2);cursor:pointer;font-weight:400;}
+.radio-inline input[type=radio]{width:16px;height:16px;accent-color:var(--gold);cursor:pointer;padding:0;}
 
 /* Q ROW */
 .q-row{margin-bottom:.9rem;}
-.q-text{font-size:.85rem;color:var(--gray-light);margin-bottom:6px;line-height:1.55;}
-.q-text em{font-size:.78rem;color:var(--gray);font-style:italic;}
+.q-text{font-size:.88rem;color:var(--text2);margin-bottom:6px;line-height:1.55;}
+.q-text em{font-size:.8rem;color:var(--text3);font-style:italic;}
 
-/* REPEAT */
-.repeat-block{border:1px solid rgba(201,168,76,.15);border-radius:3px;padding:1rem;margin-bottom:.5rem;background:rgba(255,255,255,.02);}
-.show-more-btn{display:inline-flex;align-items:center;gap:6px;background:transparent;border:1px solid rgba(201,168,76,.25);color:var(--gold);padding:7px 16px;border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;margin-top:.5rem;}
-.show-more-btn:hover{background:rgba(201,168,76,.08);border-color:var(--gold);}
+/* REPEAT BLOCK */
+.repeat-block{border:1px solid var(--border-l);border-radius:4px;padding:1.1rem;margin-bottom:.5rem;background:var(--surface2);}
+.show-more-btn{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--gold);color:var(--gold-dim);padding:7px 16px;border-radius:4px;font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;margin-top:.5rem;font-weight:600;}
+.show-more-btn:hover{background:rgba(201,168,76,.08);}
 
 /* DATE TRIO */
 .date-trio{display:flex;gap:6px;}
@@ -114,206 +113,220 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
 .date-sep{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;}
 
 /* BUTTONS */
-.btn{font-family:'Barlow Condensed',sans-serif;font-size:.8rem;letter-spacing:2px;text-transform:uppercase;padding:10px 24px;border-radius:3px;cursor:pointer;transition:all .2s;font-weight:600;border:none;display:inline-flex;align-items:center;gap:6px;}
-.btn-save{background:transparent;color:var(--gray);border:1px solid rgba(201,168,76,.2);}
-.btn-save:hover{color:var(--white);border-color:var(--gold);}
-.btn-gold{background:var(--gold);color:var(--navy);font-size:.9rem;padding:11px 32px;}
-.btn-gold:hover{background:var(--gold-light);transform:translateY(-1px);box-shadow:0 4px 20px rgba(201,168,76,.3);}
-.btn-outline{background:transparent;color:var(--gray);border:1px solid rgba(201,168,76,.2);}
-.btn-outline:hover{color:var(--white);border-color:var(--gold);}
+.btn{font-family:'Barlow Condensed',sans-serif;font-size:.82rem;letter-spacing:2px;text-transform:uppercase;padding:10px 24px;border-radius:4px;cursor:pointer;transition:all .2s;font-weight:700;border:none;display:inline-flex;align-items:center;gap:6px;}
+.btn-save{background:#fff;color:var(--text3);border:1px solid var(--border-l);}
+.btn-save:hover{color:var(--text);border-color:var(--navy);}
+.btn-gold{background:var(--gold);color:var(--navy);font-size:.88rem;padding:11px 32px;font-weight:700;}
+.btn-gold:hover{background:var(--gold-light);transform:translateY(-1px);box-shadow:0 4px 16px rgba(201,168,76,.35);}
+.btn-outline{background:#fff;color:var(--text2);border:1px solid var(--border-l);}
+.btn-outline:hover{color:var(--text);border-color:var(--navy);}
 .action-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:10px;}
 .action-bar-bottom{margin-top:1.5rem;}
 
+/* NOTICE BOX */
+.notice-box{background:#fff8e8;border:1px solid rgba(201,168,76,.4);border-left:4px solid var(--gold);border-radius:4px;padding:1rem 1.25rem;font-size:.82rem;color:var(--text2);line-height:1.75;margin-bottom:1.5rem;}
+.notice-box strong{color:var(--text);}
+
 /* UPLOAD ZONE */
-.upload-zone{border:1.5px dashed rgba(201,168,76,.3);border-radius:4px;padding:1.25rem;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;background:var(--input-bg);}
-.upload-zone:hover{border-color:var(--gold);background:rgba(201,168,76,.04);}
+.upload-zone{border:1.5px dashed var(--border-l);border-radius:4px;padding:1.25rem;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;background:var(--surface2);}
+.upload-zone:hover{border-color:var(--gold);}
 .upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;padding:0;border:none;}
 .upload-zone.uploaded{border-color:var(--success);background:rgba(39,174,96,.05);}
-.upload-icon{font-size:1.6rem;margin-bottom:.4rem;opacity:.6;}
-.upload-label{font-family:'Barlow Condensed',sans-serif;font-size:.85rem;letter-spacing:1px;color:var(--gray-light);margin-bottom:3px;}
-.upload-hint{font-size:.7rem;color:var(--gray);}
-.upload-status{font-size:.75rem;color:var(--success);font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;margin-top:4px;}
+.upload-icon{font-size:1.6rem;margin-bottom:.4rem;opacity:.7;}
+.upload-label{font-family:'Barlow Condensed',sans-serif;font-size:.85rem;letter-spacing:1px;color:var(--text2);margin-bottom:3px;}
+.upload-hint{font-size:.7rem;color:var(--text3);}
 
 /* LEGAL */
-.legal-text{font-size:.78rem;color:var(--gray-light);line-height:1.75;margin-bottom:.75rem;}
-.initials-block{background:rgba(201,168,76,.07);border:1px solid var(--border);border-radius:3px;padding:1rem 1.25rem;margin:.75rem 0;}
-.initials-label{font-family:'Barlow Condensed',sans-serif;font-size:.68rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
-.initials-input{max-width:180px;background:rgba(255,255,255,.06);border:1px solid var(--gold);border-radius:3px;color:var(--white);font-family:'Barlow',sans-serif;font-size:.9rem;padding:8px 12px;outline:none;width:100%;}
-.sig-row{display:flex;align-items:center;gap:12px;background:rgba(201,168,76,.08);border:1px solid var(--border);border-radius:3px;padding:1rem 1.25rem;margin-top:1rem;}
+.legal-text{font-size:.8rem;color:var(--text2);line-height:1.75;margin-bottom:.75rem;}
+.initials-block{background:var(--surface2);border:1px solid var(--border-l);border-left:3px solid var(--gold);border-radius:4px;padding:1rem 1.25rem;margin:.75rem 0;}
+.initials-label{font-family:'Barlow Condensed',sans-serif;font-size:.68rem;letter-spacing:2px;text-transform:uppercase;color:var(--navy-mid);font-weight:700;margin-bottom:6px;}
+.initials-input{max-width:180px;background:#fff;border:1px solid var(--border-l);border-radius:4px;color:var(--text);font-family:'Barlow',sans-serif;font-size:.9rem;padding:8px 12px;outline:none;width:100%;}
+.initials-input:focus{border-color:var(--gold);}
+.sig-row{display:flex;align-items:center;gap:12px;background:#fff8e8;border:1px solid rgba(201,168,76,.35);border-radius:4px;padding:1rem 1.25rem;margin-top:1rem;}
 .sig-row input[type=checkbox]{width:20px;height:20px;accent-color:var(--gold);cursor:pointer;padding:0;flex-shrink:0;}
-.sig-row label{font-size:.82rem;color:var(--gray-light);cursor:pointer;}
+.sig-row label{font-size:.85rem;color:var(--text2);cursor:pointer;}
+.sig-row label strong{color:var(--navy);}
 
 /* EEO */
 .def-list{display:flex;flex-direction:column;gap:.85rem;margin-bottom:1.5rem;}
-.def-item{font-size:.82rem;color:var(--gray-light);line-height:1.7;padding-left:1rem;border-left:2px solid rgba(201,168,76,.25);}
-.def-item strong{color:var(--white);display:block;margin-bottom:2px;}
+.def-item{font-size:.83rem;color:var(--text2);line-height:1.7;padding-left:1rem;border-left:3px solid rgba(201,168,76,.4);}
+.def-item strong{color:var(--text);display:block;margin-bottom:2px;font-weight:700;}
 .section-divider{display:flex;align-items:center;gap:12px;margin:1.5rem 0;}
-.section-divider span{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold-dim);white-space:nowrap;}
-.section-divider::before,.section-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.section-divider span{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:3px;text-transform:uppercase;color:var(--text3);white-space:nowrap;}
+.section-divider::before,.section-divider::after{content:'';flex:1;height:1px;background:var(--border-l);}
 
-/* NOTICE */
-.notice-box{background:rgba(201,168,76,.06);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:3px;padding:1rem 1.25rem;font-size:.8rem;color:var(--gray-light);line-height:1.75;margin-bottom:1.5rem;}
-.notice-box strong{color:var(--white);}
-
-/* ════════════ LOGIN PAGE ════════════ */
-.login-wrap{display:flex;flex:1;}
-.left-panel{width:42%;background:linear-gradient(160deg,var(--navy-light) 0%,var(--navy-mid) 60%,var(--navy) 100%);border-right:1px solid var(--border);padding:3.5rem 3rem;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden;}
+/* ════════ LOGIN PAGE ════════ */
+.login-progress{background:var(--surface);border-bottom:1px solid var(--border-l);padding:1rem 2rem;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+.login-progress-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;justify-content:center;}
+.login-wrap{display:flex;flex:1;min-height:0;}
+/* LEFT PANEL — stays dark */
+.left-panel{width:38%;background:linear-gradient(160deg,var(--navy-light) 0%,var(--navy-mid) 60%,var(--navy) 100%);border-right:1px solid rgba(201,168,76,.2);padding:3rem;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden;flex-shrink:0;}
 .left-panel::before{content:'🛡';position:absolute;font-size:20rem;bottom:-4rem;right:-5rem;opacity:.04;pointer-events:none;}
 .left-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:4px;color:var(--gold);text-transform:uppercase;margin-bottom:1rem;}
-.left-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,4vw,3rem);letter-spacing:2px;color:var(--white);line-height:1.05;margin-bottom:1.25rem;}
+.left-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,3.5vw,3rem);letter-spacing:2px;color:#fff;line-height:1.05;margin-bottom:1.25rem;}
 .left-title span{color:var(--gold);}
-.left-body{font-size:.88rem;color:var(--gray-light);line-height:1.8;font-weight:300;max-width:340px;margin-bottom:2.5rem;}
-.bullets{display:flex;flex-direction:column;gap:12px;}
-.bullet{display:flex;align-items:center;gap:12px;font-size:.83rem;color:var(--gray-light);}
+.left-body{font-size:.88rem;color:#c8d0df;line-height:1.8;font-weight:300;max-width:340px;margin-bottom:2rem;}
+.bullets{display:flex;flex-direction:column;gap:10px;}
+.bullet{display:flex;align-items:center;gap:12px;font-size:.83rem;color:#c8d0df;}
 .bullet-dot{width:6px;height:6px;background:var(--gold);border-radius:50%;flex-shrink:0;}
-.badges{display:flex;gap:10px;margin-top:2.5rem;flex-wrap:wrap;}
-.badge{background:rgba(201,168,76,.08);border:1px solid var(--border);border-radius:3px;padding:5px 12px;font-family:'Barlow Condensed',sans-serif;font-size:.65rem;letter-spacing:2px;color:var(--gold-dim);text-transform:uppercase;}
-.right-panel{flex:1;display:flex;align-items:center;justify-content:center;padding:2.5rem 2rem;}
-.auth-card{width:100%;max-width:440px;}
-.tab-row{display:flex;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:4px 4px 0 0;overflow:hidden;}
-.tab-btn{flex:1;padding:13px;background:none;border:none;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:.82rem;letter-spacing:2px;text-transform:uppercase;color:var(--gray);transition:all .25s;position:relative;}
-.tab-btn.active{background:rgba(201,168,76,.08);color:var(--gold);}
-.tab-btn.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--gold);}
-.card-body{background:rgba(17,34,64,.7);border:1px solid var(--border);border-top:none;border-radius:0 0 4px 4px;padding:1.75rem;backdrop-filter:blur(10px);}
-.card-title{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;margin-bottom:.3rem;}
-.card-sub{font-size:.8rem;color:var(--gray);margin-bottom:1.5rem;font-weight:300;line-height:1.6;}
-.social-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.25rem;}
-.soc-btn{flex:1;min-width:50px;display:flex;align-items:center;justify-content:center;gap:5px;padding:8px 6px;background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.18);border-radius:3px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:.68rem;letter-spacing:1px;color:var(--gray-light);transition:all .2s;text-transform:uppercase;}
-.soc-btn:hover{border-color:var(--gold);color:var(--white);}
+.badges{display:flex;gap:10px;margin-top:2rem;flex-wrap:wrap;}
+.badge{background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.3);border-radius:3px;padding:5px 12px;font-family:'Barlow Condensed',sans-serif;font-size:.65rem;letter-spacing:2px;color:var(--gold-dim);text-transform:uppercase;}
+/* RIGHT PANEL — white */
+.right-panel{flex:1;overflow-y:auto;padding:2.5rem 3rem;display:flex;flex-direction:column;align-items:center;background:var(--bg);}
+.auth-card{width:100%;max-width:680px;}
+.tab-row{display:flex;background:var(--surface2);border:1px solid var(--border-l);border-radius:6px 6px 0 0;overflow:hidden;}
+.tab-btn{flex:1;padding:14px;background:none;border:none;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:.88rem;letter-spacing:2px;text-transform:uppercase;color:var(--text3);transition:all .25s;position:relative;}
+.tab-btn.active{background:var(--surface);color:var(--navy);}
+.tab-btn.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--gold);}
+/* CARD BODY — white */
+.card-body{background:var(--surface);border:1px solid var(--border-l);border-top:none;border-radius:0 0 6px 6px;padding:2.5rem;box-shadow:0 2px 12px rgba(0,0,0,.07);}
+.card-title{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:2px;color:var(--text);margin-bottom:.4rem;}
+.card-sub{font-size:.85rem;color:var(--text3);margin-bottom:1.75rem;line-height:1.6;}
+.social-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:1.25rem;}
+.soc-btn{flex:1;min-width:80px;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 8px;background:#fff;border:1px solid var(--border-l);border-radius:4px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:.75rem;letter-spacing:1px;color:var(--text2);transition:all .2s;text-transform:uppercase;}
+.soc-btn:hover{border-color:var(--gold);color:var(--navy);background:#fffbf2;}
 .div-or{display:flex;align-items:center;gap:12px;margin-bottom:1.25rem;}
-.div-or span{font-family:'Barlow Condensed',sans-serif;font-size:.65rem;letter-spacing:2px;color:var(--gray);text-transform:uppercase;white-space:nowrap;}
-.div-or::before,.div-or::after{content:'';flex:1;height:1px;background:var(--border);}
-.auth-field{margin-bottom:1rem;}
-.auth-label{display:block;font-family:'Barlow Condensed',sans-serif;font-size:.67rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:5px;}
+.div-or span{font-family:'Barlow Condensed',sans-serif;font-size:.68rem;letter-spacing:2px;color:var(--text3);text-transform:uppercase;white-space:nowrap;}
+.div-or::before,.div-or::after{content:'';flex:1;height:1px;background:var(--border-l);}
+.auth-field{margin-bottom:1.1rem;}
+.auth-label{display:block;font-family:'Barlow Condensed',sans-serif;font-size:.68rem;letter-spacing:2px;text-transform:uppercase;color:var(--navy-mid);font-weight:700;margin-bottom:5px;}
 .auth-label .req{color:var(--red);margin-left:2px;}
 .pw-wrap{position:relative;}
-.pw-wrap input{padding-right:60px;}
-.pw-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--gray);font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:1px;text-transform:uppercase;}
+.pw-wrap input{padding-right:70px;}
+.pw-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:1px;text-transform:uppercase;transition:color .2s;}
 .pw-toggle:hover{color:var(--gold);}
-.f2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.field-sel{width:100%;background:var(--input-bg);border:1px solid rgba(201,168,76,.2);border-radius:3px;color:var(--white);font-family:'Barlow',sans-serif;font-size:.88rem;padding:9px 12px;outline:none;appearance:none;-webkit-appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23c9a84c' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;}
-.field-sel:focus{border-color:var(--gold);outline:none;}
-.field-sel option{background:var(--navy-mid);}
-.form-sep{display:flex;align-items:center;gap:10px;margin:1.1rem 0;}
-.form-sep span{font-family:'Barlow Condensed',sans-serif;font-size:.63rem;letter-spacing:2.5px;color:var(--gold-dim);text-transform:uppercase;white-space:nowrap;}
-.form-sep::before,.form-sep::after{content:'';flex:1;height:1px;background:var(--border);}
-.btn-full{width:100%;background:var(--gold);color:var(--navy);border:none;border-radius:3px;padding:12px;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:3px;cursor:pointer;transition:all .2s;margin-bottom:.75rem;}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.f3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.field-sel{width:100%;background:#fff;border:1px solid var(--border-l);border-radius:4px;color:var(--text);font-family:'Barlow',sans-serif;font-size:.9rem;padding:10px 13px;outline:none;appearance:none;-webkit-appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23c9a84c' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;transition:border-color .2s;}
+.field-sel:focus{border-color:var(--gold);outline:none;box-shadow:0 0 0 3px rgba(201,168,76,.12);}
+.field-sel option{background:#fff;color:var(--text);}
+.form-sep{display:flex;align-items:center;gap:12px;margin:1.25rem 0;}
+.form-sep span{font-family:'Barlow Condensed',sans-serif;font-size:.65rem;letter-spacing:2.5px;color:var(--text3);text-transform:uppercase;white-space:nowrap;font-weight:600;}
+.form-sep::before,.form-sep::after{content:'';flex:1;height:1px;background:var(--border-l);}
+.resume-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.btn-full{width:100%;background:var(--gold);color:var(--navy);border:none;border-radius:4px;padding:14px;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:3px;cursor:pointer;transition:all .2s;margin-bottom:.85rem;font-weight:700;}
 .btn-full:hover{background:var(--gold-light);transform:translateY(-1px);box-shadow:0 5px 20px rgba(201,168,76,.3);}
-.btn-full-out{width:100%;background:transparent;color:var(--gray);border:1px solid rgba(201,168,76,.2);border-radius:3px;padding:10px;font-family:'Barlow Condensed',sans-serif;font-size:.8rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;}
-.btn-full-out:hover{color:var(--white);border-color:var(--gold);}
-.auth-agree{font-size:.72rem;color:var(--gray);line-height:1.6;margin-bottom:1rem;}
-.auth-agree a{color:var(--gold);text-decoration:none;}
+.btn-full-out{width:100%;background:#fff;color:var(--text3);border:1px solid var(--border-l);border-radius:4px;padding:11px;font-family:'Barlow Condensed',sans-serif;font-size:.85rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.btn-full-out:hover{color:var(--text);border-color:var(--navy);}
+.auth-agree{font-size:.76rem;color:var(--text3);line-height:1.6;margin-bottom:1.1rem;}
+.auth-agree a{color:var(--gold-dim);text-decoration:underline;}
 .tab-pane{display:none;}
 .tab-pane.active{display:block;}
 .add-link{text-align:right;margin-top:3px;}
-.add-link a{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:1.5px;color:var(--gold);cursor:pointer;text-transform:uppercase;}
+.add-link a{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:1.5px;color:var(--gold-dim);cursor:pointer;text-transform:uppercase;text-decoration:underline;}
 
-/* ════════════ DASHBOARD ════════════ */
-.dash-hero{background:linear-gradient(135deg,var(--navy-mid) 0%,var(--navy-light) 100%);border-bottom:2px solid var(--gold);padding:2rem;flex-shrink:0;}
+/* ════════ DASHBOARD ════════ */
+.dash-hero{background:linear-gradient(135deg,var(--navy-mid) 0%,var(--navy-light) 100%);border-bottom:3px solid var(--gold);padding:2rem;flex-shrink:0;}
 .dash-hero-inner{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:1.5rem;flex-wrap:wrap;}
-.dash-greeting{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:2px;}
+.dash-greeting{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:2px;color:#fff;}
 .dash-greeting span{color:var(--gold);}
-.dash-sub{font-size:.82rem;color:var(--gray-light);margin-top:4px;}
-.dash-ref{font-family:'Barlow Condensed',sans-serif;font-size:.75rem;letter-spacing:2px;color:var(--gray);background:rgba(201,168,76,.08);border:1px solid var(--border);border-radius:3px;padding:8px 16px;}
+.dash-sub{font-size:.83rem;color:#c8d0df;margin-top:4px;}
+.dash-ref{font-family:'Barlow Condensed',sans-serif;font-size:.75rem;letter-spacing:2px;color:#8a9ab5;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.25);border-radius:3px;padding:8px 16px;}
 .dash-ref strong{color:var(--gold);}
 .dash-main{max-width:1100px;margin:0 auto;padding:2rem 1.5rem 4rem;}
 
-/* progress pipeline */
-.pipeline{display:flex;align-items:flex-start;gap:0;margin-bottom:2.5rem;overflow-x:auto;padding-bottom:.5rem;}
-.pipe-step{display:flex;flex-direction:column;align-items:center;flex:1;min-width:100px;position:relative;}
-.pipe-circle{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;border:2px solid var(--navy-light);background:var(--navy);transition:all .3s;flex-shrink:0;}
-.pipe-circle.done{background:var(--success);border-color:var(--success);}
-.pipe-circle.active{background:var(--gold);border-color:var(--gold);}
-.pipe-circle.locked{opacity:.4;}
-.pipe-title{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-top:8px;text-align:center;}
-.pipe-status{font-size:.65rem;color:var(--gray);text-align:center;margin-top:2px;}
+/* PIPELINE */
+.pipeline{display:flex;align-items:flex-start;gap:0;margin-bottom:2.5rem;background:var(--surface);border:1px solid var(--border-l);border-radius:6px;padding:1.5rem;box-shadow:0 1px 6px rgba(0,0,0,.06);overflow-x:auto;}
+.pipe-step{display:flex;flex-direction:column;align-items:center;flex:1;min-width:90px;}
+.pipe-circle{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;border:2px solid var(--border-l);background:var(--bg);transition:all .3s;flex-shrink:0;}
+.pipe-circle.done{background:var(--success);border-color:var(--success);color:#fff;}
+.pipe-circle.active{background:var(--gold);border-color:var(--gold);color:var(--navy);}
+.pipe-circle.locked{opacity:.45;}
+.pipe-title{font-family:'Barlow Condensed',sans-serif;font-size:.68rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2);margin-top:8px;text-align:center;}
+.pipe-status{font-size:.65rem;color:var(--text3);text-align:center;margin-top:2px;}
 .pipe-status.done-txt{color:var(--success);}
-.pipe-status.active-txt{color:var(--gold);}
-.pipe-connector{flex:1;height:2px;background:var(--navy-light);margin-top:24px;transition:background .3s;}
+.pipe-status.active-txt{color:var(--gold-dim);}
+.pipe-connector{flex:1;height:2px;background:var(--border-l);margin-top:23px;transition:background .3s;}
 .pipe-connector.done{background:var(--success);}
 
-/* dashboard cards */
-.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem;}
-.dash-card{background:rgba(17,34,64,.6);border:1px solid var(--border);border-radius:4px;overflow:hidden;backdrop-filter:blur(6px);}
-.dash-card-head{background:rgba(201,168,76,.1);border-bottom:1px solid var(--border);padding:.75rem 1.25rem;display:flex;justify-content:space-between;align-items:center;}
+/* DASH CARDS */
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.25rem;}
+.dash-card{background:var(--surface);border:1px solid var(--border-l);border-radius:6px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.06);}
+.dash-card-head{background:var(--navy);border-bottom:1px solid rgba(201,168,76,.2);padding:.8rem 1.25rem;display:flex;justify-content:space-between;align-items:center;}
 .dash-card-title{font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:2px;color:var(--gold);}
 .dash-card-badge{font-family:'Barlow Condensed',sans-serif;font-size:.65rem;letter-spacing:2px;text-transform:uppercase;padding:3px 10px;border-radius:20px;border:1px solid;}
 .badge-pending{color:var(--warn);border-color:var(--warn);background:rgba(230,126,34,.1);}
 .badge-done{color:var(--success);border-color:var(--success);background:rgba(39,174,96,.1);}
-.badge-todo{color:var(--gray);border-color:var(--gray);background:rgba(138,154,181,.1);}
+.badge-todo{color:#8a9ab5;border-color:#c8d0df;background:#f0f2f8;}
 .dash-card-body{padding:1.25rem;}
-.dash-continue-btn{display:inline-flex;align-items:center;gap:6px;background:var(--gold);color:var(--navy);border:none;border-radius:3px;padding:9px 20px;font-family:'Barlow Condensed',sans-serif;font-size:.75rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;margin-top:.75rem;}
+.dash-card-body p{font-size:.84rem;color:var(--text2);line-height:1.6;}
+.dash-continue-btn{display:inline-flex;align-items:center;gap:6px;background:var(--gold);color:var(--navy);border:none;border-radius:4px;padding:9px 20px;font-family:'Barlow Condensed',sans-serif;font-size:.77rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;margin-top:.75rem;font-weight:700;}
 .dash-continue-btn:hover{background:var(--gold-light);}
-.dash-outline-btn{display:inline-flex;align-items:center;gap:6px;background:transparent;color:var(--gold);border:1px solid rgba(201,168,76,.3);border-radius:3px;padding:8px 18px;font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;margin-top:.75rem;}
-.dash-outline-btn:hover{background:rgba(201,168,76,.08);}
+.dash-outline-btn{display:inline-flex;align-items:center;gap:6px;background:#fff;color:var(--gold-dim);border:1px solid rgba(201,168,76,.4);border-radius:4px;padding:8px 18px;font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;margin-top:.75rem;}
+.dash-outline-btn:hover{background:#fffbf2;}
 
-/* doc upload grid */
+/* DOC UPLOADS */
 .doc-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
-.doc-item{background:rgba(255,255,255,.03);border:1px solid rgba(201,168,76,.15);border-radius:3px;padding:1rem;position:relative;overflow:hidden;}
-.doc-item-title{font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:.4rem;}
-.doc-item-desc{font-size:.72rem;color:var(--gray);margin-bottom:.75rem;line-height:1.5;}
-.doc-upload-btn{display:flex;align-items:center;gap:6px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.25);border-radius:3px;padding:7px 14px;font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
-.doc-upload-btn:hover{background:rgba(201,168,76,.15);}
+.doc-item{background:var(--surface2);border:1px solid var(--border-l);border-radius:4px;padding:1rem;}
+.doc-item-title{font-family:'Barlow Condensed',sans-serif;font-size:.74rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--navy-mid);margin-bottom:.4rem;font-weight:700;}
+.doc-item-desc{font-size:.74rem;color:var(--text3);margin-bottom:.75rem;line-height:1.5;}
+.doc-upload-btn{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--border-l);border-radius:4px;padding:8px 14px;font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2);cursor:pointer;transition:all .2s;position:relative;overflow:hidden;width:fit-content;}
+.doc-upload-btn:hover{border-color:var(--gold);color:var(--gold-dim);}
 .doc-upload-btn input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;border:none;}
-.doc-uploaded-tag{display:inline-flex;align-items:center;gap:5px;font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:1px;color:var(--success);margin-top:.5rem;}
+.doc-uploaded-tag{display:inline-flex;align-items:center;gap:5px;font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:1px;color:var(--success);margin-top:.5rem;}
 
-/* ════════════ JOB QUESTIONS (PAGE 4) ════════════ */
-.q-card{background:rgba(17,34,64,.55);border:1px solid var(--border);border-radius:4px;padding:1.5rem;margin-bottom:1.25rem;backdrop-filter:blur(6px);}
-.q-card-text{font-size:.88rem;color:var(--white);line-height:1.65;margin-bottom:.9rem;font-weight:500;}
-.q-card-text em{font-size:.8rem;color:var(--gray);font-weight:300;}
+/* JOB QUESTIONS */
+.q-card{background:var(--surface);border:1px solid var(--border-l);border-radius:6px;padding:1.4rem;margin-bottom:1.1rem;box-shadow:0 1px 5px rgba(0,0,0,.05);}
+.q-card-text{font-size:.9rem;color:var(--text);line-height:1.65;margin-bottom:.9rem;font-weight:500;}
 
-/* ════════════ AI INTERVIEWER (PAGE 5) ════════════ */
+/* AI INTERVIEW */
 .interview-wrap{max-width:780px;margin:0 auto;padding:2rem 1.25rem 4rem;display:flex;flex-direction:column;gap:1.25rem;}
-.interviewer-card{background:rgba(17,34,64,.7);border:1px solid var(--border);border-radius:8px;overflow:hidden;backdrop-filter:blur(10px);}
-.interviewer-header{background:linear-gradient(90deg,rgba(201,168,76,.15) 0%,transparent 100%);border-bottom:1px solid var(--border);padding:1.25rem 1.5rem;display:flex;align-items:center;gap:14px;}
+.interviewer-card{background:var(--surface);border:1px solid var(--border-l);border-radius:8px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08);}
+.interviewer-header{background:var(--navy);border-bottom:1px solid rgba(201,168,76,.2);padding:1.25rem 1.5rem;display:flex;align-items:center;gap:14px;}
 .ai-avatar{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--gold) 0%,var(--gold-dim) 100%);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;border:2px solid rgba(201,168,76,.4);}
-.ai-name{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:2px;}
+.ai-name{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:2px;color:#fff;}
 .ai-status{font-size:.75rem;color:var(--gold);font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;display:flex;align-items:center;gap:5px;}
 .ai-status::before{content:'';width:7px;height:7px;background:var(--success);border-radius:50%;display:inline-block;animation:pulse 1.5s infinite;}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.chat-area{height:420px;overflow-y:auto;padding:1.5rem;display:flex;flex-direction:column;gap:1rem;scroll-behavior:smooth;}
+.chat-area{height:400px;overflow-y:auto;padding:1.5rem;display:flex;flex-direction:column;gap:1rem;scroll-behavior:smooth;background:var(--bg);}
 .msg{display:flex;gap:10px;animation:msgIn .25s ease;}
 @keyframes msgIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
 .msg.ai{align-items:flex-start;}
 .msg.user{align-items:flex-start;flex-direction:row-reverse;}
-.msg-bubble{max-width:78%;padding:.85rem 1.1rem;border-radius:6px;font-size:.87rem;line-height:1.65;}
-.msg.ai .msg-bubble{background:rgba(26,52,96,.8);border:1px solid rgba(201,168,76,.18);color:var(--white);border-radius:0 6px 6px 6px;}
-.msg.user .msg-bubble{background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.25);color:var(--white);border-radius:6px 0 6px 6px;}
+.msg-bubble{max-width:78%;padding:.85rem 1.1rem;border-radius:6px;font-size:.88rem;line-height:1.65;}
+.msg.ai .msg-bubble{background:var(--surface);border:1px solid var(--border-l);color:var(--text);border-radius:0 6px 6px 6px;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+.msg.user .msg-bubble{background:var(--navy);color:#fff;border-radius:6px 0 6px 6px;}
 .msg-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;margin-top:2px;}
-.msg.ai .msg-avatar{background:linear-gradient(135deg,var(--gold),var(--gold-dim));border:1px solid rgba(201,168,76,.4);}
-.msg.user .msg-avatar{background:var(--navy-light);border:1px solid var(--border);}
+.msg.ai .msg-avatar{background:var(--gold);border:1px solid rgba(201,168,76,.4);}
+.msg.user .msg-avatar{background:var(--navy-light);border:1px solid rgba(201,168,76,.3);}
 .typing-indicator{display:flex;gap:5px;align-items:center;padding:.85rem 1.1rem;}
 .typing-dot{width:8px;height:8px;background:var(--gold);border-radius:50%;animation:typingBounce 1.2s infinite;}
 .typing-dot:nth-child(2){animation-delay:.2s;}
 .typing-dot:nth-child(3){animation-delay:.4s;}
 @keyframes typingBounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
-.chat-input-area{border-top:1px solid var(--border);padding:1rem 1.5rem;display:flex;gap:10px;align-items:flex-end;}
-.chat-input{flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(201,168,76,.25);border-radius:6px;color:var(--white);font-family:'Barlow',sans-serif;font-size:.9rem;padding:10px 14px;outline:none;resize:none;min-height:44px;max-height:120px;line-height:1.5;transition:border-color .2s;}
-.chat-input:focus{border-color:var(--gold);}
-.chat-input::placeholder{color:rgba(138,154,181,.4);}
+.chat-input-area{border-top:1px solid var(--border-l);padding:1rem 1.5rem;display:flex;gap:10px;align-items:flex-end;background:var(--surface);}
+.chat-input{flex:1;background:var(--bg);border:1px solid var(--border-l);border-radius:6px;color:var(--text);font-family:'Barlow',sans-serif;font-size:.9rem;padding:10px 14px;outline:none;resize:none;min-height:44px;max-height:120px;line-height:1.5;transition:border-color .2s;}
+.chat-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.1);}
+.chat-input::placeholder{color:#aab2c8;}
 .send-btn{background:var(--gold);color:var(--navy);border:none;border-radius:6px;width:44px;height:44px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;transition:all .2s;flex-shrink:0;}
 .send-btn:hover{background:var(--gold-light);transform:scale(1.05);}
 .send-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
 .interview-meta{display:flex;gap:1rem;flex-wrap:wrap;}
-.meta-card{flex:1;min-width:160px;background:rgba(17,34,64,.6);border:1px solid var(--border);border-radius:4px;padding:1rem;text-align:center;}
-.meta-num{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:2px;color:var(--gold);}
-.meta-label{font-family:'Barlow Condensed',sans-serif;font-size:.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin-top:2px;}
-.interview-complete{background:rgba(39,174,96,.08);border:1px solid rgba(39,174,96,.3);border-radius:4px;padding:1.5rem;text-align:center;display:none;}
+.meta-card{flex:1;min-width:140px;background:var(--surface);border:1px solid var(--border-l);border-radius:6px;padding:1rem;text-align:center;box-shadow:0 1px 5px rgba(0,0,0,.05);}
+.meta-num{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:2px;color:var(--navy);}
+.meta-label{font-family:'Barlow Condensed',sans-serif;font-size:.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:2px;}
+.interview-complete{background:#edfaf2;border:1px solid rgba(39,174,96,.3);border-radius:6px;padding:1.5rem;text-align:center;display:none;}
 .interview-complete.show{display:block;}
 .interview-complete h3{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;color:var(--success);margin-bottom:.75rem;}
-.interview-complete p{font-size:.85rem;color:var(--gray-light);line-height:1.7;}
+.interview-complete p{font-size:.86rem;color:var(--text2);line-height:1.7;}
 
 /* SUCCESS */
-.success-screen{flex:1;display:flex;align-items:center;justify-content:center;padding:4rem 2rem;}
+.success-screen{flex:1;display:flex;align-items:center;justify-content:center;padding:4rem 2rem;background:var(--bg);}
 .success-box{text-align:center;max-width:520px;}
 .success-icon{font-size:4rem;margin-bottom:1.5rem;display:block;animation:popIn .4s ease;}
 @keyframes popIn{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
-.success-title{font-family:'Bebas Neue',sans-serif;font-size:2.6rem;letter-spacing:3px;color:var(--gold);margin-bottom:1rem;}
-.success-text{font-size:.9rem;color:var(--gray-light);line-height:1.8;margin-bottom:.5rem;}
-.ref-badge{display:inline-block;background:rgba(201,168,76,.1);border:1px solid var(--border);border-radius:3px;padding:10px 28px;font-family:'Barlow Condensed',sans-serif;letter-spacing:3px;color:var(--gold);font-size:1.1rem;margin:1rem 0 2rem;}
+.success-title{font-family:'Bebas Neue',sans-serif;font-size:2.6rem;letter-spacing:3px;color:var(--navy);margin-bottom:1rem;}
+.success-text{font-size:.92rem;color:var(--text2);line-height:1.8;margin-bottom:.5rem;}
+.ref-badge{display:inline-block;background:var(--navy);color:var(--gold);border-radius:4px;padding:12px 28px;font-family:'Barlow Condensed',sans-serif;letter-spacing:3px;font-size:1.1rem;margin:1rem 0 2rem;}
+
+/* STATE NOTICES */
+.state-notice-title{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:1.5px;color:var(--navy);margin-bottom:.5rem;margin-top:1rem;}
+.state-notice-item{margin-bottom:.75rem;}
+.state-notice-item strong{color:var(--text);font-size:.8rem;display:block;}
+.state-notice-item p{font-size:.76rem;color:var(--text2);line-height:1.7;margin-top:3px;}
 
 @media(max-width:860px){.left-panel{display:none;}.dash-grid{grid-template-columns:1fr;}.doc-grid{grid-template-columns:1fr;}}
-@media(max-width:640px){.g2,.g3{grid-template-columns:1fr;}.date-sep,.f2{grid-template-columns:1fr;}.action-bar{flex-direction:column;}.hq-info{display:none;}}
+@media(max-width:640px){.g2,.g3,.f2,.f3,.resume-btns,.date-sep{grid-template-columns:1fr;}.action-bar{flex-direction:column;}.hq-info{display:none;}}
 </style>
 </head>
 <body>
@@ -345,7 +358,22 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
      PAGE: LOGIN
 ══════════════════════════════════════════════════════ -->
 <div class="page active page-fade" id="page-login">
-  <div class="login-wrap" style="flex:1;">
+  <!-- Progress bubbles on login page -->
+  <div class="login-progress">
+    <div class="login-progress-inner">
+      <div class="prog-step"><div class="prog-circle active">1</div><div class="prog-label">Create Profile</div></div>
+      <div class="prog-line"></div>
+      <div class="prog-step"><div class="prog-circle">2</div><div class="prog-label">Application</div></div>
+      <div class="prog-line"></div>
+      <div class="prog-step"><div class="prog-circle">3</div><div class="prog-label">EEO</div></div>
+      <div class="prog-line"></div>
+      <div class="prog-step"><div class="prog-circle">4</div><div class="prog-label">Job Questions</div></div>
+      <div class="prog-line"></div>
+      <div class="prog-step"><div class="prog-circle">5</div><div class="prog-label">AI Interview</div></div>
+    </div>
+  </div>
+
+  <div class="login-wrap" style="flex:1;min-height:0;">
     <div class="left-panel">
       <div class="left-eyebrow">Security USA® Careers</div>
       <h1 class="left-title">Join the<br><span>Nation's</span><br>Premier<br>Security Team</h1>
@@ -359,6 +387,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
       </div>
       <div class="badges"><div class="badge">NY Licensed</div><div class="badge">BBB Accredited</div><div class="badge">NTAS Member</div></div>
     </div>
+
     <div class="right-panel">
       <div class="auth-card">
         <div class="tab-row">
@@ -366,10 +395,13 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
           <button class="tab-btn" onclick="switchTab('login')">Sign In</button>
         </div>
         <div class="card-body">
+
           <!-- REGISTER -->
           <div class="tab-pane active" id="pane-reg">
             <div class="card-title">Create Your Profile</div>
-            <div class="card-sub">All required fields are marked with *</div>
+            <div class="card-sub">Please enter your information below. All required fields are marked with *</div>
+
+            <div style="margin-bottom:.5rem;"><span class="auth-label">Connect Your Account</span></div>
             <div class="social-row">
               <button class="soc-btn">🍎 Apple</button>
               <button class="soc-btn">f Facebook</button>
@@ -378,55 +410,119 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
               <button class="soc-btn">⊞ Microsoft</button>
             </div>
             <div class="div-or"><span>or register with email</span></div>
+
             <div class="form-sep"><span>Resume</span></div>
             <div class="auth-field">
               <span class="auth-label">Upload Resume (Max 5MB)</span>
-              <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                <button class="soc-btn" style="flex:none;padding:8px 12px;" onclick="document.getElementById('rFile').click()">📁 My Computer</button>
-                <button class="soc-btn" style="flex:none;padding:8px 12px;">📂 Google Drive</button>
-                <button class="soc-btn" style="flex:none;padding:8px 12px;">📦 Dropbox</button>
-                <button class="soc-btn" style="flex:none;padding:8px 12px;">☁️ OneDrive</button>
-                <input type="file" id="rFile" accept=".pdf,.doc,.docx" style="display:none" onchange="this.previousElementSibling && null; document.getElementById('rFileName').textContent='✓ '+this.files[0].name;">
+              <div class="resume-btns">
+                <button class="soc-btn" style="padding:12px;" onclick="document.getElementById('rFile').click()">📁 My Computer</button>
+                <button class="soc-btn" style="padding:12px;">📂 Google Drive</button>
+                <button class="soc-btn" style="padding:12px;">📦 Dropbox</button>
+                <button class="soc-btn" style="padding:12px;">☁️ OneDrive</button>
+                <input type="file" id="rFile" accept=".pdf,.doc,.docx" style="display:none" onchange="document.getElementById('rFileName').textContent='✓ '+this.files[0].name;">
               </div>
-              <div id="rFileName" style="font-size:.72rem;color:var(--success);margin-top:4px;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;"></div>
+              <div id="rFileName" style="font-size:.74rem;color:var(--success);margin-top:6px;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;"></div>
             </div>
+
             <div class="form-sep"><span>Create a Login</span></div>
-            <div class="auth-field"><label class="auth-label">Email <span class="req">*</span></label><input type="email" id="rEmail" placeholder="yourname@email.com"></div>
+            <div class="auth-field">
+              <label class="auth-label">Login (Email) <span class="req">*</span></label>
+              <input type="email" id="rEmail" placeholder="yourname@email.com">
+            </div>
             <div class="f2">
-              <div class="auth-field" style="margin-bottom:0"><label class="auth-label">Password <span class="req">*</span></label><div class="pw-wrap"><input type="password" id="rPw" placeholder="••••••••"><button class="pw-toggle" onclick="tpw('rPw',this)">Show</button></div></div>
-              <div class="auth-field" style="margin-bottom:0"><label class="auth-label">Confirm <span class="req">*</span></label><div class="pw-wrap"><input type="password" id="rPw2" placeholder="••••••••"><button class="pw-toggle" onclick="tpw('rPw2',this)">Show</button></div></div>
+              <div class="auth-field" style="margin-bottom:0">
+                <label class="auth-label">Password <span class="req">*</span></label>
+                <div class="pw-wrap"><input type="password" id="rPw" placeholder="••••••••"><button class="pw-toggle" onclick="tpw('rPw',this)">Show</button></div>
+              </div>
+              <div class="auth-field" style="margin-bottom:0">
+                <label class="auth-label">Password (Re-enter) <span class="req">*</span></label>
+                <div class="pw-wrap"><input type="password" id="rPw2" placeholder="••••••••"><button class="pw-toggle" onclick="tpw('rPw2',this)">Show</button></div>
+              </div>
             </div>
-            <div class="form-sep"><span>Your Information</span></div>
-            <div class="f2" style="margin-bottom:.75rem;">
-              <div class="auth-field" style="margin-bottom:0"><label class="auth-label">First Name <span class="req">*</span></label><input type="text" id="rFirst" placeholder="First name"></div>
-              <div class="auth-field" style="margin-bottom:0"><label class="auth-label">Last Name <span class="req">*</span></label><input type="text" id="rLast" placeholder="Last name"></div>
+
+            <div class="form-sep"><span>Enter Your Information</span></div>
+            <div class="f3" style="margin-bottom:1.2rem;">
+              <div class="auth-field" style="margin-bottom:0">
+                <label class="auth-label">First Name <span class="req">*</span></label>
+                <input type="text" id="rFirst" placeholder="First name">
+              </div>
+              <div class="auth-field" style="margin-bottom:0">
+                <label class="auth-label">Middle Name</label>
+                <input type="text" placeholder="Middle">
+              </div>
+              <div class="auth-field" style="margin-bottom:0">
+                <label class="auth-label">Last Name <span class="req">*</span></label>
+                <input type="text" id="rLast" placeholder="Last name">
+              </div>
             </div>
-            <div class="auth-field"><label class="auth-label">Phone <span class="req">*</span></label><input type="tel" placeholder="(555) 000-0000"></div>
-            <div class="form-sep"><span>How Did You Hear About Us?</span></div>
+            <div class="auth-field">
+              <label class="auth-label">Email <span class="req">*</span></label>
+              <input type="email" placeholder="Confirm email address">
+            </div>
+
+            <div class="form-sep"><span>Phone(s) <span style="color:var(--red)">*</span></span></div>
+            <div class="f2" style="margin-bottom:6px;">
+              <select class="field-sel"><option value="">Type</option><option>Mobile</option><option>Home</option><option>Work</option><option>Other</option></select>
+              <input type="tel" placeholder="(555) 000-0000">
+            </div>
+            <div class="add-link" style="margin-bottom:.5rem;"><a>+ Add More (Phones)</a></div>
+
+            <div class="form-sep"><span>Address(es) <span style="color:var(--red)">*</span></span></div>
+            <div class="f2" style="margin-bottom:8px;">
+              <select class="field-sel"><option value="">Type</option><option>Home</option><option>Other</option><option>Work</option></select>
+              <input type="text" placeholder="Address *">
+            </div>
+            <div style="margin-bottom:8px;"><input type="text" placeholder="Address 2 (Apt, Suite...)"></div>
+            <div class="f2" style="margin-bottom:8px;">
+              <input type="text" placeholder="City *">
+              <input type="text" placeholder="ZIP / Postal Code *">
+            </div>
+            <div class="f2" style="margin-bottom:4px;">
+              <select class="field-sel"><option selected>United States</option><option>Canada</option><option>Other</option></select>
+              <select class="field-sel"><option value="">State / Province *</option><option>New York</option><option>New Jersey</option><option>Florida</option><option>Other</option></select>
+            </div>
+            <div class="add-link" style="margin-bottom:.5rem;"><a>+ Add More (Addresses)</a></div>
+
+            <div class="form-sep"><span>How Did You Hear About Us? <span style="color:var(--red)">*</span></span></div>
             <div class="f2">
               <select class="field-sel"><option value="">— Make a Selection —</option><option>Indeed</option><option>LinkedIn</option><option>Referral</option><option>Walk-In</option><option>Social Media</option><option>Other</option></select>
               <select class="field-sel"><option value="">Please select a source</option><option>Indeed</option><option>LinkedIn</option><option>ZipRecruiter</option><option>Employee Referral</option><option>Company Website</option><option>Other</option></select>
             </div>
-            <div style="margin-top:1.25rem;">
+
+            <div style="margin-top:1.75rem;">
               <p class="auth-agree">By proceeding you agree to Security USA's <a href="https://www.securityusainc.com/privacy-policy" target="_blank">Privacy Policy</a>.</p>
               <button class="btn-full" onclick="doRegister()">Create Profile &amp; Continue →</button>
               <button class="btn-full-out" onclick="switchTab('login')">Already have an account? Sign In</button>
             </div>
           </div>
+
           <!-- LOGIN -->
           <div class="tab-pane" id="pane-login">
             <div class="card-title">Welcome Back</div>
-            <div class="card-sub">Sign in to continue your application.</div>
+            <div class="card-sub">Sign in to check your application status or continue where you left off.</div>
             <div class="social-row">
-              <button class="soc-btn">🍎</button><button class="soc-btn">f</button><button class="soc-btn">G</button><button class="soc-btn">in</button><button class="soc-btn">⊞</button>
+              <button class="soc-btn">🍎 Apple</button>
+              <button class="soc-btn">f Facebook</button>
+              <button class="soc-btn">G Google</button>
+              <button class="soc-btn">in LinkedIn</button>
+              <button class="soc-btn">⊞ Microsoft</button>
             </div>
             <div class="div-or"><span>or sign in with email</span></div>
-            <div class="auth-field"><label class="auth-label">Email <span class="req">*</span></label><input type="email" id="lEmail" placeholder="yourname@email.com"></div>
-            <div class="auth-field"><label class="auth-label">Password <span class="req">*</span></label><div class="pw-wrap"><input type="password" id="lPw" placeholder="••••••••"><button class="pw-toggle" onclick="tpw('lPw',this)">Show</button></div></div>
-            <div style="text-align:right;margin:-4px 0 12px;"><a style="font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:1.5px;color:var(--gray);text-transform:uppercase;text-decoration:none;" href="#">Forgot password?</a></div>
+            <div class="auth-field">
+              <label class="auth-label">Email Address <span class="req">*</span></label>
+              <input type="email" id="lEmail" placeholder="yourname@email.com">
+            </div>
+            <div class="auth-field">
+              <label class="auth-label">Password <span class="req">*</span></label>
+              <div class="pw-wrap"><input type="password" id="lPw" placeholder="••••••••"><button class="pw-toggle" onclick="tpw('lPw',this)">Show</button></div>
+            </div>
+            <div style="text-align:right;margin:-6px 0 16px;">
+              <a style="font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:1.5px;color:var(--gray);text-transform:uppercase;text-decoration:none;" href="#">Forgot password?</a>
+            </div>
             <button class="btn-full" onclick="doLogin()">Sign In →</button>
             <button class="btn-full-out" onclick="switchTab('reg')">New applicant? Create an account</button>
           </div>
+
         </div>
       </div>
     </div>
@@ -477,55 +573,61 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
         </div>
         <div class="pipe-connector" id="conn4"></div>
         <div class="pipe-step">
-          <div class="pipe-circle locked" id="pipe5">🎤</div>
+          <div class="pipe-circle locked" id="pipe5">5</div>
           <div class="pipe-title">AI Interview</div>
           <div class="pipe-status" id="pipe5-status">Pending</div>
         </div>
       </div>
 
+      <!-- NEXT STEP BANNER -->
+      <div style="background:linear-gradient(90deg,var(--navy) 0%,var(--navy-light) 100%);border-radius:6px;padding:1.25rem 1.75rem;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;box-shadow:0 2px 10px rgba(0,0,0,.15);">
+        <div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:4px;">Next Step</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2px;color:#fff;" id="nextStepTitle">Step 2 — Employment Application</div>
+          <div style="font-size:.8rem;color:#c8d0df;margin-top:3px;" id="nextStepDesc">Complete your full employment application to continue.</div>
+        </div>
+        <button onclick="continueFlow()" style="background:var(--gold);color:var(--navy);border:none;border-radius:4px;padding:12px 30px;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .2s;">Continue →</button>
+      </div>
+
       <!-- CARDS -->
       <div class="dash-grid">
-        <!-- Application -->
         <div class="dash-card">
           <div class="dash-card-head">
-            <div class="dash-card-title">📋 Employment Application</div>
+            <div class="dash-card-title">Step 2 — Employment Application</div>
             <span class="dash-card-badge badge-pending" id="appBadge">In Progress</span>
           </div>
           <div class="dash-card-body">
-            <p style="font-size:.82rem;color:var(--gray-light);line-height:1.6;">Complete your full employment application including personal info, work history, education, and references.</p>
-            <button class="dash-continue-btn" onclick="showPage('page-application')">Continue Application →</button>
+            <p>Complete your full employment application including personal info, work history, education, and references.</p>
+            <button class="dash-continue-btn" onclick="showPage('page-application')">Continue →</button>
           </div>
         </div>
-        <!-- EEO -->
         <div class="dash-card">
           <div class="dash-card-head">
-            <div class="dash-card-title">⚖️ EEO Information</div>
+            <div class="dash-card-title">Step 3 — EEO Information</div>
             <span class="dash-card-badge badge-todo" id="eeoBadge">To Do</span>
           </div>
           <div class="dash-card-body">
-            <p style="font-size:.82rem;color:var(--gray-light);line-height:1.6;">Voluntary Equal Employment Opportunity information for federal compliance. Does not affect your eligibility.</p>
-            <button class="dash-continue-btn" onclick="showPage('page-eeo')">Complete EEO →</button>
+            <p>Voluntary Equal Employment Opportunity information for federal compliance. Does not affect your eligibility.</p>
+            <button class="dash-continue-btn" onclick="showPage('page-eeo')">Continue →</button>
           </div>
         </div>
-        <!-- Job Questions -->
         <div class="dash-card">
           <div class="dash-card-head">
-            <div class="dash-card-title">❓ Job Specific Questions</div>
+            <div class="dash-card-title">Step 4 — Job Specific Questions</div>
             <span class="dash-card-badge badge-todo" id="jqBadge">To Do</span>
           </div>
           <div class="dash-card-body">
-            <p style="font-size:.82rem;color:var(--gray-light);line-height:1.6;">Security-specific scenario questions to assess your judgment, knowledge, and professionalism on the job.</p>
-            <button class="dash-continue-btn" onclick="showPage('page-jobquestions')">Answer Questions →</button>
+            <p>Security-specific scenario questions to assess your judgment, knowledge, and professionalism on the job.</p>
+            <button class="dash-continue-btn" onclick="showPage('page-jobquestions')">Continue →</button>
           </div>
         </div>
-        <!-- AI Interview -->
         <div class="dash-card">
           <div class="dash-card-head">
-            <div class="dash-card-title">🎤 AI Screening Interview</div>
+            <div class="dash-card-title">Step 5 — AI Screening Interview</div>
             <span class="dash-card-badge badge-todo" id="aiBadge">To Do</span>
           </div>
           <div class="dash-card-body">
-            <p style="font-size:.82rem;color:var(--gray-light);line-height:1.6;">A conversational AI screening interview. Answer questions about your background, experience, and availability.</p>
+            <p>A conversational AI screening interview covering your background, experience, licenses, and availability.</p>
             <button class="dash-continue-btn" onclick="startInterview()">Begin Interview →</button>
           </div>
         </div>
@@ -534,92 +636,92 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
       <!-- DOCUMENT UPLOADS -->
       <div class="dash-card" style="margin-bottom:1.5rem;">
         <div class="dash-card-head">
-          <div class="dash-card-title">📎 Required Documents</div>
+          <div class="dash-card-title">Required Documents — Upload</div>
           <span class="dash-card-badge badge-pending">Upload Required</span>
         </div>
         <div class="dash-card-body">
-          <p style="font-size:.82rem;color:var(--gray-light);line-height:1.6;margin-bottom:1.25rem;">Please upload clear, legible copies of all applicable documents. Accepted: PDF, JPG, PNG — Max 10MB each.</p>
+          <p style="font-size:.84rem;color:var(--text2);line-height:1.6;margin-bottom:1.25rem;">Please upload clear, legible copies of all applicable documents. Accepted: PDF, JPG, PNG — Max 10MB each.</p>
           <div class="doc-grid">
 
             <div class="doc-item">
-              <div class="doc-item-title">🪪 Social Security Card or Passport</div>
+              <div class="doc-item-title">Social Security Card or Passport</div>
               <div class="doc-item-desc">Government-issued proof of identity and eligibility to work in the U.S.</div>
               <label class="doc-upload-btn"><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded(this,'ssn-tag')"> 📤 Upload Document</label>
               <div id="ssn-tag" class="doc-uploaded-tag" style="display:none;">✓ Uploaded</div>
             </div>
 
             <div class="doc-item">
-              <div class="doc-item-title">🪪 State-Issued Photo ID</div>
+              <div class="doc-item-title">State-Issued Photo ID</div>
               <div class="doc-item-desc">New York State driver's license or state ID (front and back).</div>
               <label class="doc-upload-btn"><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded(this,'stateid-tag')"> 📤 Upload Document</label>
               <div id="stateid-tag" class="doc-uploaded-tag" style="display:none;">✓ Uploaded</div>
             </div>
 
             <div class="doc-item">
-              <div class="doc-item-title">🛡️ NY Security Guard License</div>
+              <div class="doc-item-title">NY Security Guard License</div>
               <div class="doc-item-desc">Valid NYS Security Guard License issued by the Dept. of State (front and back).</div>
               <label class="doc-upload-btn"><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded(this,'guard-tag')"> 📤 Upload Document</label>
               <div id="guard-tag" class="doc-uploaded-tag" style="display:none;">✓ Uploaded</div>
             </div>
 
             <div class="doc-item">
-              <div class="doc-item-title">🔥 F-01 — Fire Guard (Torch Operations)</div>
+              <div class="doc-item-title">F-01 — Fire Guard (Torch Operations)</div>
               <div class="doc-item-desc">FDNY Certificate of Fitness — F-01 Torch Operations fire guard.</div>
               <label class="doc-upload-btn"><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded(this,'f01-tag')"> 📤 Upload Certificate</label>
               <div id="f01-tag" class="doc-uploaded-tag" style="display:none;">✓ Uploaded</div>
             </div>
 
             <div class="doc-item">
-              <div class="doc-item-title">🔥 F-02 — Fire Guard (Impairment)</div>
+              <div class="doc-item-title">F-02 — Fire Guard (Impairment)</div>
               <div class="doc-item-desc">FDNY Certificate of Fitness — F-02 Fire Guard for Impaired Fire Protection Systems.</div>
               <label class="doc-upload-btn"><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded(this,'f02-tag')"> 📤 Upload Certificate</label>
               <div id="f02-tag" class="doc-uploaded-tag" style="display:none;">✓ Uploaded</div>
             </div>
 
             <div class="doc-item">
-              <div class="doc-item-title">🔥 F-03 — Fire Guard (Premises)</div>
+              <div class="doc-item-title">F-03 — Fire Guard (Premises)</div>
               <div class="doc-item-desc">FDNY Certificate of Fitness — F-03 Fire Guard for Premises.</div>
               <label class="doc-upload-btn"><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded(this,'f03-tag')"> 📤 Upload Certificate</label>
               <div id="f03-tag" class="doc-uploaded-tag" style="display:none;">✓ Uploaded</div>
             </div>
 
             <div class="doc-item">
-              <div class="doc-item-title">🔥 F-04 — Fire Guard (Explosives)</div>
+              <div class="doc-item-title">F-04 — Fire Guard (Explosives)</div>
               <div class="doc-item-desc">FDNY Certificate of Fitness — F-04 Fire Guard for Blasting / Explosives.</div>
               <label class="doc-upload-btn"><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded(this,'f04-tag')"> 📤 Upload Certificate</label>
               <div id="f04-tag" class="doc-uploaded-tag" style="display:none;">✓ Uploaded</div>
             </div>
 
             <div class="doc-item">
-              <div class="doc-item-title">🏢 F-89 — Fire Life Safety Director</div>
+              <div class="doc-item-title">F-89 — Fire Life Safety Director (FLSD)</div>
               <div class="doc-item-desc">FDNY Certificate of Fitness — F-89 Fire and Life Safety Director (FLSD).</div>
               <label class="doc-upload-btn"><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded(this,'f89-tag')"> 📤 Upload Certificate</label>
               <div id="f89-tag" class="doc-uploaded-tag" style="display:none;">✓ Uploaded</div>
             </div>
 
             <div class="doc-item">
-              <div class="doc-item-title">🏢 T-89 — Fire Life Safety Director (Deputy)</div>
+              <div class="doc-item-title">T-89 — Deputy Fire Safety Director</div>
               <div class="doc-item-desc">FDNY Certificate of Fitness — T-89 Deputy Fire Safety Director.</div>
               <label class="doc-upload-btn"><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded(this,'t89-tag')"> 📤 Upload Certificate</label>
               <div id="t89-tag" class="doc-uploaded-tag" style="display:none;">✓ Uploaded</div>
             </div>
 
             <div class="doc-item">
-              <div class="doc-item-title">🏢 Z-89 — Fire Safety / EAP Director</div>
+              <div class="doc-item-title">Z-89 — Fire Safety / EAP Director</div>
               <div class="doc-item-desc">FDNY Certificate of Fitness — Z-89 Fire Safety / EAP Director for Large Buildings.</div>
               <label class="doc-upload-btn"><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded(this,'z89-tag')"> 📤 Upload Certificate</label>
               <div id="z89-tag" class="doc-uploaded-tag" style="display:none;">✓ Uploaded</div>
             </div>
 
             <div class="doc-item">
-              <div class="doc-item-title">🏥 CPR / First Aid Certificate</div>
+              <div class="doc-item-title">CPR / First Aid Certificate</div>
               <div class="doc-item-desc">Current, valid CPR and/or First Aid certification.</div>
               <label class="doc-upload-btn"><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded(this,'cpr-tag')"> 📤 Upload Certificate</label>
               <div id="cpr-tag" class="doc-uploaded-tag" style="display:none;">✓ Uploaded</div>
             </div>
 
             <div class="doc-item">
-              <div class="doc-item-title">📋 Additional Certifications</div>
+              <div class="doc-item-title">Additional Certifications</div>
               <div class="doc-item-desc">Any other relevant certificates (OSHA, Armed Permit, etc.).</div>
               <label class="doc-upload-btn"><input type="file" accept=".pdf,.jpg,.jpeg,.png" multiple onchange="markUploaded(this,'other-tag')"> 📤 Upload Files</label>
               <div id="other-tag" class="doc-uploaded-tag" style="display:none;">✓ Uploaded</div>
@@ -652,7 +754,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
   <div class="page-title-bar"><h1>Security Guard — NY</h1><p>US · NY · Port Washington &nbsp;|&nbsp; Candidate Forms — Step 2</p></div>
   <div class="main-scroll"><div class="main">
     <div class="action-bar">
-      <button class="btn btn-save" onclick="showPage('page-dashboard')">← Dashboard</button>
+      <button class="btn btn-save" onclick="showPage('page-dashboard')">Save Progress</button>
       <button class="btn btn-gold" onclick="goToEEO()">Next: EEO →</button>
     </div>
     <div class="notice-box"><p><strong>EMPLOYMENT APPLICATION</strong></p><p style="margin-top:.5rem;">We are committed to Equal Employment Opportunity. Please provide complete information — an incomplete application may affect your consideration for employment.</p></div>
@@ -743,7 +845,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
     </div></div>
 
     <div class="action-bar action-bar-bottom">
-      <button class="btn btn-save" onclick="showPage('page-dashboard')">← Dashboard</button>
+      <button class="btn btn-save" onclick="showPage('page-dashboard')">Save Progress</button>
       <button class="btn btn-gold" onclick="goToEEO()">Next: EEO →</button>
     </div>
   </div></div>
@@ -808,7 +910,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
   <div class="page-title-bar"><h1>Security Guard — NY</h1><p>US · NY · Port Washington &nbsp;|&nbsp; Job Specific Questions — Step 4</p></div>
   <div class="main-scroll"><div class="main">
     <div class="action-bar">
-      <button class="btn btn-save" onclick="showPage('page-dashboard')">← Dashboard</button>
+      <button class="btn btn-save" onclick="showPage('page-dashboard')">Save Progress</button>
       <button class="btn btn-gold" onclick="goToInterview()">Next: AI Interview →</button>
     </div>
     <div class="notice-box">* Required field. &nbsp;|&nbsp; Please select the best answer for each scenario question.</div>
@@ -1022,7 +1124,7 @@ function loginSuccess(){
   document.getElementById('dashRef').textContent=userRef;
   document.getElementById('finalRef').textContent='REF # '+userRef;
   document.getElementById('completeName').textContent=userName.split(' ')[0];
-  showPage('page-dashboard');
+  showPage('page-application'); // Linear flow: start at step 2
 }
 function doLogout(){
   document.getElementById('headerUser').style.display='none';
@@ -1031,15 +1133,44 @@ function doLogout(){
 }
 
 // ══════════ FORM FLOW ══════════
+// ══════════ LINEAR FLOW ══════════
+let currentStep = 2; // 2=application, 3=eeo, 4=jobq, 5=interview
+
+const stepConfig = {
+  2: { title:'Step 2 — Employment Application', desc:'Complete your full employment application to continue.', page:'page-application' },
+  3: { title:'Step 3 — EEO Information', desc:'Complete the voluntary EEO form to continue.', page:'page-eeo' },
+  4: { title:'Step 4 — Job Specific Questions', desc:'Answer the security scenario questions to continue.', page:'page-jobquestions' },
+  5: { title:'Step 5 — AI Screening Interview', desc:'Complete your AI screening interview — the final step!', page:'page-interview' }
+};
+
+function continueFlow() {
+  const s = stepConfig[currentStep];
+  if (!s) return;
+  if (currentStep === 5) { showPage('page-interview'); if(!interviewStarted) initInterview(); }
+  else showPage(s.page);
+}
+
+function updateDashboard(completedStep) {
+  currentStep = completedStep + 1;
+  const next = stepConfig[currentStep];
+  if (next) {
+    document.getElementById('nextStepTitle').textContent = next.title;
+    document.getElementById('nextStepDesc').textContent = next.desc;
+  } else {
+    document.getElementById('nextStepTitle').textContent = 'Application Complete!';
+    document.getElementById('nextStepDesc').textContent = 'All steps have been submitted. Our team will be in touch soon.';
+  }
+}
+
 function goToEEO(){
   if(!document.getElementById('appSig').checked){
     alert('Please initial all sections and check the Signature box before continuing.');
     document.getElementById('appSig').scrollIntoView({behavior:'smooth',block:'center'});return;
   }
-  markStep(2);showPage('page-eeo');
+  markStep(2); showPage('page-eeo');
 }
-function goToJobQ(){markStep(3);showPage('page-jobquestions');}
-function goToInterview(){markStep(4);showPage('page-interview');if(!interviewStarted)initInterview();}
+function goToJobQ(){ markStep(3); showPage('page-jobquestions'); }
+function goToInterview(){ markStep(4); showPage('page-interview'); if(!interviewStarted) initInterview(); }
 
 function markStep(n){
   const map={2:['pipe2','conn2','appBadge'],3:['pipe3','conn3','eeoBadge'],4:['pipe4','conn4','jqBadge']};
@@ -1048,10 +1179,10 @@ function markStep(n){
     const c=document.getElementById(pc);if(c){c.className='prog-circle done';c.textContent='✓';}
     const l=document.getElementById(cn);if(l)l.classList.add('done');
     const b=document.getElementById(bd);if(b){b.className='dash-card-badge badge-done';b.textContent='Complete';}
-    // activate next
     const next=n+1;
     const nextPipe=document.getElementById('pipe'+next);
     if(nextPipe&&!nextPipe.classList.contains('done')){nextPipe.classList.remove('locked');nextPipe.classList.add('active');}
+    updateDashboard(n);
   }
 }
 
