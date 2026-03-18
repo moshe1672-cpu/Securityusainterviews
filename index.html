@@ -158,22 +158,13 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
 /* ════════ LOGIN PAGE ════════ */
 .login-progress{background:var(--surface);border-bottom:1px solid var(--border-l);padding:1rem 2rem;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,.06);}
 .login-progress-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;justify-content:center;}
-.login-wrap{display:flex;flex:1;min-height:0;}
+.login-wrap{display:flex;flex:1;min-height:0;justify-content:center;}
 /* LEFT PANEL — stays dark */
-.left-panel{width:38%;background:linear-gradient(160deg,var(--navy-light) 0%,var(--navy-mid) 60%,var(--navy) 100%);border-right:1px solid rgba(201,168,76,.2);padding:3rem;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden;flex-shrink:0;}
-.left-panel::before{content:'🛡';position:absolute;font-size:20rem;bottom:-4rem;right:-5rem;opacity:.04;pointer-events:none;}
-.left-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:4px;color:var(--gold);text-transform:uppercase;margin-bottom:1rem;}
-.left-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,3.5vw,3rem);letter-spacing:2px;color:#fff;line-height:1.05;margin-bottom:1.25rem;}
-.left-title span{color:var(--gold);}
-.left-body{font-size:.88rem;color:#c8d0df;line-height:1.8;font-weight:300;max-width:340px;margin-bottom:2rem;}
-.bullets{display:flex;flex-direction:column;gap:10px;}
-.bullet{display:flex;align-items:center;gap:12px;font-size:.83rem;color:#c8d0df;}
-.bullet-dot{width:6px;height:6px;background:var(--gold);border-radius:50%;flex-shrink:0;}
-.badges{display:flex;gap:10px;margin-top:2rem;flex-wrap:wrap;}
-.badge{background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.3);border-radius:3px;padding:5px 12px;font-family:'Barlow Condensed',sans-serif;font-size:.65rem;letter-spacing:2px;color:var(--gold-dim);text-transform:uppercase;}
-/* RIGHT PANEL — white */
-.right-panel{flex:1;overflow-y:auto;padding:2.5rem 3rem;display:flex;flex-direction:column;align-items:center;background:var(--bg);}
-.auth-card{width:100%;max-width:680px;}
+.left-panel{display:none !important;}
+.left-eyebrow,.left-title,.left-body,.bullets,.bullet,.bullet-dot,.badges,.badge{display:none;}
+/* RIGHT PANEL — full width white */
+.right-panel{flex:1;overflow-y:auto;padding:2.5rem 2rem;display:flex;flex-direction:column;align-items:center;background:var(--bg);}
+.auth-card{width:100%;max-width:780px;}
 .tab-row{display:flex;background:var(--surface2);border:1px solid var(--border-l);border-radius:6px 6px 0 0;overflow:hidden;}
 .tab-btn{flex:1;padding:14px;background:none;border:none;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:.88rem;letter-spacing:2px;text-transform:uppercase;color:var(--text3);transition:all .25s;position:relative;}
 .tab-btn.active{background:var(--surface);color:var(--navy);}
@@ -325,7 +316,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
 .state-notice-item strong{color:var(--text);font-size:.8rem;display:block;}
 .state-notice-item p{font-size:.76rem;color:var(--text2);line-height:1.7;margin-top:3px;}
 
-@media(max-width:860px){.left-panel{display:none;}.dash-grid{grid-template-columns:1fr;}.doc-grid{grid-template-columns:1fr;}}
+@media(max-width:860px){.left-panel{display:none !important;}.dash-grid{grid-template-columns:1fr;}.doc-grid{grid-template-columns:1fr;}}
 @media(max-width:640px){.g2,.g3,.f2,.f3,.resume-btns,.date-sep{grid-template-columns:1fr;}.action-bar{flex-direction:column;}.hq-info{display:none;}}
 </style>
 </head>
@@ -373,22 +364,15 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
     </div>
   </div>
 
-  <div class="login-wrap" style="flex:1;min-height:0;">
-    <div class="left-panel">
-      <div class="left-eyebrow">Security USA® Careers</div>
-      <h1 class="left-title">Join the<br><span>Nation's</span><br>Premier<br>Security Team</h1>
-      <p class="left-body">Create your candidate profile to apply for security positions across our NY, NJ, and FL operations.</p>
-      <div class="bullets">
-        <div class="bullet"><div class="bullet-dot"></div>Licensed, bonded &amp; insured in NY, NJ &amp; FL</div>
-        <div class="bullet"><div class="bullet-dot"></div>Full-time, part-time &amp; on-call positions</div>
-        <div class="bullet"><div class="bullet-dot"></div>Competitive pay + benefits for qualified guards</div>
-        <div class="bullet"><div class="bullet-dot"></div>Armed &amp; unarmed, uniformed &amp; plainclothes</div>
-        <div class="bullet"><div class="bullet-dot"></div>20+ years protecting the tri-state area</div>
-      </div>
-      <div class="badges"><div class="badge">NY Licensed</div><div class="badge">BBB Accredited</div><div class="badge">NTAS Member</div></div>
-    </div>
+  <!-- Compact hero for login page -->
+  <div style="background:linear-gradient(90deg,var(--navy-mid) 0%,var(--navy-light) 100%);border-bottom:3px solid var(--gold);padding:2rem 2rem 1.75rem;text-align:center;flex-shrink:0;">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:4px;color:var(--gold);text-transform:uppercase;margin-bottom:.5rem;">Security USA® Careers</div>
+    <h1 style="font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:3px;color:#fff;margin-bottom:.5rem;">Security Guard — NY &nbsp;·&nbsp; Candidate Application</h1>
+    <p style="font-size:.85rem;color:#c8d0df;font-weight:300;">Licensed, bonded &amp; insured in New York, New Jersey &amp; Florida &nbsp;·&nbsp; Full-time, Part-time &amp; On-call positions</p>
+  </div>
 
-    <div class="right-panel">
+  <div class="login-wrap" style="flex:1;min-height:0;">
+    <div class="right-panel" style="width:100%;max-width:100%;">
       <div class="auth-card">
         <div class="tab-row">
           <button class="tab-btn active" onclick="switchTab('reg')">Create Account</button>
@@ -403,11 +387,11 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
 
             <div style="margin-bottom:.5rem;"><span class="auth-label">Connect Your Account</span></div>
             <div class="social-row">
-              <button class="soc-btn">🍎 Apple</button>
-              <button class="soc-btn">f Facebook</button>
-              <button class="soc-btn">G Google</button>
-              <button class="soc-btn">in LinkedIn</button>
-              <button class="soc-btn">⊞ Microsoft</button>
+              <button class="soc-btn">Apple</button>
+              <button class="soc-btn">Facebook</button>
+              <button class="soc-btn">Google</button>
+              <button class="soc-btn">LinkedIn</button>
+              <button class="soc-btn">Microsoft</button>
             </div>
             <div class="div-or"><span>or register with email</span></div>
 
@@ -415,10 +399,10 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
             <div class="auth-field">
               <span class="auth-label">Upload Resume (Max 5MB)</span>
               <div class="resume-btns">
-                <button class="soc-btn" style="padding:12px;" onclick="document.getElementById('rFile').click()">📁 My Computer</button>
-                <button class="soc-btn" style="padding:12px;">📂 Google Drive</button>
-                <button class="soc-btn" style="padding:12px;">📦 Dropbox</button>
-                <button class="soc-btn" style="padding:12px;">☁️ OneDrive</button>
+                <button class="soc-btn" style="padding:12px;" onclick="document.getElementById('rFile').click()">My Computer</button>
+                <button class="soc-btn" style="padding:12px;">Google Drive</button>
+                <button class="soc-btn" style="padding:12px;">Dropbox</button>
+                <button class="soc-btn" style="padding:12px;">OneDrive</button>
                 <input type="file" id="rFile" accept=".pdf,.doc,.docx" style="display:none" onchange="document.getElementById('rFileName').textContent='✓ '+this.files[0].name;">
               </div>
               <div id="rFileName" style="font-size:.74rem;color:var(--success);margin-top:6px;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;"></div>
@@ -501,11 +485,11 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
             <div class="card-title">Welcome Back</div>
             <div class="card-sub">Sign in to check your application status or continue where you left off.</div>
             <div class="social-row">
-              <button class="soc-btn">🍎 Apple</button>
-              <button class="soc-btn">f Facebook</button>
-              <button class="soc-btn">G Google</button>
-              <button class="soc-btn">in LinkedIn</button>
-              <button class="soc-btn">⊞ Microsoft</button>
+              <button class="soc-btn">Apple</button>
+              <button class="soc-btn">Facebook</button>
+              <button class="soc-btn">Google</button>
+              <button class="soc-btn">LinkedIn</button>
+              <button class="soc-btn">Microsoft</button>
             </div>
             <div class="div-or"><span>or sign in with email</span></div>
             <div class="auth-field">
@@ -646,84 +630,84 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
             <div class="doc-item">
               <div class="doc-item-title">Social Security Card or Passport</div>
               <div class="doc-item-desc">Government-issued proof of identity and eligibility to work in the U.S.</div>
-              <label class="doc-upload-btn"><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded(this,'ssn-tag')"> 📤 Upload Document</label>
+              <label class="doc-upload-btn"><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded(this,'ssn-tag')"> Upload Document</label>
               <div id="ssn-tag" class="doc-uploaded-tag" style="display:none;">✓ Uploaded</div>
             </div>
 
             <div class="doc-item">
               <div class="doc-item-title">State-Issued Photo ID</div>
               <div class="doc-item-desc">New York State driver's license or state ID (front and back).</div>
-              <label class="doc-upload-btn"><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded(this,'stateid-tag')"> 📤 Upload Document</label>
+              <label class="doc-upload-btn"><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded(this,'stateid-tag')"> Upload Document</label>
               <div id="stateid-tag" class="doc-uploaded-tag" style="display:none;">✓ Uploaded</div>
             </div>
 
             <div class="doc-item">
               <div class="doc-item-title">NY Security Guard License</div>
               <div class="doc-item-desc">Valid NYS Security Guard License issued by the Dept. of State (front and back).</div>
-              <label class="doc-upload-btn"><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded(this,'guard-tag')"> 📤 Upload Document</label>
+              <label class="doc-upload-btn"><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded(this,'guard-tag')"> Upload Document</label>
               <div id="guard-tag" class="doc-uploaded-tag" style="display:none;">✓ Uploaded</div>
             </div>
 
             <div class="doc-item">
               <div class="doc-item-title">F-01 — Fire Guard (Torch Operations)</div>
               <div class="doc-item-desc">FDNY Certificate of Fitness — F-01 Torch Operations fire guard.</div>
-              <label class="doc-upload-btn"><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded(this,'f01-tag')"> 📤 Upload Certificate</label>
+              <label class="doc-upload-btn"><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded(this,'f01-tag')"> Upload Certificate</label>
               <div id="f01-tag" class="doc-uploaded-tag" style="display:none;">✓ Uploaded</div>
             </div>
 
             <div class="doc-item">
               <div class="doc-item-title">F-02 — Fire Guard (Impairment)</div>
               <div class="doc-item-desc">FDNY Certificate of Fitness — F-02 Fire Guard for Impaired Fire Protection Systems.</div>
-              <label class="doc-upload-btn"><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded(this,'f02-tag')"> 📤 Upload Certificate</label>
+              <label class="doc-upload-btn"><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded(this,'f02-tag')"> Upload Certificate</label>
               <div id="f02-tag" class="doc-uploaded-tag" style="display:none;">✓ Uploaded</div>
             </div>
 
             <div class="doc-item">
               <div class="doc-item-title">F-03 — Fire Guard (Premises)</div>
               <div class="doc-item-desc">FDNY Certificate of Fitness — F-03 Fire Guard for Premises.</div>
-              <label class="doc-upload-btn"><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded(this,'f03-tag')"> 📤 Upload Certificate</label>
+              <label class="doc-upload-btn"><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded(this,'f03-tag')"> Upload Certificate</label>
               <div id="f03-tag" class="doc-uploaded-tag" style="display:none;">✓ Uploaded</div>
             </div>
 
             <div class="doc-item">
               <div class="doc-item-title">F-04 — Fire Guard (Explosives)</div>
               <div class="doc-item-desc">FDNY Certificate of Fitness — F-04 Fire Guard for Blasting / Explosives.</div>
-              <label class="doc-upload-btn"><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded(this,'f04-tag')"> 📤 Upload Certificate</label>
+              <label class="doc-upload-btn"><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded(this,'f04-tag')"> Upload Certificate</label>
               <div id="f04-tag" class="doc-uploaded-tag" style="display:none;">✓ Uploaded</div>
             </div>
 
             <div class="doc-item">
               <div class="doc-item-title">F-89 — Fire Life Safety Director (FLSD)</div>
               <div class="doc-item-desc">FDNY Certificate of Fitness — F-89 Fire and Life Safety Director (FLSD).</div>
-              <label class="doc-upload-btn"><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded(this,'f89-tag')"> 📤 Upload Certificate</label>
+              <label class="doc-upload-btn"><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded(this,'f89-tag')"> Upload Certificate</label>
               <div id="f89-tag" class="doc-uploaded-tag" style="display:none;">✓ Uploaded</div>
             </div>
 
             <div class="doc-item">
               <div class="doc-item-title">T-89 — Deputy Fire Safety Director</div>
               <div class="doc-item-desc">FDNY Certificate of Fitness — T-89 Deputy Fire Safety Director.</div>
-              <label class="doc-upload-btn"><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded(this,'t89-tag')"> 📤 Upload Certificate</label>
+              <label class="doc-upload-btn"><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded(this,'t89-tag')"> Upload Certificate</label>
               <div id="t89-tag" class="doc-uploaded-tag" style="display:none;">✓ Uploaded</div>
             </div>
 
             <div class="doc-item">
               <div class="doc-item-title">Z-89 — Fire Safety / EAP Director</div>
               <div class="doc-item-desc">FDNY Certificate of Fitness — Z-89 Fire Safety / EAP Director for Large Buildings.</div>
-              <label class="doc-upload-btn"><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded(this,'z89-tag')"> 📤 Upload Certificate</label>
+              <label class="doc-upload-btn"><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded(this,'z89-tag')"> Upload Certificate</label>
               <div id="z89-tag" class="doc-uploaded-tag" style="display:none;">✓ Uploaded</div>
             </div>
 
             <div class="doc-item">
               <div class="doc-item-title">CPR / First Aid Certificate</div>
               <div class="doc-item-desc">Current, valid CPR and/or First Aid certification.</div>
-              <label class="doc-upload-btn"><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded(this,'cpr-tag')"> 📤 Upload Certificate</label>
+              <label class="doc-upload-btn"><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded(this,'cpr-tag')"> Upload Certificate</label>
               <div id="cpr-tag" class="doc-uploaded-tag" style="display:none;">✓ Uploaded</div>
             </div>
 
             <div class="doc-item">
               <div class="doc-item-title">Additional Certifications</div>
               <div class="doc-item-desc">Any other relevant certificates (OSHA, Armed Permit, etc.).</div>
-              <label class="doc-upload-btn"><input type="file" accept=".pdf,.jpg,.jpeg,.png" multiple onchange="markUploaded(this,'other-tag')"> 📤 Upload Files</label>
+              <label class="doc-upload-btn"><input type="file" accept=".pdf,.jpg,.jpeg,.png" multiple onchange="markUploaded(this,'other-tag')"> Upload Files</label>
               <div id="other-tag" class="doc-uploaded-tag" style="display:none;">✓ Uploaded</div>
             </div>
 
