@@ -1909,33 +1909,7 @@ const QUESTIONS = [
   { text: "Finally — why do you want to work for Security USA® specifically? And where do you see your career in the security industry in the next two to three years?", cat: 'closing' }
 ];
 
-// ══════════ PERMISSIONS ══════════
-// async function requestPermissions() {
-  try {
-    stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-    document.getElementById('candidateVideo').srcObject = stream;
-    document.getElementById('camOverlay').style.display = 'none';
-    document.getElementById('camDot').classList.add('granted');
-    document.getElementById('micDot').classList.add('granted');
-    const permCheck = document.getElementById('permCheck');
-    permCheck.classList.add('ready');
-    document.getElementById('permCheckIcon').textContent = '✓';
-    document.getElementById('permCheckText').textContent = 'Camera and microphone are ready';
-    const btn = document.getElementById('saraStartBtn');
-    if(btn){ btn.disabled = false; btn.textContent = 'Begin Interview with SARA →'; }
-  } catch (e) {
-    document.getElementById('micDot').classList.add('denied');
-    document.getElementById('camDot').classList.add('denied');
-    document.getElementById('permCheckIcon').textContent = '!';
-    document.getElementById('permCheckText').textContent = 'Permission denied — please allow camera and mic';
-    const btn = document.getElementById('saraStartBtn');
-    btn.disabled = false;
-    btn.textContent = 'Continue Without Camera';
-    btn.onclick = () => startInterview(true);
-  }
-}
-
-// requestPermissions() is now called when page-sara becomes visible
+// ══════════ PERMISSIONS (handled in SARA section below) ══════════
 
 // ══════════ START ══════════
 async function startInterview(noCam = false) {
@@ -3060,8 +3034,6 @@ function showPage(id) {
     pg.style.overflow = 'hidden';
     pg.classList.add('active');
     if (header) header.style.display = 'none';
-    // Request camera/mic NOW that the page is visible
-    if (typeof requestPermissions === 'function') requestPermissions();
     return;
   }
 
