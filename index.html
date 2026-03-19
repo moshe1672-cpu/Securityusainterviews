@@ -1132,6 +1132,203 @@ body::before {
 }
 .progress-label span { color:var(--gold); }
 
+
+/* ══════════ CRITICAL LAYOUT FIXES ══════════ */
+html, body {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Every page takes full viewport */
+.page {
+  display: none !important;
+  width: 100vw !important;
+  min-height: 100vh !important;
+  flex-direction: column !important;
+  overflow-x: hidden !important;
+  position: relative !important;
+}
+.page.active {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100vw !important;
+  min-height: 100vh !important;
+}
+
+/* Header full width */
+.site-header {
+  width: 100% !important;
+  left: 0 !important;
+  right: 0 !important;
+}
+
+/* Progress bar full width */
+.progress-wrap {
+  width: 100% !important;
+  overflow-x: auto !important;
+}
+.progress-inner {
+  width: 100% !important;
+  max-width: 900px !important;
+  margin: 0 auto !important;
+  padding: 0 1rem !important;
+}
+
+/* Page title bar full width */
+.page-title-bar {
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+/* Main scrollable area fills remaining height */
+.main-scroll {
+  flex: 1 1 auto !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  width: 100% !important;
+  display: block !important;
+}
+
+/* Content container centered with proper max-width */
+.main {
+  width: 100% !important;
+  max-width: 920px !important;
+  margin: 0 auto !important;
+  padding: 2rem 1.5rem 5rem !important;
+  display: block !important;
+  box-sizing: border-box !important;
+}
+
+/* Section blocks full width */
+.section-block,
+.section-body,
+.q-card,
+.notice-box,
+.eeo-card,
+.eeo-card-body,
+.def-list,
+.def-item {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  max-width: 100% !important;
+}
+
+/* Dashboard */
+.dash-hero { width: 100% !important; }
+.dash-main {
+  width: 100% !important;
+  max-width: 1100px !important;
+  margin: 0 auto !important;
+  padding: 2rem 1.5rem 4rem !important;
+}
+.dash-grid {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 1.25rem !important;
+  width: 100% !important;
+}
+.pipeline {
+  width: 100% !important;
+  overflow-x: auto !important;
+}
+
+/* Login page */
+.login-wrap {
+  flex: 1 !important;
+  display: flex !important;
+  width: 100% !important;
+  overflow: hidden !important;
+}
+.left-panel {
+  display: none !important;
+}
+.right-panel {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  width: 100% !important;
+  padding: 2rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+}
+.auth-card {
+  width: 100% !important;
+  max-width: 720px !important;
+}
+.card-body {
+  width: 100% !important;
+}
+.login-progress {
+  width: 100% !important;
+  overflow-x: auto !important;
+}
+.login-progress-inner {
+  min-width: 500px !important;
+  margin: 0 auto !important;
+}
+
+/* Forms */
+.f2 { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 12px !important; width: 100% !important; }
+.f3 { display: grid !important; grid-template-columns: 1fr 1fr 1fr !important; gap: 12px !important; width: 100% !important; }
+.g2 { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: .9rem !important; width: 100% !important; }
+.g3 { display: grid !important; grid-template-columns: 1fr 1fr 1fr !important; gap: .9rem !important; width: 100% !important; }
+input, select, textarea { width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; }
+
+/* Footer */
+.site-footer { width: 100% !important; margin-top: auto !important; }
+
+/* Success screen */
+.success-screen {
+  flex: 1 !important;
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 3rem 2rem !important;
+}
+
+/* Doc grid */
+.doc-grid { 
+  display: grid !important; 
+  grid-template-columns: 1fr 1fr !important; 
+  gap: 1rem !important; 
+  width: 100% !important; 
+}
+
+/* Scheduler */
+.sched-wrap { width: 100% !important; max-width: 900px !important; margin: 0 auto !important; }
+.cal-grid { display: grid !important; grid-template-columns: repeat(5, 1fr) !important; gap: .75rem !important; width: 100% !important; }
+
+/* Repeat blocks */
+.repeat-block { width: 100% !important; box-sizing: border-box !important; }
+
+/* Action bars */
+.action-bar { width: 100% !important; display: flex !important; justify-content: space-between !important; align-items: center !important; flex-wrap: wrap !important; gap: 10px !important; }
+
+/* SARA page override */
+#page-sara {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 500 !important;
+  overflow: hidden !important;
+}
+
+@media (max-width: 768px) {
+  .dash-grid, .doc-grid { grid-template-columns: 1fr !important; }
+  .f2, .f3, .g2, .g3 { grid-template-columns: 1fr !important; }
+  .main { padding: 1.5rem 1rem 4rem !important; }
+  .cal-grid { grid-template-columns: repeat(3, 1fr) !important; }
+  .action-bar { flex-direction: column !important; }
+}
+/* ══════════ END CRITICAL FIXES ══════════ */
+
 </style>
 </head>
 <body>
@@ -1162,7 +1359,7 @@ body::before {
 <!-- ══════════════════════════════════════════════════════
      PAGE: LOGIN
 ══════════════════════════════════════════════════════ -->
-<div class="page active page-fade" id="page-login" style="display:flex;flex-direction:column;width:100%;min-height:calc(100vh - 68px);overflow-x:hidden;">
+<div class="page active page-fade" id="page-login" style="display:flex;flex-direction:column;width:100%;min-height:100vh;overflow-x:hidden;">
   <!-- Progress bubbles on login page -->
   <div class="login-progress">
     <div class="login-progress-inner">
@@ -1331,7 +1528,7 @@ body::before {
 <!-- ══════════════════════════════════════════════════════
      PAGE: DASHBOARD
 ══════════════════════════════════════════════════════ -->
-<div class="page page-fade" id="page-dashboard">
+<div class="page page-fade" id="page-dashboard" style="display:none;flex-direction:column;width:100%;min-height:100vh;overflow-x:hidden;">
   <div class="dash-hero">
     <div class="dash-hero-inner">
       <div>
@@ -1553,7 +1750,7 @@ body::before {
 <!-- ══════════════════════════════════════════════════════
      PAGE: APPLICATION (step 2)
 ══════════════════════════════════════════════════════ -->
-<div class="page page-fade" id="page-application">
+<div class="page page-fade" id="page-application" style="display:none;flex-direction:column;width:100%;min-height:100vh;overflow-x:hidden;">
   <div class="progress-wrap"><div class="progress-inner">
     <div class="prog-step"><div class="prog-circle done">✓</div><div class="prog-label">Profile</div></div>
     <div class="prog-line done"></div>
@@ -1669,7 +1866,7 @@ body::before {
 <!-- ══════════════════════════════════════════════════════
      PAGE: EEO (step 3)
 ══════════════════════════════════════════════════════ -->
-<div class="page page-fade" id="page-eeo">
+<div class="page page-fade" id="page-eeo" style="display:none;flex-direction:column;width:100%;min-height:100vh;overflow-x:hidden;">
   <div class="progress-wrap"><div class="progress-inner">
     <div class="prog-step"><div class="prog-circle done">✓</div><div class="prog-label">Profile</div></div><div class="prog-line done"></div>
     <div class="prog-step"><div class="prog-circle done">✓</div><div class="prog-label">Application</div></div><div class="prog-line done"></div>
@@ -1713,7 +1910,7 @@ body::before {
 <!-- ══════════════════════════════════════════════════════
      PAGE: JOB SPECIFIC QUESTIONS (step 4)
 ══════════════════════════════════════════════════════ -->
-<div class="page page-fade" id="page-jobquestions">
+<div class="page page-fade" id="page-jobquestions" style="display:none;flex-direction:column;width:100%;min-height:100vh;overflow-x:hidden;">
   <div class="progress-wrap"><div class="progress-inner">
     <div class="prog-step"><div class="prog-circle done">✓</div><div class="prog-label">Profile</div></div><div class="prog-line done"></div>
     <div class="prog-step"><div class="prog-circle done">✓</div><div class="prog-label">Application</div></div><div class="prog-line done"></div>
@@ -1820,7 +2017,7 @@ body::before {
 <!-- ══════════════════════════════════════════════════════
      PAGE: AI INTERVIEW (step 5)
 ══════════════════════════════════════════════════════ -->
-<div class="page page-fade" id="page-interview">
+<div class="page page-fade" id="page-interview" style="display:none;flex-direction:column;width:100%;min-height:100vh;overflow-x:hidden;">
   <div class="progress-wrap"><div class="progress-inner">
     <div class="prog-step"><div class="prog-circle done">✓</div><div class="prog-label">Profile</div></div><div class="prog-line done"></div>
     <div class="prog-step"><div class="prog-circle done">✓</div><div class="prog-label">Application</div></div><div class="prog-line done"></div>
@@ -1872,7 +2069,7 @@ body::before {
 <!-- ══════════════════════════════════════════════════════
      PAGE: SCHEDULE ONBOARDING (step 6)
 ══════════════════════════════════════════════════════ -->
-<div class="page page-fade" id="page-schedule">
+<div class="page page-fade" id="page-schedule" style="display:none;flex-direction:column;width:100%;min-height:100vh;overflow-x:hidden;">
   <div class="progress-wrap"><div class="progress-inner">
     <div class="prog-step"><div class="prog-circle done">✓</div><div class="prog-label">Profile</div></div><div class="prog-line done"></div>
     <div class="prog-step"><div class="prog-circle done">✓</div><div class="prog-label">Application</div></div><div class="prog-line done"></div>
@@ -3300,7 +3497,7 @@ function downloadReport() {
 <!-- ══════════════════════════════════════════════════════
      PAGE: FINAL CONFIRMATION
 ══════════════════════════════════════════════════════ -->
-<div class="page page-fade" id="page-final">
+<div class="page page-fade" id="page-final" style="display:none;flex-direction:column;width:100%;min-height:100vh;overflow-x:hidden;">
   <div class="success-screen">
     <div class="success-box">
       <span class="success-icon">🛡️</span>
@@ -3329,7 +3526,6 @@ function showPage(id) {
   document.querySelectorAll('.page').forEach(p => {
     p.classList.remove('active');
     p.style.display = 'none';
-    p.style.position = '';
   });
 
   const pg = document.getElementById(id);
@@ -3356,9 +3552,8 @@ function showPage(id) {
 
   pg.style.display = 'flex';
   pg.style.flexDirection = 'column';
-  pg.style.minHeight = 'calc(100vh - 68px)'; // account for sticky header
   pg.style.width = '100%';
-  pg.style.position = 'relative';
+  pg.style.minHeight = '100vh';
   pg.style.overflowX = 'hidden';
   pg.classList.remove('page-fade');
   pg.classList.add('active');
