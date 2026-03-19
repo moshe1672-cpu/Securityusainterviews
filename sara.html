@@ -386,14 +386,19 @@ function initDID() {
 
     // When we get the video track, show it
     peerConn.ontrack = function(e) {
+      console.log('Got track:', e.track.kind);
       if (e.track.kind === 'video') {
         var vid = document.getElementById('av-video');
         var can = document.getElementById('av-canvas');
         vid.srcObject = e.streams[0];
-        vid.style.display = 'block';
-        can.style.display = 'none';
-        didReady = true;
-        console.log('D-ID video stream active');
+        vid.onloadedmetadata = function() {
+          vid.play().then(function() {
+            vid.style.display = 'block';
+            can.style.display = 'none';
+            didReady = true;
+            console.log('D-ID avatar live!');
+          }).catch(function(e) { console.warn('Video play:', e); });
+        };
       }
     };
 
@@ -460,7 +465,7 @@ function closeDID() {
   didStreamId = null; didSessionId = null; didReady = false;
 }
 
-// ── SPEAK (ElevenLabs audio + D-ID lip sync) ──
+// ── SPEAK ──
 function speak(text) {
   avSpeaking = true;
   document.getElementById('av-glow').classList.add('on');
@@ -481,46 +486,29 @@ function speak(text) {
     if (!r.ok) throw new Error('EL ' + r.status);
     return r.blob();
   }).then(function(blob) {
+    // Send to D-ID for lip sync (fire and forget)
+    if (didReady) { didSpeak(blob.slice(0)); }
+
+    // Play audio - simple direct approach, no AudioContext routing
     var url = URL.createObjectURL(blob);
+    var aud = new Audio(url);
+    aud.volume = 1.0;
 
-    // If D-ID is ready, use it for lip sync
-    var didP = didReady ? didSpeak(blob) : Promise.resolve();
+    // Drive canvas mouth animation via polling
+    var animInt = setInterval(function() {
+      if (!avSpeaking) { clearInterval(animInt); return; }
+      avMouth = 0.3 + Math.random() * 0.5 * (Math.sin(Date.now() * 0.02) * 0.5 + 0.5);
+    }, 80);
 
-    // Play audio locally for timing
-    if (!avAudioCtx) {
-      avAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      avAnalyser = avAudioCtx.createAnalyser();
-      avAnalyser.fftSize = 256;
-      avData = new Uint8Array(avAnalyser.frequencyBinCount);
-      avAnalyser.connect(avAudioCtx.destination);
-    }
-
-    var resumeP = avAudioCtx.state === 'suspended' ? avAudioCtx.resume() : Promise.resolve();
-
-    return resumeP.then(function() {
-      var aud = new Audio(url);
-      aud.crossOrigin = 'anonymous';
-      var src = avAudioCtx.createMediaElementSource(aud);
-      src.connect(avAnalyser);
-
-      // If D-ID NOT ready, also drive canvas mouth from audio
-      if (!didReady) {
-        // canvas lip sync handled by avAnalyser in the render loop
-      }
-
-      return Promise.all([
-        new Promise(function(res) {
-          aud.onended = res; aud.onerror = res;
-          aud.play().catch(res);
-        }),
-        didP
-      ]);
-    }).then(function() {
-      URL.revokeObjectURL(url);
+    return new Promise(function(res) {
+      aud.onended = function() { clearInterval(animInt); URL.revokeObjectURL(url); res(); };
+      aud.onerror = function() { clearInterval(animInt); URL.revokeObjectURL(url); res(); };
+      var playP = aud.play();
+      if (playP) { playP.catch(function(e) { console.warn('Audio play blocked:', e.message); clearInterval(animInt); URL.revokeObjectURL(url); res(); }); }
     });
   }).catch(function(e) {
-    console.warn('speak:', e.message);
-    // Animated fallback
+    console.warn('speak error:', e.message);
+    // Fallback animation only
     var dur = Math.min(3000, Math.max(1500, text.length * 30));
     var t0 = Date.now();
     return new Promise(function(res) {
@@ -531,7 +519,8 @@ function speak(text) {
       }, 40);
     });
   }).then(function() {
-    avSpeaking = false; avMouth = 0;
+    avSpeaking = false;
+    avMouth = 0;
     document.getElementById('av-glow').classList.remove('on');
   });
 }
