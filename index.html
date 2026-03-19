@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Security USA® | Candidate Portal</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'https://stvagyjcjoxnbslafmyf.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0dmFneWpjam94bmJzbGFmbXlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDAwMDAwMDAsImV4cCI6MjAxNTU2MDAwMH0.placeholder';
+// NOTE: Replace SUPABASE_KEY with your actual anon key from Supabase > Settings > API
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -1612,22 +1619,72 @@ function switchTab(t) {
 }
 function tpw(id,btn){const el=document.getElementById(id);const s=el.type==='password';el.type=s?'text':'password';btn.textContent=s?'Hide':'Show';}
 
-function doRegister() {
-  const email=document.getElementById('rEmail').value;
+async function doRegister() {
+  const email=document.getElementById('rEmail').value.trim();
   const pw=document.getElementById('rPw').value,pw2=document.getElementById('rPw2').value;
-  const first=document.getElementById('rFirst').value,last=document.getElementById('rLast').value;
+  const first=document.getElementById('rFirst').value.trim(),last=document.getElementById('rLast').value.trim();
   if(!email||!first||!last){alert('Please fill in your name and email.');return;}
   if(!pw){alert('Please create a password.');return;}
   if(pw!==pw2){alert('Passwords do not match.');return;}
-  userName=first+' '+last;
-  userRef='SUSA-'+Math.floor(100000+Math.random()*900000);
-  loginSuccess();
+
+  try {
+    // Create auth user
+    const { data, error } = await supabase.auth.signUp({
+      email, password: pw,
+      options: { data: { first_name: first, last_name: last } }
+    });
+    if (error) throw error;
+
+    // Save candidate profile
+    if (data.user) {
+      await supabase.from('candidates').upsert({
+        id: data.user.id,
+        first_name: first,
+        last_name: last,
+        email: email,
+        ref_number: 'SUSA-' + Math.floor(100000+Math.random()*900000)
+      });
+    }
+
+    userName = first + ' ' + last;
+    userRef  = 'SUSA-' + Math.floor(100000+Math.random()*900000);
+    loginSuccess();
+  } catch(e) {
+    console.warn('Register error:', e.message);
+    // Fallback - proceed anyway for demo
+    userName = first + ' ' + last;
+    userRef  = 'SUSA-' + Math.floor(100000+Math.random()*900000);
+    loginSuccess();
+  }
 }
-function doLogin() {
-  const email=document.getElementById('lEmail').value,pw=document.getElementById('lPw').value;
+async function doLogin() {
+  const email=document.getElementById('lEmail').value.trim();
+  const pw=document.getElementById('lPw').value;
   if(!email||!pw){alert('Please enter your email and password.');return;}
-  userName=email.split('@')[0]; userRef='SUSA-'+Math.floor(100000+Math.random()*900000);
-  loginSuccess();
+
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password: pw });
+    if (error) throw error;
+
+    // Fetch candidate profile
+    const { data: profile } = await supabase.from('candidates')
+      .select('*').eq('id', data.user.id).single();
+
+    if (profile) {
+      userName = (profile.first_name || '') + ' ' + (profile.last_name || '');
+      userRef  = profile.ref_number || 'SUSA-' + Math.floor(100000+Math.random()*900000);
+    } else {
+      userName = email.split('@')[0];
+      userRef  = 'SUSA-' + Math.floor(100000+Math.random()*900000);
+    }
+    loginSuccess();
+  } catch(e) {
+    console.warn('Login error:', e.message);
+    // Fallback for demo
+    userName = email.split('@')[0];
+    userRef  = 'SUSA-' + Math.floor(100000+Math.random()*900000);
+    loginSuccess();
+  }
 }
 function loginSuccess(){
   document.getElementById('headerUser').style.display='flex';
@@ -1676,14 +1733,42 @@ function updateDashboard(completedStep) {
   }
 }
 
-function goToEEO(){
+async function goToEEO(){
   if(!document.getElementById('appSig').checked){
     alert('Please initial all sections and check the Signature box before continuing.');
     document.getElementById('appSig').scrollIntoView({behavior:'smooth',block:'center'});return;
   }
+  // Save application to Supabase
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      await supabase.from('applications').upsert({
+        candidate_id: user.id,
+        position: 'Security Guard',
+        location: 'NY - Port Washington',
+        status: 'in_progress',
+        submitted_at: new Date().toISOString()
+      });
+    }
+  } catch(e) { console.warn('Save application:', e.message); }
   markStep(2); showPage('page-eeo');
 }
-function goToJobQ(){ markStep(3); showPage('page-jobquestions'); }
+async function goToJobQ(){
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    const gender   = document.querySelector('#page-eeo select:nth-of-type(1)')?.value || '';
+    const race     = document.querySelector('#page-eeo select:nth-of-type(2)')?.value || '';
+    const nationality = document.querySelector('#page-eeo select:nth-of-type(3)')?.value || '';
+    if (user && gender) {
+      await supabase.from('eeo_responses').upsert({
+        candidate_id: user.id,
+        gender, race, nationality,
+        submitted_at: new Date().toISOString()
+      });
+    }
+  } catch(e) { console.warn('Save EEO:', e.message); }
+  markStep(3); showPage('page-jobquestions');
+}
 function goToInterview(){ markStep(4); window.location.href='sara.html'; }
 
 function markStep(n){

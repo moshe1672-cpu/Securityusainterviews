@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SARA — AI Interview | Security USA®</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SB_URL = 'https://stvagyjcjoxnbslafmyf.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.placeholder'; // replace with real key
+const sb = window.supabase.createClient(SB_URL, SB_KEY);
+</script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 html, body { width:100%; height:100%; overflow:hidden; background:#0a1628; color:#f4f6fa; font-family:'Barlow',sans-serif; }
@@ -67,7 +73,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:#0a1628; color
 
 /* ── INTERVIEW ── */
 #screen-interview { overflow:hidden; }
-#iv-main { flex:1; display:grid; grid-template-columns:1fr 340px; min-height:0; overflow:hidden; }
+#iv-main { flex:1; display:grid; grid-template-columns:1fr 1fr; min-height:0; overflow:hidden; }
 
 /* Avatar side */
 #iv-avatar-side {
@@ -137,7 +143,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:#0a1628; color
 #iv-score-fill{ height:100%; background:linear-gradient(90deg,#c9a84c,#e8c46a); border-radius:2px; width:0; transition:width .8s; }
 
 /* Bottom bar */
-#iv-bottom { height:155px; border-top:1px solid rgba(201,168,76,.2); display:grid; grid-template-columns:1fr 340px; flex-shrink:0; }
+#iv-bottom { height:155px; border-top:1px solid rgba(201,168,76,.2); display:grid; grid-template-columns:1fr 1fr; flex-shrink:0; }
 #iv-cam { background:#000; position:relative; overflow:hidden; }
 #iv-cam video { width:100%; height:100%; object-fit:cover; transform:scaleX(-1); }
 #iv-cam-overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:.4rem; background:rgba(10,22,40,.75); }
@@ -233,11 +239,6 @@ html, body { width:100%; height:100%; overflow:hidden; background:#0a1628; color
       <div class="av-ring"></div>
       <div style="position:relative;z-index:2;display:flex;align-items:center;justify-content:center;">
         <div id="av-speak-ring"></div>
-        <!-- D-ID talking video (shown when avatar is speaking) -->
-        <video id="av-video" autoplay playsinline
-          style="display:none;width:200px;height:200px;border-radius:50%;object-fit:cover;border:3px solid #c9a84c;box-shadow:0 0 40px rgba(201,168,76,.2);">
-        </video>
-        <!-- Fallback static avatar (shown when not speaking) -->
         <div id="av-face" style="display:flex;"><span id="av-initial">S</span></div>
       </div>
       <div id="av-nametag"><div class="n">SARA</div><div class="r">Security USA® AI</div></div>
@@ -388,11 +389,17 @@ function startInterview() {
   document.getElementById('screen-intro').classList.remove('show');
   document.getElementById('screen-interview').classList.add('show');
 
-  // Show D-ID presenter image as the static avatar face
+  // Load presenter photo into avatar
   const faceEl = document.getElementById('av-face');
   if (faceEl) {
-    faceEl.innerHTML = `<img src="${DID_IMG}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.style.display='none';document.getElementById('av-initial').style.display='block'">`;
-    document.getElementById('av-initial').style.display = 'none';
+    const img = new Image();
+    img.onload = () => {
+      faceEl.innerHTML = '';
+      faceEl.style.overflow = 'hidden';
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
+      faceEl.appendChild(img);
+    };
+    img.src = DID_IMG;
   }
 
   timerInt = setInterval(() => {
@@ -440,6 +447,76 @@ function setupRecog() {
     console.warn('Speech error:', e.error);
     listening = false;
   };
+}
+
+// ── ASK QUESTION ──
+async function askQ(idx) {
+  if (idx >= QS.length) { finish(); return; }
+  curQ = idx;
+  const pct = Math.round(idx / QS.length * 100);
+
+  document.getElementById('q-num').textContent = idx + 1;
+  document.getElementById('iv-prog-fill').style.width  = pct + '%';
+  document.getElementById('iv-pct').textContent        = pct + '%';
+  document.getElementById('iv-q-text').textContent     = QS[idx];
+  document.getElementById('iv-q-box').style.display    = 'block';
+  document.getElementById('iv-submit').style.display   = 'none';
+  document.getElementById('iv-mic-status').textContent = 'SARA is speaking...';
+  document.getElementById('iv-mic-status').style.color = '';
+  document.getElementById('iv-mic-btn').style.opacity  = '.4';
+  document.getElementById('av-speak-ring').classList.add('on');
+
+  addTx('sara', QS[idx]);
+
+  await speak(QS[idx]);
+
+  // Done speaking
+  document.getElementById('av-speak-ring').classList.remove('on');
+  document.getElementById('iv-q-box').style.display    = 'none';
+  document.getElementById('iv-mic-status').textContent = 'Your turn — speak or type your answer';
+  document.getElementById('iv-mic-status').style.color = '#c9a84c';
+  document.getElementById('iv-mic-btn').style.opacity  = '1';
+  document.getElementById('iv-submit').style.display   = 'block';
+
+  liveBuf = '';
+  document.getElementById('iv-live').textContent = '';
+  document.getElementById('iv-live').style.display = 'block';
+  if (recog) { try { recog.start(); } catch(e) {} }
+}
+
+// ── SPEAK (ElevenLabs voice only - fast) ──
+async function speak(text) {
+  try {
+    const r = await fetch(
+      `https://api.elevenlabs.io/v1/text-to-speech/${EL_VOICE}`,
+      {
+        method: 'POST',
+        headers: {
+          'xi-api-key': EL_KEY,
+          'Content-Type': 'application/json',
+          'Accept': 'audio/mpeg'
+        },
+        body: JSON.stringify({
+          text,
+          model_id: 'eleven_turbo_v2',
+          voice_settings: { stability:.5, similarity_boost:.8 }
+        })
+      }
+    );
+    if (!r.ok) throw new Error('ElevenLabs ' + r.status);
+    const blob = await r.blob();
+    const url  = URL.createObjectURL(blob);
+    const aud  = new Audio(url);
+    await new Promise((res, rej) => {
+      aud.onended = res;
+      aud.onerror = () => res(); // don't block on error
+      aud.play().catch(() => res());
+    });
+    URL.revokeObjectURL(url);
+  } catch(e) {
+    console.warn('speak():', e.message);
+    await new Promise(r => setTimeout(r, Math.min(3000, Math.max(1500, text.length * 30))));
+  }
 }
 
 // ── ASK QUESTION ──
@@ -691,7 +768,7 @@ function addTx(who, text) {
 }
 
 // ── FINISH ──
-function finish() {
+async function finish() {
   clearInterval(timerInt);
   if (recog)       { try { recog.stop(); } catch(e){} }
   if (mediaStream) { mediaStream.getTracks().forEach(t => t.stop()); }
@@ -730,6 +807,20 @@ function finish() {
     : overall >= 5
     ? 'Candidate showed adequate knowledge with some areas requiring HR follow-up. Licensing and availability should be verified before proceeding.'
     : 'Candidate responses did not sufficiently demonstrate required experience or licensing for this position at this time.';
+
+  // Save to Supabase
+  try {
+    const { data: { user } } = await sb.auth.getUser();
+    if (user) {
+      await sb.from('interview_results').insert({
+        candidate_id: user.id,
+        transcript: answers,
+        scores: { overall, categories: cats.map(c=>({name:c.n, score:Math.round(c.s*10)/10})) },
+        recommendation: overall >= 7 ? 'hire' : overall >= 5 ? 'review' : 'pass',
+        completed_at: new Date().toISOString()
+      });
+    }
+  } catch(e) { console.warn('Save interview:', e.message); }
 
   document.getElementById('screen-interview').classList.remove('show');
   document.getElementById('screen-scorecard').classList.add('show');
