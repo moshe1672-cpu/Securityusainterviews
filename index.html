@@ -44,13 +44,30 @@ body{
   height:100vh;
   overflow:hidden;
 }
-#page-sara{
+/* page-sara overrides */
+#page-sara { display:none; }
+#page-sara.active {
+  display:flex !important;
+  flex-direction:column !important;
   position:fixed !important;
   inset:0 !important;
   z-index:500 !important;
   width:100vw !important;
   height:100vh !important;
   overflow:hidden !important;
+}
+#page-sara{
+  display:none;
+}
+#page-sara.active {
+  display:flex !important;
+  position:fixed !important;
+  inset:0 !important;
+  z-index:500 !important;
+  width:100vw !important;
+  height:100vh !important;
+  overflow:hidden !important;
+  flex-direction:column !important;
 }
 .page-fade{animation:fadeIn .3s ease;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
@@ -1329,7 +1346,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
 <!-- ══════════════════════════════════════════════════════
      PAGE: SARA AI VIDEO INTERVIEWER
 ══════════════════════════════════════════════════════ -->
-<div class="page page-fade" id="page-sara" style="display:none;position:fixed;inset:0;background:#0a1628;z-index:500;flex-direction:column;font-family:'Barlow',sans-serif;">
+<div class="page page-fade" id="page-sara" style="background:#0a1628;font-family:'Barlow',sans-serif;">
 <div id="sara-wrap" style="display:contents;">
 
   <!-- SARA Header -->
@@ -1534,7 +1551,8 @@ function showPage(id) {
   // Hide all pages cleanly
   document.querySelectorAll('.page').forEach(p => {
     p.classList.remove('active');
-    p.style.display = 'none';
+    if (p.id !== 'page-sara') p.style.display = 'none';
+    else p.style.display = '';
   });
 
   const pg = document.getElementById(id);
@@ -1544,12 +1562,8 @@ function showPage(id) {
 
   // SARA = full-screen fixed overlay with its own header
   if (id === 'page-sara') {
-    pg.style.display = 'flex';
-    pg.style.flexDirection = 'column';
     pg.classList.add('active');
     if (header) header.style.display = 'none';
-    // Request permissions now that page is visible
-    if (typeof requestPermissions === 'function') requestPermissions();
     return;
   }
 
