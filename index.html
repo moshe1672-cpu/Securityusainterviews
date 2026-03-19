@@ -1636,116 +1636,103 @@ async function doRegister() {
   const first = document.getElementById('rFirst').value.trim();
   const last  = document.getElementById('rLast').value.trim();
 
-  // Validate all fields
-  if (!first || !last) {
-    showRegisterError('Please enter your first and last name.');
-    return;
-  }
-  if (!email) {
-    showRegisterError('Please enter your email address.');
-    return;
-  }
-  if (!isValidEmail(email)) {
-    showRegisterError('Please enter a valid email address (e.g. name@email.com).');
-    return;
-  }
-  if (!pw) {
-    showRegisterError('Please create a password.');
-    return;
-  }
-  if (pw.length < 8) {
-    showRegisterError('Password must be at least 8 characters long.');
-    return;
-  }
-  if (pw !== pw2) {
-    showRegisterError('Passwords do not match. Please re-enter.');
-    return;
-  }
+  // Clear previous errors
+  var existingErr = document.getElementById('register-error-msg');
+  if (existingErr) existingErr.style.display = 'none';
+
+  // Validation
+  if (!first || !last)      { showRegisterError('Please enter your first and last name.'); return; }
+  if (!email)               { showRegisterError('Please enter your email address.'); return; }
+  if (!isValidEmail(email)) { showRegisterError('Please enter a valid email address.'); return; }
+  if (!pw)                  { showRegisterError('Please create a password.'); return; }
+  if (pw.length < 6)        { showRegisterError('Password must be at least 6 characters.'); return; }
+  if (pw !== pw2)           { showRegisterError('Passwords do not match.'); return; }
 
   const btn = document.getElementById('registerSubmitBtn');
   if (btn) { btn.disabled = true; btn.textContent = 'Creating Account...'; }
 
+  // Check Supabase is ready
   if (!supabase) {
-    showRegisterError('Registration service unavailable. Please contact support.');
+    showRegisterError('Service unavailable. Please refresh the page and try again.');
     if (btn) { btn.disabled = false; btn.textContent = 'Create Profile & Continue →'; }
     return;
   }
 
   try {
+    console.log('Attempting signUp for:', email);
     const { data, error } = await supabase.auth.signUp({
-      email, password: pw,
+      email: email,
+      password: pw,
       options: { data: { first_name: first, last_name: last } }
     });
 
+    console.log('signUp result:', { data, error });
+
     if (error) {
-      if (error.message.includes('already registered') || error.message.includes('User already registered')) {
+      console.error('signUp error:', error);
+      if (error.message.includes('already registered') || error.message.includes('already been registered')) {
         showRegisterError('This email is already registered. Please sign in instead.');
-      } else if (error.message.includes('password')) {
-        showRegisterError('Password is too weak. Use at least 8 characters with letters and numbers.');
       } else {
-        showRegisterError(error.message);
+        showRegisterError(error.message || 'Registration failed. Please try again.');
       }
       if (btn) { btn.disabled = false; btn.textContent = 'Create Profile & Continue →'; }
       return;
     }
 
-    // Save candidate profile to Supabase
-    const refNum = 'SUSA-' + Math.floor(100000+Math.random()*900000);
+    // Check if email confirmation is required
+    if (data.user && !data.session) {
+      // Email confirmation required - tell the user
+      if (btn) { btn.disabled = false; btn.textContent = 'Create Profile & Continue →'; }
+      showRegisterError('');
+      // Show success message instead
+      var errEl = document.getElementById('register-error-msg');
+      if (!errEl) {
+        errEl = document.createElement('div');
+        errEl.id = 'register-error-msg';
+        var form = document.getElementById('pane-reg');
+        if (form) {
+          var submitBtn = form.querySelector('.btn-full');
+          if (submitBtn) form.insertBefore(errEl, submitBtn);
+        }
+      }
+      errEl.style.cssText = 'background:#f0faf4;border:1px solid #27ae60;border-radius:4px;padding:.75rem 1rem;font-size:.9rem;color:#1e7e4a;margin-bottom:1rem;font-family:Barlow,sans-serif;';
+      errEl.textContent = '✓ Account created! Check your email (' + email + ') and click the confirmation link, then come back to sign in.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    // Session exists - user is logged in immediately (email confirm disabled)
+    const refNum = 'SUSA-' + Math.floor(100000 + Math.random() * 900000);
+
+    // Try to save profile (don't block login if this fails)
     if (data.user) {
-      await supabase.from('candidates').upsert({
-        id: data.user.id,
-        first_name: first,
-        last_name: last,
-        email: email,
-        ref_number: refNum
-      });
+      try {
+        await supabase.from('candidates').upsert({
+          id: data.user.id,
+          first_name: first,
+          last_name: last,
+          email: email,
+          ref_number: refNum
+        });
+        console.log('Profile saved to Supabase');
+      } catch(dbErr) {
+        console.warn('Profile save failed (table may not exist yet):', dbErr.message);
+        // Continue anyway - auth worked
+      }
     }
 
     userName = first + ' ' + last;
     userRef  = refNum;
+    console.log('Registration successful, proceeding to application');
     loginSuccess();
 
   } catch(e) {
-    console.error('Register error:', e.message);
-    showRegisterError('Something went wrong. Please try again.');
+    console.error('Registration exception:', e);
+    showRegisterError('Something went wrong: ' + e.message);
     if (btn) { btn.disabled = false; btn.textContent = 'Create Profile & Continue →'; }
   }
 }
 
-// ── AUTH HELPERS ──
-function isValidEmail(email) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
-function showLoginError(msg) {
-  var el = document.getElementById('login-error-msg');
-  if (!el) {
-    el = document.createElement('div');
-    el.id = 'login-error-msg';
-    el.style.cssText = 'background:#fef2f2;border:1px solid #fecaca;border-radius:4px;padding:.75rem 1rem;font-size:.9rem;color:#c0392b;margin-bottom:1rem;font-family:Barlow,sans-serif;';
-    var form = document.getElementById('pane-login');
-    if (form) form.insertBefore(el, form.querySelector('.btn-full'));
-  }
-  el.textContent = msg;
-  el.style.display = 'block';
-}
-
-function showRegisterError(msg) {
-  var el = document.getElementById('register-error-msg');
-  if (!el) {
-    el = document.createElement('div');
-    el.id = 'register-error-msg';
-    el.style.cssText = 'background:#fef2f2;border:1px solid #fecaca;border-radius:4px;padding:.75rem 1rem;font-size:.9rem;color:#c0392b;margin-bottom:1rem;font-family:Barlow,sans-serif;';
-    var form = document.getElementById('pane-reg');
-    if (form) {
-      var submitBtn = form.querySelector('.btn-full');
-      if (submitBtn) form.insertBefore(el, submitBtn);
-      else form.appendChild(el);
-    }
-  }
-  el.textContent = msg;
-  el.style.display = 'block';
-}
 
 async function doLogin() {
   const email = document.getElementById('lEmail').value.trim().toLowerCase();
