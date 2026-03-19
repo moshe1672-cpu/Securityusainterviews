@@ -130,10 +130,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;color:#f4f6f
 </div>
 
 <div id="s-intro" class="screen on">
-  <div style="width:110px;height:110px;border-radius:50%;border:3px solid #c9a84c;overflow:hidden;margin-bottom:1.25rem;box-shadow:0 0 40px rgba(201,168,76,.25);">
-    <img id="sara-intro-img" src="https://create-images-results.d-id.com/DefaultPresenters/Amber_f/thumbnail.jpeg"
+  <div style="width:110px;height:110px;border-radius:50%;border:3px solid #c9a84c;overflow:hidden;margin-bottom:1.25rem;box-shadow:0 0 40px rgba(201,168,76,.25);background:#112240;">
+    <img src="https://create-images-results.d-id.com/google-oauth2|115522073797470152673/img_EzHBHN4EkYhHgNTU2dQR5/thumbnail.jpeg"
       style="width:100%;height:100%;object-fit:cover;object-position:top;"
-      onerror="this.parentElement.innerHTML='<div style='width:100%;height:100%;background:#112240;display:flex;align-items:center;justify-content:center;font-family:Bebas Neue,sans-serif;font-size:2.5rem;color:#c9a84c;'>S</div>'"
+      onerror="this.src='https://create-images-results.d-id.com/DefaultPresenters/Amber_f/thumbnail.jpeg'"
     >
   </div>
   <div class="eyebrow">Security USA® — AI Screening</div>
@@ -158,19 +158,17 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;color:#f4f6f
   <div id="iv-grid">
     <div id="iv-av">
       <div class="av-ring"></div><div class="av-ring"></div><div class="av-ring"></div>
-      <div id="av-glow"></div>
-      <!-- Static photo - shown before D-ID connects -->
-      <div id="av-photo-wrap" style="width:220px;height:220px;border-radius:50%;overflow:hidden;border:3px solid #c9a84c;box-shadow:0 0 40px rgba(201,168,76,.15);position:relative;z-index:2;flex-shrink:0;">
-        <img id="av-photo" src="https://create-images-results.d-id.com/DefaultPresenters/Amber_f/thumbnail.jpeg"
-          style="width:100%;height:100%;object-fit:cover;object-position:top;"
-          onerror="this.style.display='none'">
+      <!-- D-ID Agent iframe - the real girl, full lip sync -->
+      <div id="did-agent-wrap" style="position:relative;z-index:2;width:100%;height:100%;display:flex;align-items:center;justify-content:center;">
+        <iframe
+          id="did-agent-iframe"
+          src="https://agent.d-id.com/?agentId=v2_agt_M7ejpYI6&clientKey=Y2tfTTRNYzdpQ1I2R1ZuaDRoOEVXOTdV&mode=widget"
+          style="width:100%;height:100%;border:none;background:transparent;"
+          allow="camera;microphone;autoplay;fullscreen"
+          allowfullscreen>
+        </iframe>
       </div>
-      <!-- D-ID live video - shown when stream connects -->
-      <video id="av-video" autoplay playsinline
-        style="width:220px;height:220px;border-radius:50%;object-fit:cover;object-position:top;border:3px solid #c9a84c;box-shadow:0 0 40px rgba(201,168,76,.2);display:none;position:absolute;z-index:3;">
-      </video>
       <div id="iv-nametag"><div class="n">SARA</div><div class="r">Security USA® AI</div></div>
-      <div id="iv-qbox"><div id="iv-qinner"><div id="iv-qlbl">SARA is asking</div><div id="iv-qtxt"></div></div></div>
     </div>
     <div id="iv-tx">
       <div id="iv-tx-hdr"><span>Live Transcript</span><span style="color:#8a9ab5;font-family:'Barlow Condensed',sans-serif;font-size:.6rem;">Auto-saved</span></div>
@@ -245,132 +243,25 @@ var timerSec=0, timerInt=null;
 var avCtx=null, avSpeaking=false, avMouth=0, avBlinkT=120, avBlinkV=1;
 var avAudioCtx=null, avAnalyser=null, avData=null;
 
-// ── D-ID STREAMING ──
-var DID_PROXY   = '/api/did-proxy';
-var DID_AGENT_ID = 'v2_agt_M7ejpYI6'; // Your D-ID agent
-// Her image URL - update this once you get it from Avatar tab in D-ID Studio
-var DID_IMG     = 'https://create-images-results.d-id.com/DefaultPresenters/Amber_f/thumbnail.jpeg';
-var didStreamId = null;
-var didSessionId= null;
-var peerConn    = null;
-var didReady    = false;
+// ── D-ID AGENT (via iframe) ──
+var AGENT_ID  = 'v2_agt_M7ejpYI6';
+var CLIENT_KEY = 'Y2tfTTRNYzdpQ1I2R1ZuaDRoOEVXOTdV';
+var didReady  = true; // iframe is always ready
 
-function didProxy(path, method, body) {
-  var opts = {
-    method: method || 'GET',
-    headers: { 'Content-Type': 'application/json' }
-  };
-  if (body) opts.body = JSON.stringify(body);
-  return fetch(DID_PROXY + '?path=' + encodeURIComponent(path), opts)
-    .then(function(r) { return r.json(); });
+// Send text to the D-ID agent iframe to speak
+function didSendMessage(text) {
+  var iframe = document.getElementById('did-agent-iframe');
+  if (!iframe) return;
+  try {
+    iframe.contentWindow.postMessage({
+      type: 'speak',
+      text: text
+    }, 'https://agent.d-id.com');
+  } catch(e) { console.warn('postMessage:', e); }
 }
 
-function initDID() {
-  console.log('Initializing D-ID stream with agent:', DID_AGENT_ID);
-  // First get the agent's presenter image URL
-  return didProxy('/agents/' + DID_AGENT_ID, 'GET').then(function(agent) {
-    var imgUrl = (agent.presenter && agent.presenter.source_url) ? agent.presenter.source_url : DID_IMG;
-    console.log('Using presenter image:', imgUrl);
-    // Update photo elements with her real image
-    var introImg = document.getElementById('sara-intro-img');
-    var avPhoto  = document.getElementById('av-photo');
-    if (introImg) introImg.src = imgUrl;
-    if (avPhoto)  avPhoto.src  = imgUrl;
-    return didProxy('/talks/streams', 'POST', { source_url: imgUrl });
-  }).then(function(data) {
-    if (!data.id) { console.warn('D-ID init failed:', data); return false; }
-    didStreamId  = data.id;
-    didSessionId = data.session_id;
-    console.log('D-ID stream created:', didStreamId);
-
-    // Set up WebRTC
-    peerConn = new RTCPeerConnection({ iceServers: data.ice_servers || [] });
-
-    // When we get the video track, show it
-    peerConn.ontrack = function(e) {
-      console.log('Got track:', e.track.kind);
-      if (e.track.kind === 'video') {
-        var vid = document.getElementById('av-video');
-        var photo = document.getElementById('av-photo-wrap');
-        vid.srcObject = e.streams[0];
-        vid.onloadedmetadata = function() {
-          vid.play().then(function() {
-            vid.style.display = 'block';
-            if (photo) photo.style.display = 'none';
-            didReady = true;
-            console.log('D-ID avatar live!');
-          }).catch(function(e) { console.warn('Video play:', e); });
-        };
-      }
-    };
-
-    // Send ICE candidates
-    peerConn.onicecandidate = function(e) {
-      if (e.candidate) {
-        didProxy('/talks/streams/' + didStreamId + '/ice', 'POST', {
-          candidate: e.candidate,
-          session_id: didSessionId
-        }).catch(function(err) { console.warn('ICE error:', err); });
-      }
-    };
-
-    peerConn.oniceconnectionstatechange = function() {
-      console.log('ICE state:', peerConn.iceConnectionState);
-    };
-
-    // Set remote description (D-ID's offer)
-    return peerConn.setRemoteDescription(new RTCSessionDescription(data.offer))
-      .then(function() { return peerConn.createAnswer(); })
-      .then(function(answer) { return peerConn.setLocalDescription(answer).then(function(){ return answer; }); })
-      .then(function(answer) {
-        return didProxy('/talks/streams/' + didStreamId + '/sdp', 'POST', {
-          answer: answer,
-          session_id: didSessionId
-        });
-      }).then(function() {
-        console.log('D-ID WebRTC handshake complete');
-        return true;
-      });
-  }).catch(function(e) {
-    console.warn('D-ID init error:', e.message);
-    return false;
-  });
-}
-
-function didSpeak(audioBlob) {
-  if (!didStreamId || !didSessionId) return Promise.resolve();
-  // Convert blob to base64
-  return new Promise(function(res, rej) {
-    var reader = new FileReader();
-    reader.onloadend = function() { res(reader.result.split(',')[1]); };
-    reader.onerror = rej;
-    reader.readAsDataURL(audioBlob);
-  }).then(function(b64) {
-    return didProxy('/talks/streams/' + didStreamId, 'POST', {
-      script: {
-        type: 'audio',
-        audio_url: 'data:audio/mpeg;base64,' + b64
-      },
-      config: { fluent: true, pad_audio: 0 },
-      session_id: didSessionId
-    });
-  }).catch(function(e) {
-    console.warn('D-ID speak error:', e.message);
-  });
-}
-
-function closeDID() {
-  if (didStreamId) {
-    didProxy('/talks/streams/' + didStreamId, 'DELETE', { session_id: didSessionId }).catch(function(){});
-  }
-  if (peerConn) { peerConn.close(); peerConn = null; }
-  didStreamId = null; didSessionId = null; didReady = false;
-  // Restore photo
-  var vid = document.getElementById('av-video');
-  var photo = document.getElementById('av-photo-wrap');
-  if (vid) vid.style.display = 'none';
-  if (photo) photo.style.display = 'block';
-}
+function initDID() { return Promise.resolve(true); }
+function closeDID() {}
 
 // ── SPEAK ──
 // Global audio element - created once on user click to avoid autoplay blocks
@@ -404,8 +295,8 @@ function speak(text) {
     if (!r.ok) throw new Error('EL HTTP ' + r.status);
     return r.blob();
   }).then(function(blob) {
-    // Send to D-ID for lip sync
-    if (didReady) { didSpeak(blob.slice(0)); }
+    // Send text to D-ID agent so she lip-syncs
+    didSendMessage(text);
 
     var url = URL.createObjectURL(blob);
 
