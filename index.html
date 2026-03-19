@@ -32,13 +32,18 @@ body{
 .page{
   display:none;
   width:100%;
-  min-height:100vh;
+  height:100vh;
   position:relative;
   z-index:1;
   flex-direction:column;
-  overflow-x:hidden;
+  overflow:hidden;
 }
-.page.active{display:flex;}
+.page.active{
+  display:flex;
+  flex-direction:column;
+  height:100vh;
+  overflow:hidden;
+}
 #page-sara{
   position:fixed !important;
   inset:0 !important;
@@ -845,7 +850,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
 <!-- ══════════════════════════════════════════════════════
      PAGE: LOGIN
 ══════════════════════════════════════════════════════ -->
-<div class="page active page-fade" id="page-login" style="display:flex;flex-direction:column;width:100%;height:100vh;overflow:hidden;">
+<div class="page active page-fade" id="page-login" style="display:flex;">
   <!-- Progress bubbles on login page -->
   <div class="login-progress">
     <div class="login-progress-inner">
@@ -1014,7 +1019,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
 <!-- ══════════════════════════════════════════════════════
      PAGE: DASHBOARD
 ══════════════════════════════════════════════════════ -->
-<div class="page page-fade" id="page-dashboard" style="display:none;flex-direction:column;width:100%;height:100vh;overflow:hidden;">
+<div class="page page-fade" id="page-dashboard" style="display:none;">
   <div class="dash-hero">
     <div class="dash-hero-inner">
       <div>
@@ -1236,7 +1241,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
 <!-- ══════════════════════════════════════════════════════
      PAGE: APPLICATION (step 2)
 ══════════════════════════════════════════════════════ -->
-<div class="page page-fade" id="page-application" style="display:none;flex-direction:column;width:100%;height:100vh;overflow:hidden;">
+<div class="page page-fade" id="page-application" style="display:none;">
   <div class="progress-wrap"><div class="progress-inner">
     <div class="prog-step"><div class="prog-circle done">✓</div><div class="prog-label">Profile</div></div>
     <div class="prog-line done"></div>
@@ -1352,7 +1357,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
 <!-- ══════════════════════════════════════════════════════
      PAGE: EEO (step 3)
 ══════════════════════════════════════════════════════ -->
-<div class="page page-fade" id="page-eeo" style="display:none;flex-direction:column;width:100%;height:100vh;overflow:hidden;">
+<div class="page page-fade" id="page-eeo" style="display:none;">
   <div class="progress-wrap"><div class="progress-inner">
     <div class="prog-step"><div class="prog-circle done">✓</div><div class="prog-label">Profile</div></div><div class="prog-line done"></div>
     <div class="prog-step"><div class="prog-circle done">✓</div><div class="prog-label">Application</div></div><div class="prog-line done"></div>
@@ -1396,7 +1401,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
 <!-- ══════════════════════════════════════════════════════
      PAGE: JOB SPECIFIC QUESTIONS (step 4)
 ══════════════════════════════════════════════════════ -->
-<div class="page page-fade" id="page-jobquestions" style="display:none;flex-direction:column;width:100%;height:100vh;overflow:hidden;">
+<div class="page page-fade" id="page-jobquestions" style="display:none;">
   <div class="progress-wrap"><div class="progress-inner">
     <div class="prog-step"><div class="prog-circle done">✓</div><div class="prog-label">Profile</div></div><div class="prog-line done"></div>
     <div class="prog-step"><div class="prog-circle done">✓</div><div class="prog-label">Application</div></div><div class="prog-line done"></div>
@@ -1503,7 +1508,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
 <!-- ══════════════════════════════════════════════════════
      PAGE: AI INTERVIEW (step 5)
 ══════════════════════════════════════════════════════ -->
-<div class="page page-fade" id="page-interview" style="display:none;flex-direction:column;width:100%;height:100vh;overflow:hidden;">
+<div class="page page-fade" id="page-interview" style="display:none;">
   <div class="progress-wrap"><div class="progress-inner">
     <div class="prog-step"><div class="prog-circle done">✓</div><div class="prog-label">Profile</div></div><div class="prog-line done"></div>
     <div class="prog-step"><div class="prog-circle done">✓</div><div class="prog-label">Application</div></div><div class="prog-line done"></div>
@@ -1555,7 +1560,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
 <!-- ══════════════════════════════════════════════════════
      PAGE: SCHEDULE ONBOARDING (step 6)
 ══════════════════════════════════════════════════════ -->
-<div class="page page-fade" id="page-schedule" style="display:none;flex-direction:column;width:100%;height:100vh;overflow:hidden;">
+<div class="page page-fade" id="page-schedule" style="display:none;">
   <div class="progress-wrap"><div class="progress-inner">
     <div class="prog-step"><div class="prog-circle done">✓</div><div class="prog-label">Profile</div></div><div class="prog-line done"></div>
     <div class="prog-step"><div class="prog-circle done">✓</div><div class="prog-label">Application</div></div><div class="prog-line done"></div>
@@ -2983,7 +2988,7 @@ function downloadReport() {
 <!-- ══════════════════════════════════════════════════════
      PAGE: FINAL CONFIRMATION
 ══════════════════════════════════════════════════════ -->
-<div class="page page-fade" id="page-final" style="display:none;flex-direction:column;width:100%;height:100vh;overflow:hidden;">
+<div class="page page-fade" id="page-final" style="display:none;">
   <div class="success-screen">
     <div class="success-box">
       <span class="success-icon">🛡️</span>
@@ -3012,6 +3017,7 @@ function showPage(id) {
   document.querySelectorAll('.page').forEach(p => {
     p.classList.remove('active');
     p.style.display = 'none';
+    p.style.cssText = 'display:none;';
   });
 
   const pg = document.getElementById(id);
@@ -3037,10 +3043,6 @@ function showPage(id) {
   if (header) header.style.display = 'flex';
 
   pg.style.display = 'flex';
-  pg.style.flexDirection = 'column';
-  pg.style.width = '100%';
-  pg.style.height = '100vh';
-  pg.style.overflow = 'hidden';
   pg.classList.remove('page-fade');
   pg.classList.add('active');
   void pg.offsetWidth;
