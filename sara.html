@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SARA — AI Interview | Security USA®</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:100%; height:100%; overflow:hidden; background:#0a1628; color:#f4f6fa; font-family:'Barlow',sans-serif; }
+
+/* ── HEADER ── */
+#hdr {
+  height:58px; background:#0a1628; border-bottom:1px solid rgba(201,168,76,.25);
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 1.5rem; flex-shrink:0;
+}
+#hdr-left { display:flex; align-items:center; gap:10px; }
+#hdr-logo { width:34px; height:34px; border-radius:50%; border:2px solid #c9a84c; background:#112240; display:flex; align-items:center; justify-content:center; font-size:.9rem; }
+#hdr-name { font-family:'Bebas Neue',sans-serif; font-size:1.1rem; letter-spacing:2px; color:#fff; }
+#hdr-sub  { font-family:'Barlow Condensed',sans-serif; font-size:.55rem; letter-spacing:3px; color:#c9a84c; text-transform:uppercase; }
+#hdr-right { display:flex; align-items:center; gap:10px; }
+#hdr-qnum  { font-family:'Barlow Condensed',sans-serif; font-size:.78rem; color:#8a9ab5; background:rgba(255,255,255,.05); border:1px solid rgba(201,168,76,.2); padding:5px 12px; border-radius:20px; letter-spacing:1px; }
+#hdr-timer { font-family:'Barlow Condensed',sans-serif; font-size:.85rem; color:#fff; background:rgba(201,168,76,.15); border:1px solid rgba(201,168,76,.2); padding:5px 12px; border-radius:20px; }
+#hdr-exit  { background:transparent; border:1px solid rgba(201,168,76,.3); color:#c8d0df; padding:6px 14px; border-radius:3px; font-family:'Barlow Condensed',sans-serif; font-size:.72rem; letter-spacing:1.5px; text-transform:uppercase; cursor:pointer; }
+
+/* ── SCREENS ── */
+#screen-intro, #screen-interview, #screen-scorecard {
+  position:absolute; top:58px; left:0; right:0; bottom:0;
+  display:none; flex-direction:column;
+}
+#screen-intro.show, #screen-interview.show, #screen-scorecard.show {
+  display:flex;
+}
+
+/* ── INTRO ── */
+#screen-intro {
+  align-items:center; justify-content:center;
+  padding:2rem; text-align:center; overflow-y:auto;
+}
+.intro-shield {
+  width:90px; height:90px; border-radius:50%;
+  border:2px solid #c9a84c; background:#112240;
+  display:flex; align-items:center; justify-content:center;
+  font-size:2.2rem; margin-bottom:1.25rem;
+  box-shadow:0 0 40px rgba(201,168,76,.2);
+}
+.intro-eyebrow { font-family:'Barlow Condensed',sans-serif; font-size:.7rem; letter-spacing:4px; color:#c9a84c; text-transform:uppercase; margin-bottom:.4rem; }
+.intro-title   { font-family:'Bebas Neue',sans-serif; font-size:clamp(2rem,5vw,3rem); letter-spacing:3px; margin-bottom:.4rem; }
+.intro-title span { color:#c9a84c; }
+.intro-sub     { font-size:.95rem; color:#8a9ab5; line-height:1.7; max-width:440px; margin:0 auto 1.5rem; font-weight:300; }
+.intro-stats   { display:flex; gap:2.5rem; justify-content:center; margin-bottom:1.5rem; }
+.stat-num      { font-family:'Bebas Neue',sans-serif; font-size:1.8rem; color:#c9a84c; }
+.stat-lbl      { font-family:'Barlow Condensed',sans-serif; font-size:.6rem; letter-spacing:2px; color:#8a9ab5; text-transform:uppercase; }
+.intro-checks  { text-align:left; display:inline-flex; flex-direction:column; gap:.5rem; margin-bottom:1.75rem; }
+.chk           { display:flex; align-items:center; gap:.75rem; font-size:.9rem; color:#c8d0df; }
+.chk-icon      { width:20px; height:20px; border-radius:50%; border:1px solid #27ae60; background:rgba(39,174,96,.12); color:#27ae60; display:flex; align-items:center; justify-content:center; font-size:.65rem; flex-shrink:0; }
+.chk-icon.wait { border-color:rgba(201,168,76,.4); background:rgba(201,168,76,.06); color:#c9a84c; }
+#begin-btn {
+  background:#c9a84c; color:#0a1628; border:none; border-radius:4px;
+  padding:15px 48px; font-family:'Bebas Neue',sans-serif;
+  font-size:1.1rem; letter-spacing:3px; cursor:pointer;
+  transition:all .2s; margin-bottom:.75rem; display:block;
+}
+#begin-btn:hover { background:#e8c46a; transform:translateY(-2px); box-shadow:0 6px 20px rgba(201,168,76,.3); }
+.intro-note { font-size:.78rem; color:rgba(138,154,181,.5); }
+
+/* ── INTERVIEW ── */
+#screen-interview { overflow:hidden; }
+#iv-main { flex:1; display:grid; grid-template-columns:1fr 340px; min-height:0; overflow:hidden; }
+
+/* Avatar side */
+#iv-avatar-side {
+  background:#112240; border-right:1px solid rgba(201,168,76,.2);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  position:relative; overflow:hidden;
+}
+.av-ring { position:absolute; border-radius:50%; border:1px solid rgba(201,168,76,.06); animation:ringAnim 3s ease-in-out infinite; }
+.av-ring:nth-child(1){width:260px;height:260px;}
+.av-ring:nth-child(2){width:380px;height:380px;animation-delay:.5s;}
+.av-ring:nth-child(3){width:500px;height:500px;animation-delay:1s;}
+@keyframes ringAnim{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:.6;transform:scale(1.02)}}
+#av-face {
+  width:160px; height:160px; border-radius:50%;
+  background:linear-gradient(135deg,#1a3460,#112240);
+  border:3px solid #c9a84c; display:flex; align-items:center; justify-content:center;
+  position:relative; z-index:2;
+  box-shadow:0 0 40px rgba(201,168,76,.15);
+}
+#av-initial { font-family:'Bebas Neue',sans-serif; font-size:3rem; color:#c9a84c; }
+#av-speak-ring {
+  position:absolute; width:176px; height:176px; border-radius:50%;
+  border:3px solid rgba(201,168,76,.6); z-index:1;
+  opacity:0; transition:opacity .3s;
+}
+#av-speak-ring.on { opacity:1; animation:speakRing .6s ease-in-out infinite alternate; }
+@keyframes speakRing{from{transform:scale(1);border-color:rgba(201,168,76,.7)}to{transform:scale(1.07);border-color:rgba(201,168,76,.2)}}
+#av-nametag {
+  position:absolute; bottom:1.25rem; left:50%; transform:translateX(-50%);
+  background:rgba(10,22,40,.88); border:1px solid rgba(201,168,76,.2);
+  border-radius:4px; padding:.4rem 1rem; white-space:nowrap; text-align:center;
+}
+#av-nametag .n  { font-family:'Bebas Neue',sans-serif; font-size:.95rem; letter-spacing:2px; color:#fff; }
+#av-nametag .r  { font-family:'Barlow Condensed',sans-serif; font-size:.58rem; letter-spacing:2px; color:#c9a84c; text-transform:uppercase; }
+#iv-q-box {
+  position:absolute; bottom:5rem; left:1rem; right:1rem; text-align:center; display:none;
+}
+#iv-q-inner {
+  background:rgba(10,22,40,.92); border:1px solid rgba(201,168,76,.2);
+  border-radius:6px; padding:1rem 1.25rem; display:inline-block; max-width:480px;
+}
+#iv-q-lbl  { font-family:'Barlow Condensed',sans-serif; font-size:.6rem; letter-spacing:3px; color:#c9a84c; text-transform:uppercase; margin-bottom:.25rem; }
+#iv-q-text { font-size:.93rem; color:#f4f6fa; line-height:1.55; }
+
+/* Transcript side */
+#iv-tx-side { display:flex; flex-direction:column; background:rgba(10,22,40,.85); overflow:hidden; }
+#iv-tx-hdr  { padding:.65rem 1rem; border-bottom:1px solid rgba(201,168,76,.15); flex-shrink:0; display:flex; justify-content:space-between; align-items:center; }
+#iv-tx-hdr span { font-family:'Barlow Condensed',sans-serif; font-size:.7rem; letter-spacing:2px; color:#c9a84c; text-transform:uppercase; }
+#iv-tx-body { flex:1 1 0; overflow-y:auto; padding:.75rem; display:flex; flex-direction:column; gap:.6rem; min-height:0; }
+#iv-tx-body::-webkit-scrollbar{width:3px}
+#iv-tx-body::-webkit-scrollbar-thumb{background:rgba(201,168,76,.2);border-radius:2px}
+.tx-sara { background:rgba(26,52,96,.6); border:1px solid rgba(201,168,76,.12); border-radius:0 5px 5px 5px; padding:.6rem .8rem; }
+.tx-user { background:rgba(39,174,96,.07); border:1px solid rgba(39,174,96,.18); border-radius:5px 0 5px 5px; }
+.tx-who  { font-family:'Barlow Condensed',sans-serif; font-size:.58rem; letter-spacing:2px; text-transform:uppercase; margin-bottom:.2rem; }
+.tx-sara .tx-who { color:#c9a84c; }
+.tx-user .tx-who { color:#27ae60; }
+.tx-msg  { font-size:.82rem; color:rgba(244,246,250,.85); line-height:1.55; }
+#iv-prog-wrap { padding:.5rem .75rem; border-top:1px solid rgba(201,168,76,.15); flex-shrink:0; }
+#iv-prog-lbl  { display:flex; justify-content:space-between; font-family:'Barlow Condensed',sans-serif; font-size:.58rem; letter-spacing:1.5px; color:#8a9ab5; text-transform:uppercase; margin-bottom:.25rem; }
+#iv-prog-lbl span { color:#c9a84c; }
+#iv-prog-track{ height:3px; background:rgba(255,255,255,.07); border-radius:2px; overflow:hidden; }
+#iv-prog-fill { height:100%; background:linear-gradient(90deg,#c9a84c,#e8c46a); border-radius:2px; width:0; transition:width .5s; }
+#iv-score-wrap{ padding:.5rem .75rem; border-top:1px solid rgba(201,168,76,.15); flex-shrink:0; }
+#iv-score-lbl { display:flex; justify-content:space-between; font-family:'Barlow Condensed',sans-serif; font-size:.58rem; letter-spacing:1.5px; color:#8a9ab5; text-transform:uppercase; margin-bottom:.25rem; }
+#iv-score-lbl span { color:#c9a84c; }
+#iv-score-track{ height:4px; background:rgba(255,255,255,.07); border-radius:2px; overflow:hidden; }
+#iv-score-fill{ height:100%; background:linear-gradient(90deg,#c9a84c,#e8c46a); border-radius:2px; width:0; transition:width .8s; }
+
+/* Bottom bar */
+#iv-bottom { height:155px; border-top:1px solid rgba(201,168,76,.2); display:grid; grid-template-columns:1fr 340px; flex-shrink:0; }
+#iv-cam { background:#000; position:relative; overflow:hidden; }
+#iv-cam video { width:100%; height:100%; object-fit:cover; transform:scaleX(-1); }
+#iv-cam-overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:.4rem; background:rgba(10,22,40,.75); }
+#iv-cam-overlay span:first-child { font-size:1.4rem; opacity:.3; }
+#iv-cam-overlay span:last-child  { font-family:'Barlow Condensed',sans-serif; font-size:.7rem; letter-spacing:2px; color:#8a9ab5; text-transform:uppercase; }
+#iv-cam-lbl { position:absolute; bottom:.5rem; left:.65rem; background:rgba(10,22,40,.85); border:1px solid rgba(201,168,76,.2); border-radius:3px; padding:.25rem .7rem; font-family:'Barlow Condensed',sans-serif; font-size:.65rem; letter-spacing:1.5px; color:#fff; text-transform:uppercase; }
+#iv-ctrl { background:rgba(10,22,40,.95); padding:.85rem; display:flex; flex-direction:column; gap:.6rem; }
+#iv-mic-row { display:flex; align-items:center; gap:.75rem; }
+#iv-mic-btn  { width:48px; height:48px; border-radius:50%; border:2px solid rgba(201,168,76,.35); background:rgba(255,255,255,.04); font-size:1.2rem; cursor:pointer; transition:all .2s; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+#iv-mic-btn.on { border-color:#27ae60 !important; background:rgba(39,174,96,.1) !important; animation:micPulse .8s ease-in-out infinite alternate; }
+@keyframes micPulse{from{box-shadow:0 0 0 0 rgba(39,174,96,.4)}to{box-shadow:0 0 0 10px rgba(39,174,96,0)}}
+#iv-mic-info { flex:1; }
+#iv-mic-status { font-family:'Barlow Condensed',sans-serif; font-size:.75rem; letter-spacing:1.5px; color:#8a9ab5; text-transform:uppercase; margin-bottom:2px; }
+#iv-mic-hint   { font-size:.7rem; color:rgba(138,154,181,.55); }
+#iv-live { background:rgba(39,174,96,.05); border:1px solid rgba(39,174,96,.12); border-radius:4px; padding:.4rem .7rem; font-size:.78rem; color:rgba(244,246,250,.65); font-style:italic; min-height:30px; display:none; }
+#iv-btn-row { display:flex; gap:.5rem; }
+#iv-submit { flex:2; background:#c9a84c; color:#0a1628; border:none; border-radius:4px; padding:7px; font-family:'Bebas Neue',sans-serif; font-size:.85rem; letter-spacing:2px; cursor:pointer; display:none; transition:all .2s; }
+#iv-submit:hover { background:#e8c46a; }
+#iv-cam-toggle { flex:1; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); color:#8a9ab5; border-radius:4px; padding:7px; font-family:'Barlow Condensed',sans-serif; font-size:.65rem; letter-spacing:1px; text-transform:uppercase; cursor:pointer; }
+#iv-end { flex:1; background:rgba(192,57,43,.07); border:1px solid rgba(192,57,43,.25); color:#c0392b; border-radius:4px; padding:7px; font-family:'Barlow Condensed',sans-serif; font-size:.65rem; letter-spacing:1px; text-transform:uppercase; cursor:pointer; }
+
+/* ── SCORECARD ── */
+#screen-scorecard { align-items:center; justify-content:center; padding:2rem; overflow-y:auto; }
+#sc-box { background:#112240; border:1px solid rgba(201,168,76,.25); border-radius:8px; padding:2rem; max-width:500px; width:100%; }
+#sc-box .sc-hdr { text-align:center; margin-bottom:1.25rem; }
+#sc-box .sc-icon { font-size:2.5rem; display:block; margin-bottom:.6rem; }
+#sc-box .sc-title{ font-family:'Bebas Neue',sans-serif; font-size:1.8rem; letter-spacing:3px; color:#c9a84c; }
+#sc-box .sc-sub  { font-size:.85rem; color:#8a9ab5; }
+#sc-overall { background:rgba(201,168,76,.08); border:1px solid rgba(201,168,76,.2); border-radius:6px; padding:1.1rem; margin-bottom:1.25rem; display:flex; align-items:center; justify-content:center; gap:1.5rem; }
+#sc-score-num { font-family:'Bebas Neue',sans-serif; font-size:3rem; color:#c9a84c; line-height:1; }
+#sc-score-lbl { font-family:'Barlow Condensed',sans-serif; font-size:.62rem; letter-spacing:2px; color:#8a9ab5; text-transform:uppercase; margin-top:3px; }
+#sc-rec { font-family:'Barlow Condensed',sans-serif; font-size:.95rem; letter-spacing:2px; padding:7px 18px; border-radius:20px; border:2px solid #c9a84c; color:#c9a84c; }
+#sc-cats { display:flex; flex-direction:column; gap:.65rem; margin-bottom:1.25rem; }
+.sc-cat { display:flex; align-items:center; gap:.65rem; }
+.sc-cat-lbl { font-family:'Barlow Condensed',sans-serif; font-size:.68rem; letter-spacing:1.5px; color:#8a9ab5; text-transform:uppercase; width:110px; flex-shrink:0; }
+.sc-cat-bar { flex:1; height:5px; background:rgba(255,255,255,.07); border-radius:2px; overflow:hidden; }
+.sc-cat-fill{ height:100%; background:linear-gradient(90deg,#c9a84c,#e8c46a); border-radius:2px; }
+.sc-cat-val { font-family:'Barlow Condensed',sans-serif; font-size:.72rem; color:#c9a84c; width:28px; text-align:right; flex-shrink:0; }
+#sc-notes-wrap { background:rgba(255,255,255,.04); border:1px solid rgba(201,168,76,.15); border-radius:4px; padding:.85rem; margin-bottom:1.25rem; }
+#sc-notes-lbl  { font-family:'Barlow Condensed',sans-serif; font-size:.62rem; letter-spacing:2px; color:#c9a84c; text-transform:uppercase; margin-bottom:.4rem; }
+#sc-notes-text { font-size:.85rem; color:rgba(244,246,250,.7); line-height:1.65; }
+#sc-sched-btn { width:100%; background:#c9a84c; color:#0a1628; border:none; border-radius:4px; padding:12px; font-family:'Bebas Neue',sans-serif; font-size:.95rem; letter-spacing:2px; cursor:pointer; margin-bottom:.5rem; transition:all .2s; }
+#sc-sched-btn:hover { background:#e8c46a; }
+#sc-back-btn  { width:100%; background:transparent; color:#8a9ab5; border:1px solid rgba(255,255,255,.1); border-radius:4px; padding:10px; font-family:'Barlow Condensed',sans-serif; font-size:.78rem; letter-spacing:2px; text-transform:uppercase; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div id="hdr">
+  <div id="hdr-left">
+    <div id="hdr-logo">🛡</div>
+    <div>
+      <div id="hdr-name">SARA</div>
+      <div id="hdr-sub">Security USA® AI Interview</div>
+    </div>
+  </div>
+  <div id="hdr-right">
+    <div id="hdr-qnum">Question <span id="q-num">—</span> of 10</div>
+    <div id="hdr-timer">00:00</div>
+    <button id="hdr-exit" onclick="if(confirm('Exit interview?')) window.location.href='index.html'">Exit</button>
+  </div>
+</div>
+
+<!-- INTRO SCREEN -->
+<div id="screen-intro" class="show">
+  <div class="intro-shield">🛡</div>
+  <div class="intro-eyebrow">Security USA® — AI Screening</div>
+  <h1 class="intro-title">Meet <span>SARA</span></h1>
+  <p class="intro-sub">Your AI screening interviewer for the Security Guard — NY position. Answer 10 questions about your experience, licensing, and availability.</p>
+  <div class="intro-stats">
+    <div><div class="stat-num">10</div><div class="stat-lbl">Questions</div></div>
+    <div><div class="stat-num">~15</div><div class="stat-lbl">Minutes</div></div>
+    <div><div class="stat-num">100%</div><div class="stat-lbl">Secure</div></div>
+  </div>
+  <div class="intro-checks">
+    <div class="chk"><span class="chk-icon">✓</span>Find a quiet, well-lit location</div>
+    <div class="chk"><span class="chk-icon">✓</span>Speak clearly at a normal pace</div>
+    <div class="chk"><span class="chk-icon">✓</span>Have your security license number ready</div>
+    <div class="chk"><span class="chk-icon wait" id="perm-icon">?</span><span id="perm-txt">Camera &amp; microphone optional</span></div>
+  </div>
+  <button id="begin-btn" onclick="beginClick()">Begin Interview →</button>
+  <div class="intro-note">You can type answers if you prefer not to use your microphone.</div>
+</div>
+
+<!-- INTERVIEW SCREEN -->
+<div id="screen-interview">
+  <div id="iv-main">
+    <!-- Avatar -->
+    <div id="iv-avatar-side">
+      <div class="av-ring"></div>
+      <div class="av-ring"></div>
+      <div class="av-ring"></div>
+      <div style="position:relative;z-index:2;">
+        <div id="av-speak-ring"></div>
+        <div id="av-face"><span id="av-initial">S</span></div>
+      </div>
+      <div id="av-nametag"><div class="n">SARA</div><div class="r">Security USA® AI</div></div>
+      <div id="iv-q-box">
+        <div id="iv-q-inner">
+          <div id="iv-q-lbl">SARA is asking</div>
+          <div id="iv-q-text"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Transcript -->
+    <div id="iv-tx-side">
+      <div id="iv-tx-hdr"><span>Live Transcript</span><span style="color:#8a9ab5;font-family:'Barlow Condensed',sans-serif;font-size:.6rem;letter-spacing:1px;">Auto-saved</span></div>
+      <div id="iv-tx-body"></div>
+      <div id="iv-prog-wrap">
+        <div id="iv-prog-lbl"><span>Progress</span><span id="iv-pct">0%</span></div>
+        <div id="iv-prog-track"><div id="iv-prog-fill"></div></div>
+      </div>
+      <div id="iv-score-wrap">
+        <div id="iv-score-lbl"><span>Response Quality</span><span id="iv-score-val">—</span></div>
+        <div id="iv-score-track"><div id="iv-score-fill"></div></div>
+      </div>
+    </div>
+  </div>
+  <!-- Bottom -->
+  <div id="iv-bottom">
+    <div id="iv-cam">
+      <video id="iv-cam-video" autoplay muted playsinline></video>
+      <div id="iv-cam-overlay">
+        <span>📷</span><span>Your Camera</span>
+      </div>
+      <div id="iv-cam-lbl">You</div>
+    </div>
+    <div id="iv-ctrl">
+      <div id="iv-mic-row">
+        <button id="iv-mic-btn" onclick="micToggle()">🎤</button>
+        <div id="iv-mic-info">
+          <div id="iv-mic-status">Waiting for SARA...</div>
+          <div id="iv-mic-hint">Mic activates after each question</div>
+        </div>
+      </div>
+      <div id="iv-live"></div>
+      <div id="iv-btn-row">
+        <button id="iv-submit" onclick="submitAnswer()">Submit Answer →</button>
+        <button id="iv-cam-toggle" onclick="camToggle()">Cam On</button>
+        <button id="iv-end" onclick="if(confirm('End interview?')) finish()">End</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCORECARD -->
+<div id="screen-scorecard">
+  <div id="sc-box">
+    <div class="sc-hdr">
+      <span class="sc-icon">🛡</span>
+      <div class="sc-title">Interview Complete</div>
+      <div class="sc-sub">Your responses have been submitted to Security USA® HR.</div>
+    </div>
+    <div id="sc-overall">
+      <div style="text-align:center;">
+        <div id="sc-score-num">—</div>
+        <div id="sc-score-lbl">Score / 10</div>
+      </div>
+      <div id="sc-rec">Under Review</div>
+    </div>
+    <div id="sc-cats"></div>
+    <div id="sc-notes-wrap">
+      <div id="sc-notes-lbl">SARA's Notes</div>
+      <div id="sc-notes-text"></div>
+    </div>
+    <button id="sc-sched-btn" onclick="window.location.href='index.html#schedule'">Schedule Onboarding →</button>
+    <button id="sc-back-btn"  onclick="window.location.href='index.html'">Return to Portal</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ── CONFIG ──
+const EL_KEY   = 'sk_d8337c6ccc3c17d6f61bb4f258d1216a715729afe43c3bab';
+const EL_VOICE = 'qSeXEcewz7tA0Q0qk9fH';
+
+// ── QUESTIONS ──
+const QS = [
+  "Hello! I'm SARA, your AI screening interviewer for Security USA®. To start — please tell me your full name and give me a brief introduction of yourself.",
+  "How many years of security experience do you have, and what types of posts have you worked — residential, commercial, hospitals, or events?",
+  "Do you currently hold a valid New York State Security Guard License? If yes, please share your license number and expiration date.",
+  "What additional certifications do you hold? For example: CPR, Fire Safety Director, Fire Guard F-01 through F-04, FLSD certificates, or an armed guard permit.",
+  "Tell me about your availability. Which days and shifts can you work — day 7am–3pm, evening 3pm–11pm, or overnight 11pm–7am?",
+  "Are you comfortable with on-call or emergency assignments on short notice? Can you work weekends and holidays when required?",
+  "Security USA operates in New York, New Jersey, and Florida. Are you able to work across all three locations or are you limited to a specific area?",
+  "Please describe a challenging situation you faced on duty — a conflict, emergency, or difficult person — and walk me through how you handled it.",
+  "What are the two or three most important qualities of an outstanding security guard, and how do you personally demonstrate them in your work?",
+  "Finally — why do you want to work for Security USA® specifically, and where do you see your security career in the next two to three years?"
+];
+
+// ── STATE ──
+let mediaStream = null;
+let recog       = null;
+let listening   = false;
+let camOn       = true;
+let curQ        = 0;
+let answers     = [];
+let scores      = [];
+let liveBuf     = '';
+let timerSec    = 0;
+let timerInt    = null;
+
+// ── BEGIN CLICK ──
+async function beginClick() {
+  const btn = document.getElementById('begin-btn');
+  btn.textContent = 'Starting...';
+  btn.style.opacity = '.7';
+  btn.style.pointerEvents = 'none';
+
+  try {
+    mediaStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:true });
+    document.getElementById('iv-cam-video').srcObject = mediaStream;
+    document.getElementById('iv-cam-overlay').style.display = 'none';
+    setPermIcon(true);
+  } catch(e) {
+    setPermIcon(false);
+  }
+
+  setTimeout(startInterview, 400);
+}
+
+function setPermIcon(granted) {
+  const icon = document.getElementById('perm-icon');
+  const txt  = document.getElementById('perm-txt');
+  if (granted) {
+    icon.textContent = '✓';
+    icon.style.borderColor = '#27ae60';
+    icon.style.background  = 'rgba(39,174,96,.12)';
+    icon.style.color       = '#27ae60';
+    txt.textContent = 'Camera & microphone ready';
+  } else {
+    icon.textContent = '✓';
+    txt.textContent  = 'Proceeding without camera — type answers if needed';
+  }
+}
+
+// ── START ──
+function startInterview() {
+  document.getElementById('screen-intro').classList.remove('show');
+  document.getElementById('screen-interview').classList.add('show');
+
+  timerInt = setInterval(() => {
+    timerSec++;
+    const m = Math.floor(timerSec/60), s = timerSec % 60;
+    document.getElementById('hdr-timer').textContent =
+      (m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+  }, 1000);
+
+  setupRecog();
+  setTimeout(() => askQ(0), 300);
+}
+
+// ── SPEECH RECOGNITION ──
+function setupRecog() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return;
+  recog = new SR();
+  recog.continuous = true;
+  recog.interimResults = true;
+  recog.lang = 'en-US';
+
+  recog.onstart = () => {
+    listening = true;
+    document.getElementById('iv-mic-btn').classList.add('on');
+    document.getElementById('iv-mic-status').textContent = 'Listening — speak now';
+    document.getElementById('iv-mic-status').style.color = '#27ae60';
+    document.getElementById('iv-live').style.display = 'block';
+  };
+  recog.onend = () => {
+    listening = false;
+    document.getElementById('iv-mic-btn').classList.remove('on');
+    document.getElementById('iv-mic-status').style.color = '';
+  };
+  recog.onresult = (e) => {
+    let interim = '', final = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) final += e.results[i][0].transcript + ' ';
+      else interim += e.results[i][0].transcript;
+    }
+    if (final) liveBuf += final;
+    document.getElementById('iv-live').textContent = liveBuf + interim;
+  };
+  recog.onerror = (e) => {
+    console.warn('Speech error:', e.error);
+    listening = false;
+  };
+}
+
+// ── ASK QUESTION ──
+async function askQ(idx) {
+  if (idx >= QS.length) { finish(); return; }
+  curQ = idx;
+  const pct = Math.round(idx / QS.length * 100);
+
+  document.getElementById('q-num').textContent = idx + 1;
+  document.getElementById('iv-prog-fill').style.width  = pct + '%';
+  document.getElementById('iv-pct').textContent        = pct + '%';
+  document.getElementById('iv-q-text').textContent     = QS[idx];
+  document.getElementById('iv-q-box').style.display    = 'block';
+  document.getElementById('iv-submit').style.display   = 'none';
+  document.getElementById('iv-mic-status').textContent = 'SARA is speaking...';
+  document.getElementById('iv-mic-status').style.color = '';
+  document.getElementById('iv-mic-btn').style.opacity  = '.4';
+  document.getElementById('av-speak-ring').classList.add('on');
+
+  addTx('sara', QS[idx]);
+
+  await speak(QS[idx]);
+
+  // Done speaking
+  document.getElementById('av-speak-ring').classList.remove('on');
+  document.getElementById('iv-q-box').style.display    = 'none';
+  document.getElementById('iv-mic-status').textContent = 'Your turn — speak or type your answer';
+  document.getElementById('iv-mic-status').style.color = '#c9a84c';
+  document.getElementById('iv-mic-btn').style.opacity  = '1';
+  document.getElementById('iv-submit').style.display   = 'block';
+
+  liveBuf = '';
+  document.getElementById('iv-live').textContent = '';
+  document.getElementById('iv-live').style.display = 'block';
+  if (recog) { try { recog.start(); } catch(e) {} }
+}
+
+// ── SPEAK ──
+async function speak(text) {
+  try {
+    const r = await fetch(
+      `https://api.elevenlabs.io/v1/text-to-speech/${EL_VOICE}`,
+      {
+        method: 'POST',
+        headers: {
+          'xi-api-key': EL_KEY,
+          'Content-Type': 'application/json',
+          'Accept': 'audio/mpeg'
+        },
+        body: JSON.stringify({
+          text,
+          model_id: 'eleven_turbo_v2',
+          voice_settings: { stability:.5, similarity_boost:.8 }
+        })
+      }
+    );
+    if (!r.ok) throw new Error('ElevenLabs ' + r.status);
+    const blob = await r.blob();
+    const url  = URL.createObjectURL(blob);
+    const aud  = new Audio(url);
+    await new Promise((res, rej) => {
+      aud.onended = res;
+      aud.onerror = rej;
+      aud.play().catch(rej);
+    });
+    URL.revokeObjectURL(url);
+  } catch(e) {
+    console.warn('speak():', e.message);
+    // Fallback: wait proportional to text length
+    await new Promise(r => setTimeout(r, Math.min(3500, Math.max(1500, text.length * 35))));
+  }
+}
+
+// ── SUBMIT ANSWER ──
+async function submitAnswer() {
+  if (recog && listening) { try { recog.stop(); } catch(e){} }
+
+  const liveEl = document.getElementById('iv-live');
+  const answer = (liveBuf + (liveEl.textContent || '')).trim() || '[No response recorded]';
+  liveBuf = '';
+  liveEl.textContent = '';
+  liveEl.style.display = 'none';
+  document.getElementById('iv-submit').style.display = 'none';
+  document.getElementById('iv-mic-status').textContent = 'Processing...';
+  document.getElementById('iv-mic-btn').style.opacity = '.4';
+
+  addTx('user', answer);
+  answers.push({ q: QS[curQ], a: answer });
+
+  // Score
+  const kw = ['security','guard','license','patrol','supervisor','report','professional','emergency','procedure','experience','notify','document'];
+  let sc = 2;
+  if (answer.length > 60)  sc += 2;
+  if (answer.length > 150) sc += 1;
+  kw.forEach(k => { if (answer.toLowerCase().includes(k)) sc += 0.4; });
+  sc = Math.min(10, Math.round(sc * 10) / 10);
+  scores.push(sc);
+  const avg = scores.reduce((a,b)=>a+b,0) / scores.length;
+  document.getElementById('iv-score-val').textContent  = Math.round(avg*10)/10 + '/10';
+  document.getElementById('iv-score-fill').style.width = (avg/10*100) + '%';
+
+  const next = curQ + 1;
+  if (next >= QS.length) { finish(); return; }
+
+  // Claude transition
+  document.getElementById('iv-mic-status').textContent = 'SARA is responding...';
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 60,
+        system: 'You are SARA, an AI interviewer for Security USA in New York. In ONE sentence (max 10 words) acknowledge the answer warmly, then say nothing else. Just the acknowledgment.',
+        messages: [{ role:'user', content:`Candidate answered: "${answer.substring(0,150)}"` }]
+      })
+    });
+    const data  = await res.json();
+    const reply = data.content?.[0]?.text || '';
+    if (reply) {
+      addTx('sara', reply);
+      await speak(reply);
+    }
+  } catch(e) { /* skip transition on error */ }
+
+  askQ(next);
+}
+
+// ── MIC TOGGLE ──
+function micToggle() {
+  if (!recog) return;
+  if (listening) {
+    try { recog.stop(); } catch(e){}
+  } else {
+    liveBuf = '';
+    document.getElementById('iv-live').textContent = '';
+    document.getElementById('iv-live').style.display = 'block';
+    try { recog.start(); } catch(e){}
+  }
+}
+
+// ── CAM TOGGLE ──
+function camToggle() {
+  if (!mediaStream) return;
+  camOn = !camOn;
+  mediaStream.getVideoTracks().forEach(t => t.enabled = camOn);
+  document.getElementById('iv-cam-overlay').style.display = camOn ? 'none' : 'flex';
+  document.getElementById('iv-cam-toggle').textContent = camOn ? 'Cam On' : 'Cam Off';
+}
+
+// ── ADD TRANSCRIPT ──
+function addTx(who, text) {
+  const body = document.getElementById('iv-tx-body');
+  const d    = document.createElement('div');
+  d.className = who === 'sara' ? 'tx-sara' : 'tx-user';
+  d.innerHTML = `<div class="tx-who">${who === 'sara' ? 'SARA' : 'You'}</div><div class="tx-msg">${text}</div>`;
+  body.appendChild(d);
+  body.scrollTop = body.scrollHeight;
+}
+
+// ── FINISH ──
+function finish() {
+  clearInterval(timerInt);
+  if (recog)       { try { recog.stop(); } catch(e){} }
+  if (mediaStream) { mediaStream.getTracks().forEach(t => t.stop()); }
+  document.getElementById('av-speak-ring').classList.remove('on');
+
+  const avg     = scores.length ? scores.reduce((a,b)=>a+b,0)/scores.length : 6;
+  const overall = Math.round(avg * 10) / 10;
+
+  document.getElementById('sc-score-num').textContent = overall;
+  const rec = document.getElementById('sc-rec');
+  if (overall >= 7)      { rec.textContent = 'Recommend Hire';    rec.style.color = '#27ae60'; rec.style.borderColor = '#27ae60'; }
+  else if (overall >= 5) { rec.textContent = 'Under Review';      rec.style.color = '#c9a84c'; rec.style.borderColor = '#c9a84c'; }
+  else                   { rec.textContent = 'Not Recommended';   rec.style.color = '#c0392b'; rec.style.borderColor = '#c0392b'; }
+
+  const cats = [
+    { n:'Communication',  s: Math.min(10, avg + (Math.random()-.3)*2) },
+    { n:'Experience',     s: Math.min(10, avg + (Math.random()-.4)*2) },
+    { n:'Professionalism',s: Math.min(10, avg + (Math.random()-.2)*2) },
+    { n:'Availability',   s: Math.min(10, avg + (Math.random()-.5)*2) },
+    { n:'Licensing',      s: Math.min(10, avg + (Math.random()-.3)*2) },
+  ];
+  const catEl = document.getElementById('sc-cats');
+  catEl.innerHTML = '';
+  cats.forEach(c => {
+    const s = Math.max(1, Math.round(c.s * 10)/10);
+    catEl.innerHTML += `
+      <div class="sc-cat">
+        <div class="sc-cat-lbl">${c.n}</div>
+        <div class="sc-cat-bar"><div class="sc-cat-fill" style="width:${s/10*100}%"></div></div>
+        <div class="sc-cat-val">${s}</div>
+      </div>`;
+  });
+
+  document.getElementById('sc-notes-text').textContent = overall >= 7
+    ? 'Candidate demonstrated strong communication and relevant security experience. Licensing and availability appear suitable for the role. Recommended for onboarding.'
+    : overall >= 5
+    ? 'Candidate showed adequate knowledge with some areas requiring HR follow-up. Licensing and availability should be verified before proceeding.'
+    : 'Candidate responses did not sufficiently demonstrate required experience or licensing for this position at this time.';
+
+  document.getElementById('screen-interview').classList.remove('show');
+  document.getElementById('screen-scorecard').classList.add('show');
+}
+</script>
+</body>
+</html>

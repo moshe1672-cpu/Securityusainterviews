@@ -846,7 +846,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
           </div>
           <div class="dash-card-body">
             <p>A conversational AI screening interview covering your background, experience, licenses, and availability.</p>
-            <button class="dash-continue-btn" onclick="showPage('page-sara')">Begin Interview →</button>
+            <button class="dash-continue-btn" onclick="window.location.href='sara.html'">Begin Interview →</button>
           </div>
         </div>
         <div class="dash-card">
@@ -1684,7 +1684,7 @@ function goToEEO(){
   markStep(2); showPage('page-eeo');
 }
 function goToJobQ(){ markStep(3); showPage('page-jobquestions'); }
-function goToInterview(){ markStep(4); showPage('page-sara'); }
+function goToInterview(){ markStep(4); window.location.href='sara.html'; }
 
 function markStep(n){
   const map={2:['pipe2','conn2','appBadge'],3:['pipe3','conn3','eeoBadge'],4:['pipe4','conn4','jqBadge']};
