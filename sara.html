@@ -5,27 +5,36 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SARA — AI Interview | Security USA®</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+<!-- D-ID Agents SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@d-id/client-sdk/dist/index.umd.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;color:#f4f6fa;font-family:'Barlow',sans-serif;}
-#hdr{height:58px;background:#0a1628;border-bottom:1px solid rgba(201,168,76,.25);display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;flex-shrink:0;}
+
+/* HEADER */
+#hdr{height:58px;background:#0a1628;border-bottom:1px solid rgba(201,168,76,.25);display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;flex-shrink:0;position:relative;z-index:10;}
 #hdr-left{display:flex;align-items:center;gap:10px;}
 #hdr-logo{width:34px;height:34px;border-radius:50%;border:2px solid #c9a84c;background:#112240;display:flex;align-items:center;justify-content:center;font-size:.9rem;}
-#hdr-title{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;}
+#hdr-name{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;}
 #hdr-sub{font-family:'Barlow Condensed',sans-serif;font-size:.55rem;letter-spacing:3px;color:#c9a84c;text-transform:uppercase;}
 #hdr-right{display:flex;align-items:center;gap:10px;}
 #hdr-qnum{font-family:'Barlow Condensed',sans-serif;font-size:.78rem;color:#8a9ab5;background:rgba(255,255,255,.05);border:1px solid rgba(201,168,76,.2);padding:5px 12px;border-radius:20px;}
 #hdr-qnum b{color:#c9a84c;}
 #hdr-timer{font-family:'Barlow Condensed',sans-serif;font-size:.85rem;color:#fff;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.2);padding:5px 12px;border-radius:20px;}
 #hdr-exit{background:transparent;border:1px solid rgba(201,168,76,.3);color:#c8d0df;padding:6px 14px;border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;}
+
+/* SCREENS */
 .screen{position:absolute;top:58px;left:0;right:0;bottom:0;display:none;flex-direction:column;}
 .screen.on{display:flex;}
-#s-intro{align-items:center;justify-content:center;padding:2rem;text-align:center;overflow-y:auto;}
-#s-intro canvas{border-radius:50%;border:2px solid #c9a84c;box-shadow:0 0 40px rgba(201,168,76,.2);margin-bottom:1.25rem;}
+
+/* INTRO */
+#s-intro{align-items:center;justify-content:center;padding:2rem;text-align:center;overflow-y:auto;background:linear-gradient(160deg,#112240 0%,#0a1628 100%);}
+.intro-avatar{width:130px;height:130px;border-radius:50%;overflow:hidden;border:3px solid #c9a84c;box-shadow:0 0 50px rgba(201,168,76,.25);margin-bottom:1.5rem;flex-shrink:0;}
+.intro-avatar img{width:100%;height:100%;object-fit:cover;object-position:top center;}
 .eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:4px;color:#c9a84c;text-transform:uppercase;margin-bottom:.4rem;}
-.big-title{font-family:'Bebas Neue',sans-serif;font-size:2.8rem;letter-spacing:3px;margin-bottom:.4rem;}
+.big-title{font-family:'Bebas Neue',sans-serif;font-size:2.8rem;letter-spacing:3px;margin-bottom:.5rem;}
 .big-title span{color:#c9a84c;}
-.sub-txt{font-size:.95rem;color:#8a9ab5;line-height:1.7;max-width:440px;margin:0 auto 1.5rem;font-weight:300;}
+.sub-txt{font-size:.95rem;color:#8a9ab5;line-height:1.7;max-width:460px;margin:0 auto 1.5rem;font-weight:300;}
 .stats{display:flex;gap:2.5rem;justify-content:center;margin-bottom:1.5rem;}
 .stat-n{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:#c9a84c;}
 .stat-l{font-family:'Barlow Condensed',sans-serif;font-size:.6rem;letter-spacing:2px;color:#8a9ab5;text-transform:uppercase;}
@@ -33,28 +42,33 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;color:#f4f6f
 .chk{display:flex;align-items:center;gap:.75rem;font-size:.9rem;color:#c8d0df;}
 .chk-i{width:20px;height:20px;border-radius:50%;border:1px solid #27ae60;background:rgba(39,174,96,.12);color:#27ae60;display:flex;align-items:center;justify-content:center;font-size:.65rem;flex-shrink:0;}
 .chk-i.q{border-color:rgba(201,168,76,.4);background:rgba(201,168,76,.06);color:#c9a84c;}
-#begin-btn{background:#c9a84c;color:#0a1628;border:none;border-radius:4px;padding:15px 48px;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:3px;cursor:pointer;transition:all .2s;display:block;margin-bottom:.75rem;}
+#begin-btn{background:#c9a84c;color:#0a1628;border:none;border-radius:4px;padding:15px 52px;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:3px;cursor:pointer;transition:all .2s;margin-bottom:.75rem;}
 #begin-btn:hover{background:#e8c46a;transform:translateY(-1px);}
 .note-sm{font-size:.78rem;color:rgba(138,154,181,.5);}
+#status-msg{margin-top:.75rem;font-family:'Barlow Condensed',sans-serif;font-size:.82rem;letter-spacing:1px;color:#c9a84c;min-height:20px;}
+
+/* INTERVIEW */
 #s-interview{overflow:hidden;}
 #iv-grid{flex:1;display:grid;grid-template-columns:1fr 1fr;min-height:0;overflow:hidden;}
-#iv-av{background:#112240;border-right:1px solid rgba(201,168,76,.2);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;}
 
-.av-ring{position:absolute;border-radius:50%;border:1px solid rgba(201,168,76,.06);animation:ringA 3s ease-in-out infinite;}
-.av-ring:nth-child(1){width:280px;height:280px;}
-.av-ring:nth-child(2){width:400px;height:400px;animation-delay:.5s;}
-.av-ring:nth-child(3){width:520px;height:520px;animation-delay:1s;}
-@keyframes ringA{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:.6;transform:scale(1.02)}}
-#av-glow{position:absolute;width:240px;height:240px;border-radius:50%;border:3px solid rgba(201,168,76,.5);opacity:0;transition:opacity .3s;z-index:1;}
-#av-glow.on{opacity:1;animation:glowP .6s ease-in-out infinite alternate;}
-@keyframes glowP{from{transform:scale(1);border-color:rgba(201,168,76,.7)}to{transform:scale(1.08);border-color:rgba(201,168,76,.2)}}
-#iv-nametag{position:absolute;bottom:1.25rem;left:50%;transform:translateX(-50%);background:rgba(10,22,40,.88);border:1px solid rgba(201,168,76,.2);border-radius:4px;padding:.4rem 1rem;white-space:nowrap;text-align:center;}
+/* D-ID Avatar side */
+#iv-av{background:#0d1a2e;border-right:1px solid rgba(201,168,76,.2);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+/* D-ID video element - SDK injects stream here */
+#did-video-container{width:100%;height:100%;display:flex;align-items:center;justify-content:center;position:relative;}
+#did-video-container video{width:100%;height:100%;object-fit:cover;}
+/* Idle photo shown before/between speaking */
+#av-idle-photo{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#0d1a2e;}
+#av-idle-photo img{width:100%;height:100%;object-fit:cover;object-position:top center;}
+/* Gold ring pulse when speaking */
+#av-speaking-ring{position:absolute;inset:0;border:3px solid rgba(201,168,76,.6);pointer-events:none;display:none;}
+#av-speaking-ring.on{display:block;animation:ringPulse .8s ease-in-out infinite alternate;}
+@keyframes ringPulse{from{border-color:rgba(201,168,76,.7);box-shadow:inset 0 0 30px rgba(201,168,76,.1)}to{border-color:rgba(201,168,76,.2);box-shadow:inset 0 0 5px rgba(201,168,76,.05)}}
+#iv-nametag{position:absolute;bottom:1rem;left:50%;transform:translateX(-50%);background:rgba(10,22,40,.9);border:1px solid rgba(201,168,76,.25);border-radius:4px;padding:.4rem 1.25rem;white-space:nowrap;text-align:center;z-index:5;}
 #iv-nametag .n{font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:2px;}
 #iv-nametag .r{font-family:'Barlow Condensed',sans-serif;font-size:.58rem;letter-spacing:2px;color:#c9a84c;text-transform:uppercase;}
-#iv-qbox{position:absolute;bottom:5rem;left:1rem;right:1rem;text-align:center;display:none;}
-#iv-qinner{background:rgba(10,22,40,.92);border:1px solid rgba(201,168,76,.2);border-radius:6px;padding:1rem 1.25rem;display:inline-block;max-width:480px;}
-#iv-qlbl{font-family:'Barlow Condensed',sans-serif;font-size:.6rem;letter-spacing:3px;color:#c9a84c;text-transform:uppercase;margin-bottom:.25rem;}
-#iv-qtxt{font-size:.93rem;color:#f4f6fa;line-height:1.55;}
+#av-status{position:absolute;top:1rem;left:50%;transform:translateX(-50%);background:rgba(10,22,40,.85);border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:.3rem 1rem;font-family:'Barlow Condensed',sans-serif;font-size:.68rem;letter-spacing:2px;color:#c9a84c;text-transform:uppercase;white-space:nowrap;}
+
+/* Transcript side */
 #iv-tx{display:flex;flex-direction:column;background:rgba(10,22,40,.85);overflow:hidden;}
 #iv-tx-hdr{padding:.65rem 1rem;border-bottom:1px solid rgba(201,168,76,.15);flex-shrink:0;display:flex;justify-content:space-between;align-items:center;}
 #iv-tx-hdr span{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:2px;color:#c9a84c;text-transform:uppercase;}
@@ -72,7 +86,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;color:#f4f6f
 .bar-track{height:3px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden;}
 .bar-fill{height:100%;background:linear-gradient(90deg,#c9a84c,#e8c46a);border-radius:2px;width:0;transition:width .5s;}
 #iv-score{padding:.5rem .75rem;border-top:1px solid rgba(201,168,76,.15);flex-shrink:0;}
-#iv-score-fill{height:100%;background:linear-gradient(90deg,#c9a84c,#e8c46a);border-radius:2px;width:0;transition:width .8s;}
+
+/* Bottom bar */
 #iv-bottom{height:155px;border-top:1px solid rgba(201,168,76,.2);display:grid;grid-template-columns:1fr 1fr;flex-shrink:0;}
 #iv-cam{background:#000;position:relative;overflow:hidden;}
 #iv-cam video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);}
@@ -82,7 +97,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;color:#f4f6f
 #iv-cam-lbl{position:absolute;bottom:.5rem;left:.65rem;background:rgba(10,22,40,.85);border:1px solid rgba(201,168,76,.2);border-radius:3px;padding:.25rem .7rem;font-family:'Barlow Condensed',sans-serif;font-size:.65rem;letter-spacing:1.5px;text-transform:uppercase;}
 #iv-ctrl{background:rgba(10,22,40,.95);padding:.85rem;display:flex;flex-direction:column;gap:.6rem;}
 #iv-mic-row{display:flex;align-items:center;gap:.75rem;}
-#iv-mic-btn{width:48px;height:48px;border-radius:50%;border:2px solid rgba(201,168,76,.35);background:rgba(255,255,255,.04);font-size:1.2rem;cursor:pointer;transition:all .2s;flex-shrink:0;}
+#iv-mic-btn{width:48px;height:48px;border-radius:50%;border:2px solid rgba(201,168,76,.35);background:rgba(255,255,255,.04);font-size:1.2rem;cursor:pointer;flex-shrink:0;transition:all .2s;}
 #iv-mic-btn.on{border-color:#27ae60!important;background:rgba(39,174,96,.1)!important;animation:micP .8s ease-in-out infinite alternate;}
 @keyframes micP{from{box-shadow:0 0 0 0 rgba(39,174,96,.4)}to{box-shadow:0 0 0 10px rgba(39,174,96,0)}}
 #iv-mic-status{font-family:'Barlow Condensed',sans-serif;font-size:.75rem;letter-spacing:1.5px;color:#8a9ab5;text-transform:uppercase;margin-bottom:2px;}
@@ -94,6 +109,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;color:#f4f6f
 #iv-camtog,#iv-end{flex:1;border-radius:4px;padding:7px;font-family:'Barlow Condensed',sans-serif;font-size:.65rem;letter-spacing:1px;text-transform:uppercase;cursor:pointer;}
 #iv-camtog{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:#8a9ab5;}
 #iv-end{background:rgba(192,57,43,.07);border:1px solid rgba(192,57,43,.25);color:#c0392b;}
+
+/* SCORECARD */
 #s-score{align-items:center;justify-content:center;padding:2rem;overflow-y:auto;}
 #sc-box{background:#112240;border:1px solid rgba(201,168,76,.25);border-radius:8px;padding:2rem;max-width:500px;width:100%;}
 .sc-title{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:3px;color:#c9a84c;text-align:center;margin-bottom:.4rem;}
@@ -117,10 +134,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;color:#f4f6f
 </head>
 <body>
 
+<!-- HEADER -->
 <div id="hdr">
   <div id="hdr-left">
     <div id="hdr-logo">🛡</div>
-    <div><div id="hdr-title">SARA</div><div id="hdr-sub">Security USA® AI Interview</div></div>
+    <div><div id="hdr-name">SARA</div><div id="hdr-sub">Security USA® AI Interview</div></div>
   </div>
   <div id="hdr-right">
     <div id="hdr-qnum">Question <b id="q-num">—</b> of 10</div>
@@ -129,16 +147,16 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;color:#f4f6f
   </div>
 </div>
 
+<!-- INTRO SCREEN -->
 <div id="s-intro" class="screen on">
-  <div style="width:110px;height:110px;border-radius:50%;border:3px solid #c9a84c;overflow:hidden;margin-bottom:1.25rem;box-shadow:0 0 40px rgba(201,168,76,.25);background:#112240;">
-    <img src="https://create-images-results.d-id.com/google-oauth2|115522073797470152673/img_EzHBHN4EkYhHgNTU2dQR5/thumbnail.jpeg"
-      style="width:100%;height:100%;object-fit:cover;object-position:top;"
-      onerror="this.src='https://create-images-results.d-id.com/DefaultPresenters/Amber_f/thumbnail.jpeg'"
-    >
+  <div class="intro-avatar">
+    <img src="https://create-images-results.d-id.com/DefaultPresenters/Amber_f/thumbnail.jpeg"
+      id="intro-img"
+      onerror="this.style.display='none'">
   </div>
   <div class="eyebrow">Security USA® — AI Screening</div>
   <h1 class="big-title">Meet <span>SARA</span></h1>
-  <p class="sub-txt">Your AI screening interviewer for the Security Guard — NY position. 10 questions about your experience, licensing, and availability.</p>
+  <p class="sub-txt">Your AI screening interviewer for the Security Guard — NY position. SARA will ask 10 questions about your experience, licensing, and availability.</p>
   <div class="stats">
     <div><div class="stat-n">10</div><div class="stat-l">Questions</div></div>
     <div><div class="stat-n">~15</div><div class="stat-l">Minutes</div></div>
@@ -146,32 +164,42 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;color:#f4f6f
   </div>
   <div class="checks">
     <div class="chk"><span class="chk-i">✓</span>Find a quiet, well-lit location</div>
-    <div class="chk"><span class="chk-i">✓</span>Speak clearly at a normal pace</div>
+    <div class="chk"><span class="chk-i">✓</span>Speak clearly and at a normal pace</div>
     <div class="chk"><span class="chk-i">✓</span>Have your security license number ready</div>
-    <div class="chk"><span class="chk-i q" id="perm-icon">?</span><span id="perm-txt">Camera &amp; mic optional — click to begin</span></div>
+    <div class="chk"><span class="chk-i q" id="perm-icon">?</span><span id="perm-txt">Camera &amp; microphone access required</span></div>
   </div>
   <button id="begin-btn">Begin Interview →</button>
-  <div class="note-sm">Camera &amp; mic optional. You can type answers if preferred.</div>
+  <div class="note-sm">Click the button to allow camera &amp; microphone, then your interview will begin.</div>
+  <div id="status-msg"></div>
 </div>
 
+<!-- INTERVIEW SCREEN -->
 <div id="s-interview" class="screen">
   <div id="iv-grid">
+
+    <!-- SARA / D-ID Avatar -->
     <div id="iv-av">
-      <div class="av-ring"></div><div class="av-ring"></div><div class="av-ring"></div>
-      <!-- D-ID Agent iframe - the real girl, full lip sync -->
-      <div id="did-agent-wrap" style="position:relative;z-index:2;width:100%;height:100%;display:flex;align-items:center;justify-content:center;">
-        <iframe
-          id="did-agent-iframe"
-          src="https://agent.d-id.com/?agentId=v2_agt_M7ejpYI6&clientKey=Y2tfTTRNYzdpQ1I2R1ZuaDRoOEVXOTdV&mode=widget"
-          style="width:100%;height:100%;border:none;background:transparent;"
-          allow="camera;microphone;autoplay;fullscreen"
-          allowfullscreen>
-        </iframe>
+      <!-- Idle photo shown when not actively streaming -->
+      <div id="av-idle-photo">
+        <img src="https://create-images-results.d-id.com/DefaultPresenters/Amber_f/thumbnail.jpeg"
+          id="av-photo" onerror="this.style.display='none'">
       </div>
+      <!-- D-ID SDK injects video stream into this div -->
+      <div id="did-video-container"></div>
+      <!-- Speaking indicator ring -->
+      <div id="av-speaking-ring"></div>
+      <!-- Status badge -->
+      <div id="av-status">Connecting...</div>
+      <!-- Name tag -->
       <div id="iv-nametag"><div class="n">SARA</div><div class="r">Security USA® AI</div></div>
     </div>
+
+    <!-- Transcript -->
     <div id="iv-tx">
-      <div id="iv-tx-hdr"><span>Live Transcript</span><span style="color:#8a9ab5;font-family:'Barlow Condensed',sans-serif;font-size:.6rem;">Auto-saved</span></div>
+      <div id="iv-tx-hdr">
+        <span>Live Transcript</span>
+        <span style="color:#8a9ab5;font-family:'Barlow Condensed',sans-serif;font-size:.6rem;letter-spacing:1px;">Auto-saved</span>
+      </div>
       <div id="iv-tx-body"></div>
       <div id="iv-prog">
         <div class="bar-row"><span>Progress</span><b id="iv-pct">0%</b></div>
@@ -179,10 +207,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;color:#f4f6f
       </div>
       <div id="iv-score">
         <div class="bar-row"><span>Response Quality</span><b id="iv-score-val">—</b></div>
-        <div class="bar-track"><div class="bar-fill" id="iv-score-fill" style="height:4px;"></div></div>
+        <div class="bar-track"><div class="bar-fill" id="iv-score-fill"></div></div>
       </div>
     </div>
   </div>
+
+  <!-- Bottom: candidate cam + controls -->
   <div id="iv-bottom">
     <div id="iv-cam">
       <video id="iv-video" autoplay muted playsinline></video>
@@ -192,7 +222,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;color:#f4f6f
     <div id="iv-ctrl">
       <div id="iv-mic-row">
         <button id="iv-mic-btn">🎤</button>
-        <div><div id="iv-mic-status">Waiting for SARA...</div><div id="iv-mic-hint">Mic activates after each question</div></div>
+        <div>
+          <div id="iv-mic-status">Waiting for SARA...</div>
+          <div id="iv-mic-hint">Mic activates after each question</div>
+        </div>
       </div>
       <div id="iv-live"></div>
       <div id="iv-btn-row">
@@ -204,325 +237,467 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;color:#f4f6f
   </div>
 </div>
 
+<!-- SCORECARD -->
 <div id="s-score" class="screen">
   <div id="sc-box">
     <div style="text-align:center;font-size:2.5rem;margin-bottom:.6rem;">🛡</div>
     <div class="sc-title">Interview Complete</div>
-    <div class="sc-sub">Submitted to Security USA® HR</div>
+    <div class="sc-sub">Submitted to Security USA® HR for review</div>
     <div id="sc-overall">
       <div style="text-align:center;"><div id="sc-num">—</div><div id="sc-numl">Score / 10</div></div>
       <div id="sc-rec">Under Review</div>
     </div>
     <div id="sc-cats"></div>
     <div id="sc-notes"><div id="sc-nl">SARA's Notes</div><div id="sc-nt"></div></div>
-    <button class="sc-btn" id="sc-sched-btn">Schedule Onboarding →</button>
-    <button class="sc-btn-o" id="sc-back-btn">Return to Portal</button>
+    <button class="sc-btn" id="sc-sched">Schedule Onboarding →</button>
+    <button class="sc-btn-o" id="sc-back">Return to Portal</button>
   </div>
 </div>
 
 <script>
-var EL_KEY   = 'sk_d8337c6ccc3c17d6f61bb4f258d1216a715729afe43c3bab';
-var EL_VOICE = 'qSeXEcewz7tA0Q0qk9fH';
+// ═══════════════════════════
+// CONFIG
+// ═══════════════════════════
+var AGENT_ID   = 'v2_agt_M7ejpYI6';
+var CLIENT_KEY = 'Y2tfTTRNYzdpQ1I2R1ZuaDRoOEVXOTdV';
 
 var QS = [
   "Hello! I'm SARA, your AI screening interviewer for Security USA. To start, please tell me your full name and give me a brief introduction of yourself.",
-  "How many years of security experience do you have, and what types of posts have you worked, such as residential, commercial, hospitals, or events?",
+  "How many years of security experience do you have, and what types of posts have you worked — residential, commercial, hospitals, or events?",
   "Do you currently hold a valid New York State Security Guard License? If yes, please share your license number and expiration date.",
-  "What additional certifications do you hold, such as CPR, Fire Safety Director, Fire Guard certificates, or an armed guard permit?",
-  "Tell me about your availability. Which days and shifts can you work — day, evening, or overnight?",
-  "Are you comfortable with on-call assignments on short notice, and can you work weekends and holidays?",
-  "Security USA operates in New York, New Jersey, and Florida. Are you able to work in all three locations?",
-  "Please describe a challenging situation you faced on duty and walk me through how you handled it.",
-  "What are the most important qualities of an outstanding security guard, and how do you demonstrate them?",
+  "What additional certifications do you hold? For example CPR, Fire Safety Director, Fire Guard certificates, or an armed guard permit.",
+  "Tell me about your availability. Which days and shifts can you work — day 7am to 3pm, evening 3pm to 11pm, or overnight?",
+  "Are you comfortable with on-call assignments on short notice? Can you work weekends and holidays when required?",
+  "Security USA operates in New York, New Jersey, and Florida. Are you able to work in all three locations or are you limited to a specific area?",
+  "Please describe a challenging situation you faced on duty and walk me through exactly how you handled it.",
+  "What are the most important qualities of an outstanding security guard, and how do you personally demonstrate them in your work?",
   "Finally, why do you want to work for Security USA specifically, and where do you see your security career in the next few years?"
 ];
 
-var mediaStream=null, recog=null, isListening=false, camOn=true;
-var curQ=0, answers=[], scores=[], liveBuf='';
-var timerSec=0, timerInt=null;
-var avCtx=null, avSpeaking=false, avMouth=0, avBlinkT=120, avBlinkV=1;
-var avAudioCtx=null, avAnalyser=null, avData=null;
+// ═══════════════════════════
+// STATE
+// ═══════════════════════════
+var agentManager = null;
+var mediaStream  = null;
+var recog        = null;
+var isListening  = false;
+var camOn        = true;
+var curQ         = 0;
+var answers      = [];
+var scores       = [];
+var liveBuf      = '';
+var timerSec     = 0;
+var timerInt     = null;
+var saraReady    = false;
+var saraSpeaking = false;
 
-// ── D-ID AGENT (via iframe) ──
-var AGENT_ID  = 'v2_agt_M7ejpYI6';
-var CLIENT_KEY = 'Y2tfTTRNYzdpQ1I2R1ZuaDRoOEVXOTdV';
-var didReady  = true; // iframe is always ready
+// ═══════════════════════════
+// BEGIN — called on button click
+// ═══════════════════════════
+function beginInterview() {
+  var btn = document.getElementById('begin-btn');
+  btn.textContent = 'Starting...';
+  btn.style.opacity = '.7';
+  btn.style.pointerEvents = 'none';
+  setStatus('Requesting camera & microphone...');
 
-// Send text to the D-ID agent iframe to speak
-function didSendMessage(text) {
-  var iframe = document.getElementById('did-agent-iframe');
-  if (!iframe) return;
-  try {
-    iframe.contentWindow.postMessage({
-      type: 'speak',
-      text: text
-    }, 'https://agent.d-id.com');
-  } catch(e) { console.warn('postMessage:', e); }
+  // Get camera + mic
+  var camP = navigator.mediaDevices
+    ? navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+        .then(function(stream) {
+          mediaStream = stream;
+          document.getElementById('iv-video').srcObject = stream;
+          document.getElementById('iv-cam-ov').style.display = 'none';
+          setPerm(true);
+        })
+        .catch(function(e) {
+          console.warn('Camera/mic denied:', e);
+          setPerm(false);
+        })
+    : Promise.resolve();
+
+  camP.then(function() {
+    setStatus('Connecting to SARA...');
+    initDIDAgent();
+  });
 }
 
-function initDID() { return Promise.resolve(true); }
-function closeDID() {}
+function setPerm(ok) {
+  var icon = document.getElementById('perm-icon');
+  var txt  = document.getElementById('perm-txt');
+  icon.textContent = '✓';
+  icon.style.borderColor = ok ? '#27ae60' : '#c9a84c';
+  icon.style.background  = ok ? 'rgba(39,174,96,.12)' : 'rgba(201,168,76,.06)';
+  icon.style.color       = ok ? '#27ae60' : '#c9a84c';
+  txt.textContent = ok ? 'Camera & microphone ready' : 'Proceeding without camera';
+}
 
-// ── SPEAK ──
-// Global audio element - created once on user click to avoid autoplay blocks
-var globalAudio = null;
+function setStatus(msg) {
+  var el = document.getElementById('status-msg');
+  if (el) el.textContent = msg;
+}
 
-function unlockAudio() {
-  // Must be called from a user gesture (button click)
-  if (!globalAudio) {
-    globalAudio = new Audio();
-    globalAudio.volume = 1.0;
+// ═══════════════════════════
+// D-ID AGENT SDK
+// ═══════════════════════════
+function initDIDAgent() {
+  // Check SDK loaded
+  if (typeof window.DID === 'undefined' && typeof createAgentManager === 'undefined') {
+    console.warn('D-ID SDK not loaded, using fallback');
+    startFallback();
+    return;
+  }
+
+  var sdk = window.DID || window;
+  var createFn = sdk.createAgentManager || window.createAgentManager;
+
+  if (!createFn) {
+    console.warn('createAgentManager not found, using fallback');
+    startFallback();
+    return;
+  }
+
+  var auth = { type: 'key', clientKey: CLIENT_KEY };
+
+  var callbacks = {
+    onSrcObjectReady: function(value) {
+      // D-ID is streaming - attach video to our container
+      console.log('D-ID stream ready');
+      var container = document.getElementById('did-video-container');
+      var idle = document.getElementById('av-idle-photo');
+      // Create video element if not exists
+      var vid = container.querySelector('video');
+      if (!vid) {
+        vid = document.createElement('video');
+        vid.autoplay = true;
+        vid.playsinline = true;
+        vid.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+        container.appendChild(vid);
+      }
+      vid.srcObject = value;
+      idle.style.display = 'none';
+      container.style.display = 'flex';
+      saraReady = true;
+      setAvStatus('Ready');
+    },
+
+    onVideoStateChange: function(state) {
+      console.log('Video state:', state);
+      saraSpeaking = (state === 'TALKING');
+      document.getElementById('av-speaking-ring').classList.toggle('on', saraSpeaking);
+      if (saraSpeaking) {
+        setAvStatus('Speaking...');
+      } else {
+        setAvStatus('Listening');
+      }
+    },
+
+    onNewMessage: function(messages, type) {
+      // Agent sent a message back - we don't use this since we control questions
+      console.log('Agent message:', type, messages);
+    },
+
+    onError: function(error, errorData) {
+      console.error('D-ID error:', error, errorData);
+      setAvStatus('Connection issue');
+    }
+  };
+
+  var streamOptions = {
+    compatibilityMode: 'auto',
+    streamWarmup: true
+  };
+
+  try {
+    createFn(AGENT_ID, { auth: auth, callbacks: callbacks, streamOptions: streamOptions })
+      .then(function(manager) {
+        agentManager = manager;
+        console.log('D-ID agent manager created');
+        return agentManager.connect();
+      })
+      .then(function() {
+        console.log('D-ID agent connected');
+        saraReady = true;
+        goToInterview();
+      })
+      .catch(function(e) {
+        console.error('D-ID connect error:', e);
+        startFallback();
+      });
+  } catch(e) {
+    console.error('D-ID init error:', e);
+    startFallback();
   }
 }
 
-function speak(text) {
-  avSpeaking = true;
-  document.getElementById('av-glow').classList.add('on');
-
-  return fetch('https://api.elevenlabs.io/v1/text-to-speech/' + EL_VOICE, {
-    method: 'POST',
-    headers: {
-      'xi-api-key': EL_KEY,
-      'Content-Type': 'application/json',
-      'Accept': 'audio/mpeg'
-    },
-    body: JSON.stringify({
-      text: text,
-      model_id: 'eleven_turbo_v2',
-      voice_settings: { stability: .5, similarity_boost: .8 }
-    })
-  }).then(function(r) {
-    if (!r.ok) throw new Error('EL HTTP ' + r.status);
-    return r.blob();
-  }).then(function(blob) {
-    // Send text to D-ID agent so she lip-syncs
-    didSendMessage(text);
-
-    var url = URL.createObjectURL(blob);
-
-    // Use the global audio element (already unlocked by user click)
-    var aud = globalAudio || new Audio();
-    aud.src = url;
-    aud.volume = 1.0;
-
-    // Mouth animation while speaking
-    var animInt = setInterval(function() {
-      if (!avSpeaking) { clearInterval(animInt); return; }
-      var t = Date.now() * 0.001;
-      avMouth = Math.max(0.1, Math.abs(Math.sin(t * 8)) * 0.5 + Math.abs(Math.sin(t * 13)) * 0.3);
-    }, 60);
-
-    return new Promise(function(res) {
-      aud.onended = function() {
-        clearInterval(animInt);
-        URL.revokeObjectURL(url);
-        res();
-      };
-      aud.onerror = function(e) {
-        console.warn('Audio error:', e);
-        clearInterval(animInt);
-        URL.revokeObjectURL(url);
-        res();
-      };
-      aud.play().then(function() {
-        console.log('Audio playing OK');
-      }).catch(function(e) {
-        console.warn('Audio blocked:', e.message);
-        clearInterval(animInt);
-        URL.revokeObjectURL(url);
-        res();
-      });
-    });
-  }).catch(function(e) {
-    console.warn('speak() failed:', e.message);
-    var dur = Math.min(3000, Math.max(1500, text.length * 30));
-    var t0 = Date.now();
-    return new Promise(function(res) {
-      var id = setInterval(function() {
-        var prog = (Date.now() - t0) / dur;
-        avMouth = Math.abs(Math.sin(prog * 20)) * .6;
-        if (prog >= 1) { clearInterval(id); res(); }
-      }, 40);
-    });
-  }).then(function() {
-    avSpeaking = false;
-    avMouth = 0;
-    document.getElementById('av-glow').classList.remove('on');
-  });
+function setAvStatus(txt) {
+  var el = document.getElementById('av-status');
+  if (el) el.textContent = txt;
 }
 
-
-// ── INTERVIEW FLOW ──
-function beginInterview() {
-  // MUST unlock audio first - this is called from a user click
-  unlockAudio();
-  var btn = document.getElementById('begin-btn');
-  btn.textContent = 'Starting...'; btn.style.opacity = '.7'; btn.style.pointerEvents = 'none';
-  var camP = navigator.mediaDevices
-    ? navigator.mediaDevices.getUserMedia({video:true,audio:true}).then(function(s){
-        mediaStream=s;
-        document.getElementById('iv-video').srcObject=s;
-        document.getElementById('iv-cam-ov').style.display='none';
-        var pi=document.getElementById('perm-icon');
-        pi.textContent='✓'; pi.style.borderColor='#27ae60'; pi.style.background='rgba(39,174,96,.12)'; pi.style.color='#27ae60';
-        document.getElementById('perm-txt').textContent='Camera & microphone ready';
-      }).catch(function(){
-        document.getElementById('perm-icon').textContent='✓';
-        document.getElementById('perm-txt').textContent='Proceeding without camera';
-      })
-    : Promise.resolve();
-  camP.then(function(){
-    document.getElementById('s-intro').classList.remove('on');
-    document.getElementById('s-interview').classList.add('on');
-
-    // Initialize D-ID - loads her image and starts stream
-    initDID().then(function(ok){ console.log('D-ID stream result:', ok); }).catch(function(e){ console.warn('D-ID failed:', e); });
-    timerInt=setInterval(function(){
-      timerSec++;
-      var m=Math.floor(timerSec/60), s=timerSec%60;
-      document.getElementById('hdr-timer').textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
-    },1000);
-    setupRecog();
-    setTimeout(function(){askQ(0);},300);
-  });
+// Fallback if D-ID doesn't load
+function startFallback() {
+  console.log('Running in fallback mode - no D-ID avatar');
+  setAvStatus('Voice only mode');
+  saraReady = true;
+  goToInterview();
 }
 
-function setupRecog(){
-  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR) return;
-  recog=new SR(); recog.continuous=true; recog.interimResults=true; recog.lang='en-US';
-  recog.onstart=function(){
-    isListening=true;
+// ═══════════════════════════
+// GO TO INTERVIEW
+// ═══════════════════════════
+function goToInterview() {
+  document.getElementById('s-intro').classList.remove('on');
+  document.getElementById('s-interview').classList.add('on');
+
+  // Timer
+  timerInt = setInterval(function() {
+    timerSec++;
+    var m = Math.floor(timerSec / 60), s = timerSec % 60;
+    document.getElementById('hdr-timer').textContent = (m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+  }, 1000);
+
+  // Speech recognition
+  setupRecog();
+
+  // Ask first question after short delay
+  setTimeout(function() { askQ(0); }, 1000);
+}
+
+// ═══════════════════════════
+// SPEECH RECOGNITION
+// ═══════════════════════════
+function setupRecog() {
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return;
+  recog = new SR();
+  recog.continuous = true;
+  recog.interimResults = true;
+  recog.lang = 'en-US';
+
+  recog.onstart = function() {
+    isListening = true;
     document.getElementById('iv-mic-btn').classList.add('on');
-    document.getElementById('iv-mic-status').textContent='Listening — speak now';
-    document.getElementById('iv-mic-status').style.color='#27ae60';
-    document.getElementById('iv-live').style.display='block';
+    document.getElementById('iv-mic-status').textContent = 'Listening — speak now';
+    document.getElementById('iv-mic-status').style.color = '#27ae60';
+    document.getElementById('iv-live').style.display = 'block';
   };
-  recog.onend=function(){ isListening=false; document.getElementById('iv-mic-btn').classList.remove('on'); document.getElementById('iv-mic-status').style.color=''; };
-  recog.onresult=function(e){
-    var interim='', final='';
-    for(var i=e.resultIndex;i<e.results.length;i++){
-      if(e.results[i].isFinal) final+=e.results[i][0].transcript+' ';
-      else interim+=e.results[i][0].transcript;
+  recog.onend = function() {
+    isListening = false;
+    document.getElementById('iv-mic-btn').classList.remove('on');
+    document.getElementById('iv-mic-status').style.color = '';
+  };
+  recog.onresult = function(e) {
+    var interim = '', final = '';
+    for (var i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) final += e.results[i][0].transcript + ' ';
+      else interim += e.results[i][0].transcript;
     }
-    if(final) liveBuf+=final;
-    document.getElementById('iv-live').textContent=liveBuf+interim;
+    if (final) liveBuf += final;
+    document.getElementById('iv-live').textContent = liveBuf + interim;
   };
-  recog.onerror=function(e){ console.warn('recog:',e.error); isListening=false; };
+  recog.onerror = function(e) { console.warn('recog:', e.error); isListening = false; };
 }
 
-function askQ(idx){
-  if(idx>=QS.length){ finish(); return; }
-  curQ=idx;
-  var pct=Math.round(idx/QS.length*100);
-  document.getElementById('q-num').textContent=idx+1;
-  document.getElementById('iv-prog-fill').style.width=pct+'%';
-  document.getElementById('iv-pct').textContent=pct+'%';
-  document.getElementById('iv-qtxt').textContent=QS[idx];
-  document.getElementById('iv-qbox').style.display='block';
-  document.getElementById('iv-submit').style.display='none';
-  document.getElementById('iv-mic-status').textContent='SARA is speaking...';
-  document.getElementById('iv-mic-status').style.color='';
-  document.getElementById('iv-mic-btn').style.opacity='.4';
-  addTx('s',QS[idx]);
-  speak(QS[idx]).then(function(){
-    document.getElementById('iv-qbox').style.display='none';
-    document.getElementById('iv-mic-status').textContent='Your turn — speak your answer';
-    document.getElementById('iv-mic-status').style.color='#c9a84c';
-    document.getElementById('iv-mic-btn').style.opacity='1';
-    document.getElementById('iv-submit').style.display='block';
-    liveBuf='';
-    document.getElementById('iv-live').textContent='';
-    document.getElementById('iv-live').style.display='block';
-    if(recog){ try{recog.start();}catch(e){} }
-  });
+// ═══════════════════════════
+// ASK QUESTION
+// ═══════════════════════════
+function askQ(idx) {
+  if (idx >= QS.length) { finish(); return; }
+  curQ = idx;
+  var pct = Math.round(idx / QS.length * 100);
+
+  document.getElementById('q-num').textContent = idx + 1;
+  document.getElementById('iv-prog-fill').style.width = pct + '%';
+  document.getElementById('iv-pct').textContent = pct + '%';
+  document.getElementById('iv-mic-status').textContent = 'SARA is speaking...';
+  document.getElementById('iv-mic-status').style.color = '';
+  document.getElementById('iv-mic-btn').style.opacity = '.4';
+  document.getElementById('iv-submit').style.display = 'none';
+
+  addTx('s', QS[idx]);
+
+  // Send question to D-ID agent to speak
+  if (agentManager) {
+    agentManager.speak({ type: 'text', input: QS[idx] })
+      .then(function() {
+        onSaraFinished();
+      })
+      .catch(function(e) {
+        console.warn('agent speak error:', e);
+        // Fallback: wait estimated duration then activate mic
+        setTimeout(onSaraFinished, Math.min(4000, Math.max(2000, QS[idx].length * 40)));
+      });
+  } else {
+    // No agent - just wait then activate mic
+    setTimeout(onSaraFinished, Math.min(4000, Math.max(2000, QS[idx].length * 40)));
+  }
 }
 
-function submitAnswer(){
-  if(recog&&isListening){ try{recog.stop();}catch(e){} }
-  var live=document.getElementById('iv-live');
-  var ans=(liveBuf+(live.textContent||'')).trim()||'No response recorded';
-  liveBuf=''; live.textContent=''; live.style.display='none';
-  document.getElementById('iv-submit').style.display='none';
-  document.getElementById('iv-mic-status').textContent='Processing...';
-  document.getElementById('iv-mic-btn').style.opacity='.4';
-  addTx('u',ans);
-  answers.push({q:QS[curQ],a:ans});
-  var kw=['security','guard','license','patrol','supervisor','report','professional','emergency','experience'];
-  var sc=2; if(ans.length>60)sc+=2; if(ans.length>150)sc+=1;
-  kw.forEach(function(k){ if(ans.toLowerCase().indexOf(k)>=0)sc+=0.4; });
-  sc=Math.min(10,Math.round(sc*10)/10);
+function onSaraFinished() {
+  document.getElementById('iv-mic-status').textContent = 'Your turn — speak your answer';
+  document.getElementById('iv-mic-status').style.color = '#c9a84c';
+  document.getElementById('iv-mic-btn').style.opacity = '1';
+  document.getElementById('iv-submit').style.display = 'block';
+  liveBuf = '';
+  document.getElementById('iv-live').textContent = '';
+  document.getElementById('iv-live').style.display = 'block';
+  if (recog) { try { recog.start(); } catch(e) {} }
+}
+
+// ═══════════════════════════
+// SUBMIT ANSWER
+// ═══════════════════════════
+function submitAnswer() {
+  if (recog && isListening) { try { recog.stop(); } catch(e) {} }
+  var live = document.getElementById('iv-live');
+  var ans = (liveBuf + (live.textContent || '')).trim() || 'No response recorded';
+  liveBuf = '';
+  live.textContent = '';
+  live.style.display = 'none';
+  document.getElementById('iv-submit').style.display = 'none';
+  document.getElementById('iv-mic-status').textContent = 'Processing...';
+  document.getElementById('iv-mic-btn').style.opacity = '.4';
+
+  addTx('u', ans);
+  answers.push({ q: QS[curQ], a: ans });
+
+  // Score the answer
+  var kw = ['security','guard','license','patrol','supervisor','report','professional','emergency','experience','call','procedure'];
+  var sc = 2;
+  if (ans.length > 60)  sc += 2;
+  if (ans.length > 150) sc += 1;
+  kw.forEach(function(k) { if (ans.toLowerCase().indexOf(k) >= 0) sc += 0.4; });
+  sc = Math.min(10, Math.round(sc * 10) / 10);
   scores.push(sc);
-  var avg=scores.reduce(function(a,b){return a+b;},0)/scores.length;
-  document.getElementById('iv-score-val').textContent=Math.round(avg*10)/10+'/10';
-  document.getElementById('iv-score-fill').style.width=(avg/10*100)+'%';
-  var next=curQ+1;
-  if(next>=QS.length){ finish(); return; }
-  document.getElementById('iv-mic-status').textContent='SARA is responding...';
-  fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:60,
-      system:"You are SARA, an AI interviewer for Security USA. Acknowledge the answer in ONE warm sentence, max 10 words.",
-      messages:[{role:'user',content:'Candidate said: "'+ans.substring(0,150)+'"'}]
+  var avg = scores.reduce(function(a,b){return a+b;},0) / scores.length;
+  document.getElementById('iv-score-val').textContent = Math.round(avg*10)/10 + '/10';
+  document.getElementById('iv-score-fill').style.width = (avg/10*100) + '%';
+
+  var next = curQ + 1;
+  if (next >= QS.length) { finish(); return; }
+
+  // Get brief transition from Claude then ask next question
+  document.getElementById('iv-mic-status').textContent = 'SARA is thinking...';
+
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 40,
+      system: 'You are SARA, a professional AI interviewer. Acknowledge this answer in ONE sentence, max 8 words. Be warm.',
+      messages: [{ role: 'user', content: 'Answer: "' + ans.substring(0, 120) + '"' }]
     })
-  }).then(function(r){return r.json();}).then(function(d){
-    var reply=d.content&&d.content[0]?d.content[0].text:'';
-    if(reply){ addTx('s',reply); return speak(reply); }
-  }).catch(function(){}).then(function(){ askQ(next); });
+  }).then(function(r) { return r.json(); })
+    .then(function(d) {
+      var reply = d.content && d.content[0] ? d.content[0].text : '';
+      if (reply) {
+        addTx('s', reply);
+        if (agentManager) {
+          return agentManager.speak({ type: 'text', input: reply });
+        }
+      }
+    })
+    .catch(function() {})
+    .then(function() { askQ(next); });
 }
 
-function micToggle(){
-  if(!recog) return;
-  if(isListening){ try{recog.stop();}catch(e){} }
-  else{ liveBuf=''; document.getElementById('iv-live').textContent=''; document.getElementById('iv-live').style.display='block'; try{recog.start();}catch(e){} }
+// ═══════════════════════════
+// CONTROLS
+// ═══════════════════════════
+function micToggle() {
+  if (!recog) return;
+  if (isListening) { try { recog.stop(); } catch(e) {} }
+  else {
+    liveBuf = '';
+    document.getElementById('iv-live').textContent = '';
+    document.getElementById('iv-live').style.display = 'block';
+    try { recog.start(); } catch(e) {}
+  }
 }
 
-function camToggle(){
-  if(!mediaStream) return;
-  camOn=!camOn;
-  mediaStream.getVideoTracks().forEach(function(t){t.enabled=camOn;});
-  document.getElementById('iv-cam-ov').style.display=camOn?'none':'flex';
-  document.getElementById('iv-camtog').textContent=camOn?'Cam On':'Cam Off';
+function camToggle() {
+  if (!mediaStream) return;
+  camOn = !camOn;
+  mediaStream.getVideoTracks().forEach(function(t) { t.enabled = camOn; });
+  document.getElementById('iv-cam-ov').style.display = camOn ? 'none' : 'flex';
+  document.getElementById('iv-camtog').textContent = camOn ? 'Cam On' : 'Cam Off';
 }
 
-function addTx(who,text){
-  var body=document.getElementById('iv-tx-body');
-  var d=document.createElement('div'); d.className=who==='s'?'tx-s':'tx-u';
-  d.innerHTML='<div class="tx-w">'+(who==='s'?'SARA':'You')+'</div><div class="tx-m">'+text+'</div>';
-  body.appendChild(d); body.scrollTop=body.scrollHeight;
+function addTx(who, text) {
+  var body = document.getElementById('iv-tx-body');
+  var d = document.createElement('div');
+  d.className = who === 's' ? 'tx-s' : 'tx-u';
+  d.innerHTML = '<div class="tx-w">' + (who === 's' ? 'SARA' : 'You') + '</div><div class="tx-m">' + text + '</div>';
+  body.appendChild(d);
+  body.scrollTop = body.scrollHeight;
 }
 
-function finish(){
+// ═══════════════════════════
+// FINISH
+// ═══════════════════════════
+function finish() {
   clearInterval(timerInt);
-  if(recog){ try{recog.stop();}catch(e){} }
-  if(mediaStream) mediaStream.getTracks().forEach(function(t){t.stop();});
-  avSpeaking=false; avMouth=0;
-  document.getElementById('av-glow').classList.remove('on');
-  closeDID();
-  var avg=scores.length?scores.reduce(function(a,b){return a+b;},0)/scores.length:6;
-  var ov=Math.round(avg*10)/10;
-  document.getElementById('sc-num').textContent=ov;
-  var rec=document.getElementById('sc-rec');
-  if(ov>=7){rec.textContent='Recommend Hire';rec.style.color='#27ae60';rec.style.borderColor='#27ae60';}
-  else if(ov>=5){rec.textContent='Under Review';rec.style.color='#c9a84c';rec.style.borderColor='#c9a84c';}
-  else{rec.textContent='Not Recommended';rec.style.color='#c0392b';rec.style.borderColor='#c0392b';}
-  var cats=[{n:'Communication',s:avg+(Math.random()-.3)*2},{n:'Experience',s:avg+(Math.random()-.4)*2},{n:'Professionalism',s:avg+(Math.random()-.2)*2},{n:'Availability',s:avg+(Math.random()-.5)*2},{n:'Licensing',s:avg+(Math.random()-.3)*2}];
-  document.getElementById('sc-cats').innerHTML=cats.map(function(c){var sv=Math.max(1,Math.min(10,Math.round(c.s*10)/10));return'<div class="sc-cat"><div class="sc-cl">'+c.n+'</div><div class="sc-cb"><div class="sc-cf" style="width:'+(sv/10*100)+'%"></div></div><div class="sc-cv">'+sv+'</div></div>';}).join('');
-  document.getElementById('sc-nt').textContent=ov>=7?'Candidate demonstrated strong communication and relevant security experience. Recommended for onboarding.':ov>=5?'Candidate showed adequate knowledge. Licensing and availability should be verified.':'Candidate responses did not sufficiently demonstrate required experience for this position.';
+  if (recog) { try { recog.stop(); } catch(e) {} }
+  if (mediaStream) mediaStream.getTracks().forEach(function(t) { t.stop(); });
+  if (agentManager) { try { agentManager.disconnect(); } catch(e) {} }
+
+  var avg = scores.length ? scores.reduce(function(a,b){return a+b;},0)/scores.length : 6;
+  var ov = Math.round(avg * 10) / 10;
+  document.getElementById('sc-num').textContent = ov;
+
+  var rec = document.getElementById('sc-rec');
+  if (ov >= 7)      { rec.textContent = 'Recommend Hire';    rec.style.color = '#27ae60'; rec.style.borderColor = '#27ae60'; }
+  else if (ov >= 5) { rec.textContent = 'Under Review';      rec.style.color = '#c9a84c'; rec.style.borderColor = '#c9a84c'; }
+  else              { rec.textContent = 'Not Recommended';   rec.style.color = '#c0392b'; rec.style.borderColor = '#c0392b'; }
+
+  var cats = [
+    {n:'Communication', s:avg+(Math.random()-.3)*2},
+    {n:'Experience',    s:avg+(Math.random()-.4)*2},
+    {n:'Professionalism',s:avg+(Math.random()-.2)*2},
+    {n:'Availability',  s:avg+(Math.random()-.5)*2},
+    {n:'Licensing',     s:avg+(Math.random()-.3)*2}
+  ];
+  document.getElementById('sc-cats').innerHTML = cats.map(function(c) {
+    var sv = Math.max(1, Math.min(10, Math.round(c.s * 10)/10));
+    return '<div class="sc-cat"><div class="sc-cl">'+c.n+'</div><div class="sc-cb"><div class="sc-cf" style="width:'+(sv/10*100)+'%"></div></div><div class="sc-cv">'+sv+'</div></div>';
+  }).join('');
+
+  document.getElementById('sc-nt').textContent = ov >= 7
+    ? 'Candidate demonstrated strong communication and relevant security experience. Recommended for onboarding.'
+    : ov >= 5
+    ? 'Candidate showed adequate knowledge. Licensing and availability should be verified before proceeding.'
+    : 'Candidate responses did not sufficiently demonstrate required experience for this position.';
+
   document.getElementById('s-interview').classList.remove('on');
   document.getElementById('s-score').classList.add('on');
 }
 
+// ═══════════════════════════
+// BOOT — wire up buttons
+// ═══════════════════════════
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('begin-btn').addEventListener('click', beginInterview);
   document.getElementById('iv-mic-btn').addEventListener('click', micToggle);
   document.getElementById('iv-camtog').addEventListener('click', camToggle);
   document.getElementById('iv-submit').addEventListener('click', submitAnswer);
-  document.getElementById('iv-end').addEventListener('click', function(){ if(confirm('End interview?')) finish(); });
-  document.getElementById('hdr-exit').addEventListener('click', function(){ if(confirm('Exit?')) window.location.href='index.html'; });
-  document.getElementById('sc-sched-btn').addEventListener('click', function(){ window.location.href='index.html'; });
-  document.getElementById('sc-back-btn').addEventListener('click', function(){ window.location.href='index.html'; });
+  document.getElementById('iv-end').addEventListener('click', function() { if (confirm('End interview?')) finish(); });
+  document.getElementById('hdr-exit').addEventListener('click', function() { if (confirm('Exit?')) window.location.href = 'index.html'; });
+  document.getElementById('sc-sched').addEventListener('click', function() { window.location.href = 'index.html'; });
+  document.getElementById('sc-back').addEventListener('click',  function() { window.location.href = 'index.html'; });
 
+  // Try to load her real photo from D-ID agent
+  fetch('/api/did-proxy?path=' + encodeURIComponent('/agents/' + 'v2_agt_M7ejpYI6'))
+    .then(function(r) { return r.json(); })
+    .then(function(agent) {
+      var url = agent.presenter && agent.presenter.thumbnail;
+      if (url) {
+        document.getElementById('intro-img').src = url;
+        document.getElementById('av-photo').src = url;
+      }
+    })
+    .catch(function() {});
 });
 </script>
 </body>
