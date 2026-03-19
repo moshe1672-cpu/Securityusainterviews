@@ -355,7 +355,9 @@ function startIntroLoop() {
 
 // ── D-ID STREAMING ──
 var DID_PROXY   = '/api/did-proxy';
-var DID_IMG     = 'https://create-images-results.d-id.com/DefaultPresenters/Amber_f/thumbnail.jpeg'; // Replace with your custom presenter URL from D-ID Studio
+var DID_AGENT_ID = 'v2_agt_M7ejpYI6'; // Your D-ID agent
+// Her image URL - update this once you get it from Avatar tab in D-ID Studio
+var DID_IMG     = 'https://create-images-results.d-id.com/DefaultPresenters/Amber_f/thumbnail.jpeg';
 var didStreamId = null;
 var didSessionId= null;
 var peerConn    = null;
@@ -372,9 +374,26 @@ function didProxy(path, method, body) {
 }
 
 function initDID() {
-  console.log('Initializing D-ID stream...');
-  return didProxy('/talks/streams', 'POST', {
-    source_url: DID_IMG
+  console.log('Initializing D-ID stream with agent:', DID_AGENT_ID);
+  // First get the agent's presenter image URL
+  return didProxy('/agents/' + DID_AGENT_ID, 'GET').then(function(agent) {
+    var imgUrl = (agent.presenter && agent.presenter.source_url) ? agent.presenter.source_url : DID_IMG;
+    console.log('Using presenter image:', imgUrl);
+    // Show her image as static avatar immediately
+    var vid = document.getElementById('av-video');
+    var img = new Image();
+    img.onload = function() {
+      var can = document.getElementById('av-canvas');
+      var ctx = can.getContext('2d');
+      // Draw her photo on canvas as background
+      ctx.save();
+      ctx.beginPath(); ctx.arc(110,110,107,0,Math.PI*2); ctx.clip();
+      ctx.drawImage(img, 0, 0, 220, 220);
+      ctx.restore();
+    };
+    img.crossOrigin = 'anonymous';
+    img.src = imgUrl;
+    return didProxy('/talks/streams', 'POST', { source_url: imgUrl });
   }).then(function(data) {
     if (!data.id) { console.warn('D-ID init failed:', data); return false; }
     didStreamId  = data.id;
@@ -577,8 +596,8 @@ function beginInterview() {
     document.getElementById('s-intro').classList.remove('on');
     document.getElementById('s-interview').classList.add('on');
     startAvatarLoop(document.getElementById('av-canvas'));
-    // Initialize D-ID
-    initDID().then(function(ok){ console.log('D-ID ready:', ok); });
+    // Initialize D-ID - loads her image and starts stream
+    initDID().then(function(ok){ console.log('D-ID stream result:', ok); }).catch(function(e){ console.warn('D-ID failed:', e); });
     timerInt=setInterval(function(){
       timerSec++;
       var m=Math.floor(timerSec/60), s=timerSec%60;
