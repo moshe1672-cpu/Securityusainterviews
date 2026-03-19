@@ -356,7 +356,7 @@ let timerSec    = 0;
 let timerInt    = null;
 
 // ── BEGIN CLICK ──
-async function beginClick() {
+async async function beginClick() {
   const btn = document.getElementById('begin-btn');
   btn.textContent = 'Starting...';
   btn.style.opacity = '.7';
@@ -1615,6 +1615,93 @@ async function finish() {
   document.getElementById('screen-interview').classList.remove('show');
   document.getElementById('screen-scorecard').classList.add('show');
 }
+// ── INIT ──
+window.addEventListener('DOMContentLoaded', () => {
+  // Animate the intro screen canvas (idle face, blinking)
+  const ic = document.getElementById('intro-canvas');
+  if (!ic) return;
+  const ictx = ic.getContext('2d');
+  let it = 0;
+  let iBlinkT = 100 + Math.random()*100;
+  let iBlinkV = 1;
+
+  function drawIntroFace() {
+    requestAnimationFrame(drawIntroFace);
+    it += 0.016;
+    iBlinkT--;
+    if (iBlinkT <= 0) {
+      iBlinkV = 0;
+      setTimeout(() => { iBlinkV = 1; iBlinkT = 150 + Math.random()*200; }, 120);
+    }
+    const W=100, H=100, cx=50, cy=50;
+    ictx.clearRect(0,0,W,H);
+    ictx.save();
+    ictx.beginPath(); ictx.arc(cx,cy,48,0,Math.PI*2); ictx.clip();
+
+    // BG
+    const bg = ictx.createRadialGradient(cx,cy-10,8,cx,cy,48);
+    bg.addColorStop(0,'#112240'); bg.addColorStop(1,'#0a1628');
+    ictx.fillStyle = bg; ictx.fillRect(0,0,W,H);
+
+    // Neck
+    ictx.fillStyle='#d4956a';
+    ictx.beginPath(); ictx.ellipse(cx,90,10,14,0,0,Math.PI*2); ictx.fill();
+
+    // Clothes
+    ictx.fillStyle='#1a2840';
+    ictx.beginPath(); ictx.moveTo(cx-32,100); ictx.lineTo(cx-22,82);
+    ictx.quadraticCurveTo(cx,90,cx+22,82); ictx.lineTo(cx+32,100); ictx.closePath(); ictx.fill();
+    ictx.strokeStyle='#c9a84c'; ictx.lineWidth=1;
+    ictx.beginPath(); ictx.moveTo(cx-9,88); ictx.lineTo(cx,96); ictx.lineTo(cx+9,88); ictx.stroke();
+
+    // Head
+    const hg = ictx.createRadialGradient(cx-7,cy-8,4,cx,cy-2,34);
+    hg.addColorStop(0,'#e8b090'); hg.addColorStop(0.6,'#d4956a'); hg.addColorStop(1,'#b87850');
+    ictx.fillStyle=hg; ictx.beginPath(); ictx.ellipse(cx,cy-2,28,34,0,0,Math.PI*2); ictx.fill();
+
+    // Hair top
+    ictx.fillStyle='#2c1a0e';
+    ictx.beginPath(); ictx.ellipse(cx,cy-27,29,16,0,Math.PI,0); ictx.fill();
+    // Hair sides
+    [-1,1].forEach(s => {
+      ictx.beginPath(); ictx.moveTo(cx+s*28,cy-2);
+      ictx.quadraticCurveTo(cx+s*34,cy+10,cx+s*26,cy+24);
+      ictx.quadraticCurveTo(cx+s*18,cy+32,cx+s*11,cy+31);
+      ictx.lineTo(cx+s*11,cy+20);
+      ictx.quadraticCurveTo(cx+s*24,cy+16,cx+s*24,cy-2); ictx.fill();
+    });
+
+    // Brows
+    ictx.strokeStyle='#2c1a0e'; ictx.lineWidth=2; ictx.lineCap='round';
+    ictx.beginPath(); ictx.moveTo(cx-20,cy-14); ictx.quadraticCurveTo(cx-13,cy-18,cx-7,cy-15); ictx.stroke();
+    ictx.beginPath(); ictx.moveTo(cx+7,cy-15);  ictx.quadraticCurveTo(cx+13,cy-18,cx+20,cy-14); ictx.stroke();
+
+    // Eyes
+    const bl = iBlinkV;
+    [-1,1].forEach(s => {
+      const ex=cx+s*13, ey=cy-6;
+      ictx.fillStyle='#f8f4f0'; ictx.beginPath(); ictx.ellipse(ex,ey,7,4.5*bl,0,0,Math.PI*2); ictx.fill();
+      ictx.fillStyle='#5c3a1e'; ictx.beginPath(); ictx.ellipse(ex,ey,3.8,3.8*bl,0,0,Math.PI*2); ictx.fill();
+      ictx.fillStyle='#000';    ictx.beginPath(); ictx.ellipse(ex,ey,2.2,2.2*bl,0,0,Math.PI*2); ictx.fill();
+      ictx.fillStyle='rgba(255,255,255,0.75)'; ictx.beginPath(); ictx.ellipse(ex-1.5,ey-1.5,1.5,1.2*bl,0,0,Math.PI*2); ictx.fill();
+    });
+
+    // Nose
+    ictx.strokeStyle='rgba(184,120,80,0.7)'; ictx.lineWidth=0.9;
+    ictx.beginPath(); ictx.moveTo(cx-1,cy-2); ictx.quadraticCurveTo(cx-4,cy+5,cx-3,cy+7); ictx.quadraticCurveTo(cx,cy+8,cx+3,cy+7); ictx.quadraticCurveTo(cx+4,cy+5,cx+1,cy-2); ictx.stroke();
+
+    // Smile
+    ictx.strokeStyle='#c26a5a'; ictx.lineWidth=1.8;
+    ictx.beginPath(); ictx.moveTo(cx-10,cy+15); ictx.quadraticCurveTo(cx,cy+20,cx+10,cy+15); ictx.stroke();
+    // Lower lip fill
+    ictx.fillStyle='rgba(194,106,90,0.4)';
+    ictx.beginPath(); ictx.moveTo(cx-10,cy+15); ictx.quadraticCurveTo(cx,cy+22,cx+10,cy+15); ictx.quadraticCurveTo(cx,cy+20,cx-10,cy+15); ictx.fill();
+
+    ictx.restore();
+  }
+  drawIntroFace();
+});
+
 </script>
 </body>
 </html>
