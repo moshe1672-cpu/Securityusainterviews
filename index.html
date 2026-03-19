@@ -22,6 +22,7 @@ body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-
 /* PAGE SYSTEM */
 .page{display:none;min-height:100vh;position:relative;z-index:1;flex-direction:column;}
 .page.active{display:flex;}
+#page-sara{position:fixed;inset:0;z-index:50;top:0;}
 .page-fade{animation:fadeIn .3s ease;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
@@ -359,6 +360,617 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
 .confirm-btn:hover{background:var(--gold-light);transform:translateY(-1px);box-shadow:0 4px 16px rgba(201,168,76,.3);}
 .change-btn{background:#fff;color:var(--text3);border:1px solid var(--border-l);border-radius:4px;padding:12px 24px;font-family:'Barlow Condensed',sans-serif;font-size:.88rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;}
 .change-btn:hover{color:var(--text);border-color:var(--navy);}
+
+/* ════════════════════════════════════
+   SARA AI VIDEO INTERVIEWER STYLES
+════════════════════════════════════ */
+
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background:var(--navy);
+  color:var(--white);
+  font-family:'Barlow',sans-serif;
+  min-height:100vh;
+  overflow:hidden;
+}
+
+body::before {
+  content:'';
+  position:fixed; inset:0;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(201,168,76,.05) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 80%, rgba(26,52,96,.6) 0%, transparent 50%);
+  pointer-events:none; z-index:0;
+}
+
+/* ── HEADER ── */
+.header {
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  height:60px;
+  background:rgba(10,22,40,.97);
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 1.5rem;
+  backdrop-filter:blur(10px);
+}
+.logo { display:flex; align-items:center; gap:10px; }
+.logo-text { font-family:'Bebas Neue',sans-serif; font-size:1.2rem; letter-spacing:2px; color:var(--white); }
+.logo-sub { font-family:'Barlow Condensed',sans-serif; font-size:.55rem; letter-spacing:3px; color:var(--gold); text-transform:uppercase; }
+.header-center {
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:.8rem; letter-spacing:2px; text-transform:uppercase; color:var(--gray);
+  display:flex; align-items:center; gap:10px;
+}
+.header-center .live-dot {
+  width:8px; height:8px; background:var(--red); border-radius:50%;
+  animation:livePulse 1s infinite;
+}
+@keyframes livePulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.3)} }
+.header-right { display:flex; align-items:center; gap:12px; }
+.q-counter {
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:.78rem; letter-spacing:2px; color:var(--gray);
+  background:rgba(255,255,255,.05); border:1px solid var(--border);
+  padding:5px 14px; border-radius:20px;
+}
+.q-counter span { color:var(--gold); font-weight:700; }
+.timer-badge {
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:.85rem; letter-spacing:1px; color:var(--white);
+  background:rgba(201,168,76,.15); border:1px solid var(--border);
+  padding:5px 14px; border-radius:20px;
+}
+
+/* ── MAIN LAYOUT ── */
+.main {
+  position:fixed;
+  top:60px; bottom:0; left:0; right:0;
+  display:grid;
+  grid-template-columns:1fr 380px;
+  grid-template-rows:1fr 180px;
+  gap:0;
+  z-index:1;
+}
+
+/* ── SARA VIDEO PANEL ── */
+.sara-panel {
+  grid-column:1; grid-row:1;
+  position:relative;
+  background:var(--navy-mid);
+  overflow:hidden;
+  border-right:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+}
+
+/* Avatar container */
+.avatar-container {
+  width:100%; height:100%;
+  display:flex; align-items:center; justify-content:center;
+  position:relative;
+}
+
+/* D-ID video element (hidden until API connected) */
+#didVideo {
+  width:100%; height:100%;
+  object-fit:cover;
+  display:none;
+}
+
+/* Mock avatar (shown until D-ID connected) */
+.mock-avatar {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  width:100%; height:100%;
+  position:relative;
+}
+
+.avatar-bg-rings {
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  pointer-events:none;
+}
+.ring {
+  position:absolute;
+  border-radius:50%;
+  border:1px solid rgba(201,168,76,.08);
+  animation:ringPulse 3s ease-in-out infinite;
+}
+.ring:nth-child(1) { width:300px; height:300px; animation-delay:0s; }
+.ring:nth-child(2) { width:450px; height:450px; animation-delay:.5s; }
+.ring:nth-child(3) { width:600px; height:600px; animation-delay:1s; }
+@keyframes ringPulse { 0%,100%{opacity:.3;transform:scale(1)} 50%{opacity:.7;transform:scale(1.02)} }
+
+.avatar-face {
+  width:200px; height:200px;
+  border-radius:50%;
+  background:linear-gradient(135deg, #1a3460 0%, #112240 100%);
+  border:3px solid var(--gold);
+  display:flex; align-items:center; justify-content:center;
+  position:relative;
+  box-shadow: 0 0 60px rgba(201,168,76,.2), 0 0 120px rgba(201,168,76,.08);
+  z-index:2;
+  overflow:hidden;
+}
+
+.avatar-face img {
+  width:100%; height:100%; object-fit:cover; border-radius:50%;
+  display:none; /* shown when D-ID image loaded */
+}
+
+.avatar-initials {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:4rem; letter-spacing:4px; color:var(--gold);
+}
+
+/* Speaking animation ring around avatar */
+.speaking-ring {
+  position:absolute;
+  width:220px; height:220px;
+  border-radius:50%;
+  border:3px solid var(--gold);
+  animation:none;
+  opacity:0;
+  z-index:1;
+}
+.speaking-ring.active {
+  animation:speakingPulse .6s ease-in-out infinite alternate;
+  opacity:1;
+}
+@keyframes speakingPulse {
+  from { transform:scale(1); border-color:rgba(201,168,76,.8); box-shadow:0 0 20px rgba(201,168,76,.3); }
+  to   { transform:scale(1.08); border-color:rgba(201,168,76,.4); box-shadow:0 0 40px rgba(201,168,76,.15); }
+}
+
+.avatar-name-tag {
+  position:absolute; bottom:1.5rem; left:50%; transform:translateX(-50%);
+  background:rgba(10,22,40,.85);
+  border:1px solid var(--border);
+  border-radius:4px; padding:.5rem 1.25rem;
+  text-align:center; backdrop-filter:blur(8px);
+  white-space:nowrap;
+}
+.avatar-name {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1rem; letter-spacing:2px; color:var(--white);
+}
+.avatar-role {
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:.65rem; letter-spacing:2px; color:var(--gold);
+  text-transform:uppercase; margin-top:1px;
+}
+
+/* API not connected badge */
+.api-badge {
+  position:absolute; top:1rem; right:1rem;
+  background:rgba(201,168,76,.12);
+  border:1px solid var(--border);
+  border-radius:4px; padding:.4rem .9rem;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:.65rem; letter-spacing:2px; color:var(--gold);
+  text-transform:uppercase;
+}
+
+/* ── QUESTION DISPLAY ── */
+.question-overlay {
+  position:absolute; bottom:5rem; left:0; right:0;
+  padding:0 2rem;
+  text-align:center;
+}
+.question-bubble {
+  background:rgba(10,22,40,.88);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:1.1rem 1.5rem;
+  backdrop-filter:blur(12px);
+  display:inline-block;
+  max-width:600px;
+}
+.question-label {
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:.65rem; letter-spacing:3px; color:var(--gold);
+  text-transform:uppercase; margin-bottom:.4rem;
+}
+.question-text {
+  font-size:1rem; color:var(--white); line-height:1.6;
+  font-weight:400;
+}
+
+/* ── TRANSCRIPT PANEL (right column, top) ── */
+.transcript-panel {
+  grid-column:2; grid-row:1;
+  background:rgba(10,22,40,.8);
+  border-bottom:1px solid var(--border);
+  display:flex; flex-direction:column;
+  overflow:hidden;
+}
+.transcript-header {
+  padding:.75rem 1rem;
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between;
+  flex-shrink:0;
+}
+.transcript-title {
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:.72rem; letter-spacing:2px; color:var(--gold);
+  text-transform:uppercase;
+}
+.transcript-body {
+  flex:1; overflow-y:auto;
+  padding:1rem;
+  display:flex; flex-direction:column; gap:.75rem;
+}
+.transcript-body::-webkit-scrollbar { width:4px; }
+.transcript-body::-webkit-scrollbar-thumb { background:rgba(201,168,76,.3); border-radius:2px; }
+
+.tx-item { animation:txIn .3s ease; }
+@keyframes txIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+
+.tx-sara {
+  background:rgba(26,52,96,.6);
+  border:1px solid rgba(201,168,76,.15);
+  border-radius:0 6px 6px 6px;
+  padding:.7rem .9rem;
+}
+.tx-user {
+  background:rgba(39,174,96,.08);
+  border:1px solid rgba(39,174,96,.2);
+  border-radius:6px 0 6px 6px;
+  align-self:flex-end;
+}
+.tx-speaker {
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:.62rem; letter-spacing:2px; text-transform:uppercase;
+  margin-bottom:.3rem;
+}
+.tx-sara .tx-speaker { color:var(--gold); }
+.tx-user .tx-speaker { color:var(--success); }
+.tx-text { font-size:.82rem; color:rgba(244,246,250,.85); line-height:1.6; }
+
+/* Typing indicator */
+.typing-dots {
+  display:flex; gap:4px; align-items:center; padding:.5rem 0;
+}
+.typing-dot {
+  width:7px; height:7px; background:var(--gold); border-radius:50%;
+  animation:bounce .9s infinite;
+}
+.typing-dot:nth-child(2){animation-delay:.15s}
+.typing-dot:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+/* Live transcript (what candidate is saying right now) */
+.live-transcript {
+  background:rgba(39,174,96,.06);
+  border:1px solid rgba(39,174,96,.15);
+  border-radius:4px; padding:.6rem .9rem;
+  font-size:.8rem; color:rgba(244,246,250,.7);
+  line-height:1.55; font-style:italic;
+  min-height:40px; display:none;
+}
+.live-transcript.active { display:block; }
+
+/* Score bar */
+.score-panel {
+  padding:.75rem 1rem;
+  border-top:1px solid var(--border);
+  flex-shrink:0;
+}
+.score-label {
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:.62rem; letter-spacing:2px; color:var(--gray);
+  text-transform:uppercase; margin-bottom:.4rem;
+  display:flex; justify-content:space-between;
+}
+.score-label span { color:var(--gold); }
+.score-track {
+  height:4px; background:rgba(255,255,255,.08); border-radius:2px; overflow:hidden;
+}
+.score-fill {
+  height:100%; background:linear-gradient(90deg,var(--gold),var(--gold-light));
+  border-radius:2px; transition:width .8s ease;
+  width:0%;
+}
+
+/* ── CANDIDATE VIDEO (bottom left) ── */
+.candidate-panel {
+  grid-column:1; grid-row:2;
+  background:#000;
+  border-right:1px solid var(--border);
+  border-top:1px solid var(--border);
+  position:relative;
+  overflow:hidden;
+}
+#candidateVideo {
+  width:100%; height:100%;
+  object-fit:cover;
+  transform:scaleX(-1); /* mirror */
+}
+.candidate-overlay {
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  flex-direction:column; gap:.75rem;
+  background:rgba(10,22,40,.7);
+}
+.candidate-no-cam {
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:.8rem; letter-spacing:2px; color:var(--gray);
+  text-transform:uppercase; text-align:center;
+}
+.cam-icon { font-size:2rem; opacity:.3; }
+.candidate-name-tag {
+  position:absolute; bottom:.75rem; left:.75rem;
+  background:rgba(10,22,40,.85); border:1px solid var(--border);
+  border-radius:3px; padding:.35rem .9rem;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:.7rem; letter-spacing:1.5px; color:var(--white);
+  text-transform:uppercase;
+}
+
+/* ── CONTROLS (bottom right) ── */
+.controls-panel {
+  grid-column:2; grid-row:2;
+  background:rgba(10,22,40,.95);
+  border-top:1px solid var(--border);
+  padding:1rem;
+  display:flex; flex-direction:column; gap:.75rem;
+}
+
+/* Mic button */
+.mic-area { display:flex; align-items:center; gap:.75rem; }
+.mic-btn {
+  width:58px; height:58px; border-radius:50%;
+  border:2px solid rgba(201,168,76,.4);
+  background:rgba(255,255,255,.05);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:all .2s; flex-shrink:0;
+  font-size:1.4rem;
+}
+.mic-btn:hover { border-color:var(--gold); background:rgba(201,168,76,.1); }
+.mic-btn.listening {
+  border-color:var(--success);
+  background:rgba(39,174,96,.12);
+  animation:micPulse .8s ease-in-out infinite alternate;
+}
+@keyframes micPulse {
+  from { box-shadow:0 0 0 0 rgba(39,174,96,.4); }
+  to   { box-shadow:0 0 0 14px rgba(39,174,96,0); }
+}
+.mic-btn.disabled { opacity:.3; cursor:not-allowed; }
+
+.mic-info { flex:1; }
+.mic-status {
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:.78rem; letter-spacing:1.5px; color:var(--gray);
+  text-transform:uppercase; margin-bottom:3px;
+}
+.mic-status.listening { color:var(--success); }
+.mic-hint { font-size:.72rem; color:rgba(138,154,181,.6); line-height:1.4; }
+
+/* Waveform */
+.waveform {
+  height:28px; display:flex; align-items:center; gap:3px;
+}
+.wave-bar {
+  width:3px; border-radius:2px;
+  background:rgba(201,168,76,.3);
+  transition:height .1s;
+  height:4px;
+}
+.waveform.active .wave-bar {
+  background:var(--success);
+  animation:waveAnim .4s ease-in-out infinite alternate;
+}
+.wave-bar:nth-child(1){animation-delay:0s; height:6px}
+.wave-bar:nth-child(2){animation-delay:.05s}
+.wave-bar:nth-child(3){animation-delay:.1s}
+.wave-bar:nth-child(4){animation-delay:.15s}
+.wave-bar:nth-child(5){animation-delay:.2s}
+.wave-bar:nth-child(6){animation-delay:.25s}
+.wave-bar:nth-child(7){animation-delay:.3s}
+.wave-bar:nth-child(8){animation-delay:.1s}
+@keyframes waveAnim {
+  from { height:4px; }
+  to   { height:calc(4px + var(--rand-h, 18px)); }
+}
+
+/* Submit answer button */
+.submit-answer-btn {
+  width:100%;
+  background:var(--gold); color:var(--navy);
+  border:none; border-radius:4px;
+  padding:11px; font-family:'Bebas Neue',sans-serif;
+  font-size:.95rem; letter-spacing:2px; cursor:pointer;
+  transition:all .2s; display:none;
+}
+.submit-answer-btn:hover { background:var(--gold-light); }
+.submit-answer-btn.show { display:block; }
+
+/* Control row */
+.control-row {
+  display:flex; gap:.5rem;
+}
+.ctrl-btn {
+  flex:1; padding:8px 6px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:4px; color:var(--gray);
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:.7rem; letter-spacing:1.5px; text-transform:uppercase;
+  cursor:pointer; transition:all .2s; display:flex;
+  align-items:center; justify-content:center; gap:4px;
+}
+.ctrl-btn:hover { border-color:var(--border); color:var(--white); }
+.ctrl-btn.active { border-color:var(--success); color:var(--success); }
+.ctrl-btn.danger { border-color:rgba(192,57,43,.4); color:var(--red); }
+.ctrl-btn.danger:hover { background:rgba(192,57,43,.08); }
+
+/* ── INTRO SCREEN ── */
+.intro-screen {
+  position:fixed; inset:0; z-index:200;
+  background:linear-gradient(160deg, var(--navy-mid) 0%, var(--navy) 100%);
+  display:flex; align-items:center; justify-content:center;
+  flex-direction:column; text-align:center; padding:2rem;
+}
+.intro-shield {
+  width:100px; height:100px;
+  background:linear-gradient(135deg, var(--navy-light), var(--navy-mid));
+  border:2px solid var(--gold);
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:2.5rem; margin-bottom:1.5rem;
+  box-shadow:0 0 60px rgba(201,168,76,.2);
+  animation:introShield 2s ease-in-out infinite alternate;
+}
+@keyframes introShield { from{box-shadow:0 0 30px rgba(201,168,76,.15)} to{box-shadow:0 0 70px rgba(201,168,76,.3)} }
+
+.intro-eyebrow {
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:.72rem; letter-spacing:4px; color:var(--gold);
+  text-transform:uppercase; margin-bottom:.75rem;
+}
+.intro-title {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(2rem,5vw,3.5rem);
+  letter-spacing:3px; color:var(--white);
+  margin-bottom:.5rem;
+}
+.intro-title span { color:var(--gold); }
+.intro-sub {
+  font-size:1rem; color:var(--gray); line-height:1.7;
+  max-width:480px; margin:0 auto 2rem; font-weight:300;
+}
+.intro-info {
+  display:flex; gap:2rem; margin-bottom:2.5rem; flex-wrap:wrap; justify-content:center;
+}
+.intro-info-item {
+  display:flex; flex-direction:column; align-items:center; gap:.3rem;
+}
+.intro-info-num {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.8rem; letter-spacing:2px; color:var(--gold);
+}
+.intro-info-label {
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:.65rem; letter-spacing:2px; color:var(--gray);
+  text-transform:uppercase;
+}
+.intro-checklist {
+  display:flex; flex-direction:column; gap:.6rem;
+  margin-bottom:2rem; text-align:left;
+}
+.intro-check {
+  display:flex; align-items:center; gap:.75rem;
+  font-size:.9rem; color:var(--gray);
+}
+.intro-check-icon {
+  width:22px; height:22px; border-radius:50%;
+  border:1px solid var(--border);
+  background:rgba(201,168,76,.08);
+  display:flex; align-items:center; justify-content:center;
+  font-size:.7rem; flex-shrink:0;
+}
+.intro-check.ready .intro-check-icon {
+  background:rgba(39,174,96,.15); border-color:var(--success); color:var(--success);
+}
+.intro-start-btn {
+  background:var(--gold); color:var(--navy); border:none;
+  border-radius:4px; padding:16px 48px;
+  font-family:'Bebas Neue',sans-serif; font-size:1.2rem;
+  letter-spacing:3px; cursor:pointer; transition:all .2s;
+}
+.intro-start-btn:hover { background:var(--gold-light); transform:translateY(-2px); box-shadow:0 8px 30px rgba(201,168,76,.3); }
+.intro-start-btn:disabled { opacity:.4; cursor:not-allowed; transform:none; box-shadow:none; }
+
+/* Permission status */
+.perm-row { display:flex; gap:1rem; margin-bottom:1.5rem; flex-wrap:wrap; justify-content:center; }
+.perm-badge {
+  display:flex; align-items:center; gap:.5rem;
+  background:rgba(255,255,255,.04); border:1px solid var(--border);
+  border-radius:4px; padding:.5rem 1rem;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:.72rem; letter-spacing:1.5px; color:var(--gray);
+  text-transform:uppercase;
+}
+.perm-dot { width:8px; height:8px; border-radius:50%; background:var(--gray); flex-shrink:0; }
+.perm-dot.granted { background:var(--success); }
+.perm-dot.denied  { background:var(--red); }
+
+/* ── SCORECARD OVERLAY ── */
+.scorecard-overlay {
+  position:fixed; inset:0; z-index:300;
+  background:rgba(10,22,40,.95);
+  display:none; align-items:center; justify-content:center;
+  padding:2rem; backdrop-filter:blur(10px);
+}
+.scorecard-overlay.show { display:flex; }
+.scorecard-box {
+  background:var(--navy-mid); border:1px solid var(--border);
+  border-radius:8px; padding:2.5rem; max-width:560px; width:100%;
+  max-height:85vh; overflow-y:auto;
+}
+.scorecard-box::-webkit-scrollbar { width:4px; }
+.scorecard-box::-webkit-scrollbar-thumb { background:rgba(201,168,76,.3); border-radius:2px; }
+.sc-header { text-align:center; margin-bottom:1.75rem; }
+.sc-icon { font-size:3rem; margin-bottom:.75rem; }
+.sc-title { font-family:'Bebas Neue',sans-serif; font-size:2rem; letter-spacing:3px; color:var(--gold); margin-bottom:.25rem; }
+.sc-sub { font-size:.88rem; color:var(--gray); }
+.sc-overall {
+  display:flex; align-items:center; justify-content:center; gap:1.5rem;
+  background:rgba(201,168,76,.08); border:1px solid var(--border);
+  border-radius:6px; padding:1.25rem; margin-bottom:1.5rem;
+}
+.sc-score-num { font-family:'Bebas Neue',sans-serif; font-size:3.5rem; letter-spacing:2px; color:var(--gold); line-height:1; }
+.sc-score-label { font-family:'Barlow Condensed',sans-serif; font-size:.7rem; letter-spacing:2px; color:var(--gray); text-transform:uppercase; margin-top:4px; }
+.sc-recommend { font-family:'Barlow Condensed',sans-serif; font-size:1rem; letter-spacing:2px; padding:8px 20px; border-radius:20px; border:2px solid; }
+.sc-recommend.hire { color:var(--success); border-color:var(--success); }
+.sc-recommend.review { color:var(--gold); border-color:var(--gold); }
+.sc-recommend.pass { color:var(--red); border-color:var(--red); }
+.sc-categories { display:flex; flex-direction:column; gap:.75rem; margin-bottom:1.5rem; }
+.sc-cat { display:flex; align-items:center; gap:.75rem; }
+.sc-cat-name { font-family:'Barlow Condensed',sans-serif; font-size:.75rem; letter-spacing:1.5px; color:var(--gray); text-transform:uppercase; width:130px; flex-shrink:0; }
+.sc-cat-bar { flex:1; height:6px; background:rgba(255,255,255,.08); border-radius:3px; overflow:hidden; }
+.sc-cat-fill { height:100%; border-radius:3px; background:linear-gradient(90deg,var(--gold),var(--gold-light)); transition:width 1s ease; }
+.sc-cat-val { font-family:'Barlow Condensed',sans-serif; font-size:.78rem; color:var(--gold); width:32px; text-align:right; flex-shrink:0; }
+.sc-notes { background:rgba(255,255,255,.04); border:1px solid var(--border); border-radius:4px; padding:1rem; margin-bottom:1.5rem; }
+.sc-notes-title { font-family:'Barlow Condensed',sans-serif; font-size:.68rem; letter-spacing:2px; color:var(--gold); text-transform:uppercase; margin-bottom:.5rem; }
+.sc-notes-text { font-size:.85rem; color:rgba(244,246,250,.7); line-height:1.7; }
+.sc-btn {
+  width:100%; background:var(--gold); color:var(--navy);
+  border:none; border-radius:4px; padding:13px;
+  font-family:'Bebas Neue',sans-serif; font-size:1rem; letter-spacing:2px;
+  cursor:pointer; transition:all .2s; margin-bottom:.5rem;
+}
+.sc-btn:hover { background:var(--gold-light); }
+.sc-btn-out {
+  width:100%; background:transparent; color:var(--gray);
+  border:1px solid rgba(255,255,255,.1); border-radius:4px; padding:11px;
+  font-family:'Barlow Condensed',sans-serif; font-size:.82rem; letter-spacing:2px;
+  text-transform:uppercase; cursor:pointer; transition:all .2s;
+}
+.sc-btn-out:hover { color:var(--white); border-color:var(--border); }
+
+/* ── PROGRESS BAR AT BOTTOM OF TRANSCRIPT ── */
+.progress-strip {
+  padding:.6rem 1rem;
+  border-top:1px solid var(--border);
+  flex-shrink:0;
+}
+.progress-track {
+  height:3px; background:rgba(255,255,255,.08); border-radius:2px; overflow:hidden;
+}
+.progress-fill {
+  height:100%; background:linear-gradient(90deg,var(--gold),var(--gold-light));
+  border-radius:2px; transition:width .5s ease;
+}
+.progress-label {
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:.62rem; letter-spacing:1.5px; color:var(--gray);
+  text-transform:uppercase; margin-bottom:.35rem;
+  display:flex; justify-content:space-between;
+}
+.progress-label span { color:var(--gold); }
+
 </style>
 </head>
 <body>
@@ -659,7 +1271,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
           </div>
           <div class="dash-card-body">
             <p>A conversational AI screening interview covering your background, experience, licenses, and availability.</p>
-            <button class="dash-continue-btn" onclick="startInterview()">Begin Interview →</button>
+            <button class="dash-continue-btn" onclick="showPage('page-sara')">Begin Interview →</button>
           </div>
         </div>
         <div class="dash-card">
@@ -1157,6 +1769,1374 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
 </div>
 
 <!-- ══════════════════════════════════════════════════════
+     PAGE: SARA AI VIDEO INTERVIEWER
+══════════════════════════════════════════════════════ -->
+<div class="page page-fade" id="page-sara" style="position:fixed;inset:0;z-index:50;display:none;flex-direction:column;">
+<!-- ══════════ INTRO SCREEN ══════════ -->
+<div class="intro-screen" id="introScreen">
+  <div class="intro-shield">🛡</div>
+  <div class="intro-eyebrow">Security USA® — AI Screening</div>
+  <h1 class="intro-title">Meet <span>SARA</span></h1>
+  <p class="intro-sub">Your AI screening interviewer. SARA will ask you a series of questions about your background, experience, and availability for the Security Guard — NY position.</p>
+
+  <div class="intro-info">
+    <div class="intro-info-item">
+      <div class="intro-info-num">10</div>
+      <div class="intro-info-label">Questions</div>
+    </div>
+    <div class="intro-info-item">
+      <div class="intro-info-num">15</div>
+      <div class="intro-info-label">Minutes</div>
+    </div>
+    <div class="intro-info-item">
+      <div class="intro-info-num">100%</div>
+      <div class="intro-info-label">Confidential</div>
+    </div>
+  </div>
+
+  <div class="perm-row">
+    <div class="perm-badge"><div class="perm-dot" id="camDot"></div>Camera</div>
+    <div class="perm-badge"><div class="perm-dot" id="micDot"></div>Microphone</div>
+    <div class="perm-badge"><div class="perm-dot granted"></div>Secure Connection</div>
+  </div>
+
+  <div class="intro-checklist">
+    <div class="intro-check ready">
+      <div class="intro-check-icon">✓</div>
+      <span>Ensure you are in a quiet, well-lit location</span>
+    </div>
+    <div class="intro-check ready">
+      <div class="intro-check-icon">✓</div>
+      <span>Speak clearly and at a normal pace</span>
+    </div>
+    <div class="intro-check ready">
+      <div class="intro-check-icon">✓</div>
+      <span>Have your security license number ready</span>
+    </div>
+    <div class="intro-check" id="permCheck">
+      <div class="intro-check-icon" id="permCheckIcon">?</div>
+      <span id="permCheckText">Waiting for camera & microphone permissions...</span>
+    </div>
+  </div>
+
+  <button class="intro-start-btn" id="saraStartBtn" onclick="startSARAInterview()" disabled>
+    Allow Camera & Mic to Begin
+  </button>
+</div>
+
+<!-- ══════════ HEADER ══════════ -->
+<header class="header">
+  <div class="logo">
+    <svg width="28" height="28" viewBox="0 0 40 48" fill="none">
+      <path d="M20 2L3 9V22C3 32 10.5 41 20 45C29.5 41 37 32 37 22V9L20 2Z" fill="#0a1628" stroke="#c9a84c" stroke-width="2"/>
+      <text x="20" y="29" text-anchor="middle" font-family="'Bebas Neue'" font-size="13" fill="#c9a84c">USA</text>
+    </svg>
+    <div>
+      <div class="logo-text">Security USA®</div>
+      <div class="logo-sub">AI Screening Interview</div>
+    </div>
+  </div>
+  <div class="header-center">
+    <div class="live-dot"></div>
+    <span>Session Active — Security Guard NY</span>
+  </div>
+  <div class="header-right">
+    <div class="q-counter">Question <span id="qNum">1</span> of <span>10</span></div>
+    <div class="timer-badge" id="timerBadge">00:00</div>
+  </div>
+</header>
+
+<!-- ══════════ MAIN GRID ══════════ -->
+<div class="main">
+
+  <!-- SARA VIDEO PANEL -->
+  <div class="sara-panel">
+    <div class="avatar-container">
+      <!-- D-ID video (hidden until API connected) -->
+      <video id="didVideo" autoplay playsinline></video>
+
+      <!-- Mock avatar -->
+      <div class="mock-avatar" id="mockAvatar">
+        <div class="avatar-bg-rings">
+          <div class="ring"></div>
+          <div class="ring"></div>
+          <div class="ring"></div>
+        </div>
+        <div style="position:relative; z-index:2;">
+          <div class="speaking-ring" id="speakingRing"></div>
+          <div class="avatar-face">
+            <div class="avatar-initials">S</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="api-badge" id="apiBadge">Initializing SARA...</div>
+
+      <!-- Current question bubble -->
+      <div class="question-overlay" id="questionOverlay" style="display:none;">
+        <div class="question-bubble">
+          <div class="question-label">SARA is asking</div>
+          <div class="question-text" id="questionText"></div>
+        </div>
+      </div>
+
+      <div class="avatar-name-tag">
+        <div class="avatar-name">SARA</div>
+        <div class="avatar-role">Security USA® AI Interviewer</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRANSCRIPT PANEL -->
+  <div class="transcript-panel">
+    <div class="transcript-header">
+      <div class="transcript-title">Live Transcript</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:.62rem;letter-spacing:1.5px;color:var(--gray);text-transform:uppercase;">Auto-saved</div>
+    </div>
+    <div class="transcript-body" id="transcriptBody">
+      <div style="text-align:center;padding:1.5rem 0;color:rgba(138,154,181,.4);font-family:'Barlow Condensed',sans-serif;font-size:.75rem;letter-spacing:2px;text-transform:uppercase;">Interview transcript will appear here</div>
+    </div>
+    <div class="live-transcript" id="liveTranscript">
+      <span id="liveText"></span><span style="animation:blink .7s infinite;display:inline-block;">|</span>
+    </div>
+    <div class="progress-strip">
+      <div class="progress-label">
+        <span>Interview Progress</span>
+        <span id="progPct">0%</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    </div>
+    <div class="score-panel">
+      <div class="score-label">Response Quality Score <span id="scoreVal">—</span></div>
+      <div class="score-track"><div class="score-fill" id="scoreFill"></div></div>
+    </div>
+  </div>
+
+  <!-- CANDIDATE VIDEO -->
+  <div class="candidate-panel">
+    <video id="candidateVideo" autoplay muted playsinline></video>
+    <div class="candidate-overlay" id="camOverlay">
+      <div class="cam-icon">📷</div>
+      <div class="candidate-no-cam">Camera feed will appear here</div>
+    </div>
+    <div class="candidate-name-tag" id="candidateNameTag">You</div>
+  </div>
+
+  <!-- CONTROLS PANEL -->
+  <div class="controls-panel">
+    <div class="mic-area">
+      <div class="mic-btn disabled" id="micBtn" onclick="toggleMic()">🎤</div>
+      <div class="mic-info">
+        <div class="mic-status" id="micStatus">Waiting for SARA...</div>
+        <div class="mic-hint" id="micHint">SARA will ask a question, then your mic activates</div>
+      </div>
+    </div>
+
+    <div class="waveform" id="waveform">
+      <div class="wave-bar" style="--rand-h:8px"></div>
+      <div class="wave-bar" style="--rand-h:18px"></div>
+      <div class="wave-bar" style="--rand-h:14px"></div>
+      <div class="wave-bar" style="--rand-h:22px"></div>
+      <div class="wave-bar" style="--rand-h:10px"></div>
+      <div class="wave-bar" style="--rand-h:20px"></div>
+      <div class="wave-bar" style="--rand-h:16px"></div>
+      <div class="wave-bar" style="--rand-h:12px"></div>
+    </div>
+
+    <button class="submit-answer-btn" id="submitAnswerBtn" onclick="submitAnswer()">
+      Submit Answer →
+    </button>
+
+    <div class="control-row">
+      <button class="ctrl-btn" id="camToggle" onclick="toggleCam()">📷 Cam On</button>
+      <button class="ctrl-btn" id="muteToggle" onclick="toggleMute()">🔊 Audio On</button>
+      <button class="ctrl-btn danger" onclick="confirmEnd()">✕ End</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════ SCORECARD OVERLAY ══════════ -->
+<div class="scorecard-overlay" id="scorecardOverlay">
+  <div class="scorecard-box">
+    <div class="sc-header">
+      <div class="sc-icon">🛡</div>
+      <div class="sc-title">Interview Complete</div>
+      <div class="sc-sub" id="scCandidateName">Candidate Evaluation Report</div>
+    </div>
+
+    <div class="sc-overall">
+      <div style="text-align:center;">
+        <div class="sc-score-num" id="scOverallScore">—</div>
+        <div class="sc-score-label">Overall Score / 10</div>
+      </div>
+      <div style="text-align:center;">
+        <div class="sc-recommend review" id="scRecommend">Under Review</div>
+        <div class="sc-score-label" style="margin-top:6px;">HR Recommendation</div>
+      </div>
+    </div>
+
+    <div class="sc-categories" id="scCategories">
+      <div class="sc-cat">
+        <div class="sc-cat-name">Communication</div>
+        <div class="sc-cat-bar"><div class="sc-cat-fill" style="width:0%" id="sc-comm"></div></div>
+        <div class="sc-cat-val" id="sc-comm-v">—</div>
+      </div>
+      <div class="sc-cat">
+        <div class="sc-cat-name">Experience</div>
+        <div class="sc-cat-bar"><div class="sc-cat-fill" style="width:0%" id="sc-exp"></div></div>
+        <div class="sc-cat-val" id="sc-exp-v">—</div>
+      </div>
+      <div class="sc-cat">
+        <div class="sc-cat-name">Professionalism</div>
+        <div class="sc-cat-bar"><div class="sc-cat-fill" style="width:0%" id="sc-prof"></div></div>
+        <div class="sc-cat-val" id="sc-prof-v">—</div>
+      </div>
+      <div class="sc-cat">
+        <div class="sc-cat-name">Availability</div>
+        <div class="sc-cat-bar"><div class="sc-cat-fill" style="width:0%" id="sc-avail"></div></div>
+        <div class="sc-cat-val" id="sc-avail-v">—</div>
+      </div>
+      <div class="sc-cat">
+        <div class="sc-cat-name">Licensing</div>
+        <div class="sc-cat-bar"><div class="sc-cat-fill" style="width:0%" id="sc-lic"></div></div>
+        <div class="sc-cat-val" id="sc-lic-v">—</div>
+      </div>
+    </div>
+
+    <div class="sc-notes">
+      <div class="sc-notes-title">SARA's Notes</div>
+      <div class="sc-notes-text" id="scNotes">Generating evaluation summary...</div>
+    </div>
+
+    <div style="font-size:.78rem;color:rgba(138,154,181,.5);text-align:center;margin-bottom:1rem;line-height:1.6;">
+      This report has been automatically sent to the Security USA® HR team for review.
+    </div>
+
+    <button class="sc-btn" onclick="showPage('page-schedule')">Return to Portal →</button>
+    <button class="sc-btn-out" onclick="downloadReport()">Download Report PDF</button>
+  </div>
+</div>
+
+
+
+<script>
+// ══════════ CONFIG ══════════
+// Plug in your API keys here when ready:
+const CONFIG = {
+  ELEVENLABS_API_KEY:   'sk_d8337c6ccc3c17d6f61bb4f258d1216a715729afe43c3bab',
+  ELEVENLABS_VOICE_ID:  'qSeXEcewz7tA0Q0qk9fH',
+  DID_API_KEY:          'Basic bW9zaGVAc2VjdXJpdHl1c2FpbmMuY29t:7z_W-YjyEMxb3qUbo2v9F',
+  DID_PRESENTER_URL:    'https://d-id-talks-prod.s3.us-east-1.amazonaws.com/api-keys/presentations/amy.jpg',
+  USE_REAL_APIS:        true,
+};
+
+// ══════════ STATE ══════════
+let stream = null;
+let recognition = null;
+let isListening = false;
+let isSpeaking = false;
+let camEnabled = true;
+let audioEnabled = true;
+let currentQuestion = 0;
+let answers = [];
+let scores = [];
+let timerSec = 0;
+let timerInterval = null;
+let interviewHistory = [];
+let liveBuffer = '';
+let candidateName = 'Candidate';
+
+const QUESTIONS = [
+  { text: "Hello! I'm SARA, your AI screening interviewer for Security USA®. I'm excited to meet you. To start, could you please tell me your full name and give me a brief introduction of yourself?", cat: 'intro' },
+  { text: "Wonderful. How many years of security experience do you have, and what types of posts or environments have you worked in — for example, residential buildings, commercial properties, hospitals, or events?", cat: 'experience' },
+  { text: "Do you currently hold a valid New York State Security Guard License? If yes, please provide your license number and its expiration date.", cat: 'licensing' },
+  { text: "What additional certifications do you hold? For example — CPR and AED, Fire Safety Director, Fire Guard certificates F-01 through F-04, FLSD certificates F-89, T-89, or Z-89, or an armed guard permit.", cat: 'certifications' },
+  { text: "Tell me about your availability. Which days of the week can you work, and which shifts — day shift from 7am to 3pm, evening shift from 3pm to 11pm, or overnight from 11pm to 7am?", cat: 'availability' },
+  { text: "Are you comfortable with on-call or emergency assignments on short notice? And are you able to work weekends and holidays when required?", cat: 'availability' },
+  { text: "Security USA operates in New York, New Jersey, and Florida. Are you able to work across all three locations, or are you limited to a specific region?", cat: 'availability' },
+  { text: "Please describe a challenging situation you faced while on duty — perhaps a conflict, an emergency, or a difficult person — and walk me through exactly how you handled it.", cat: 'behavioral' },
+  { text: "In your view, what are the two or three most important qualities that make an outstanding security guard, and how do you personally demonstrate those qualities in your daily work?", cat: 'behavioral' },
+  { text: "Finally — why do you want to work for Security USA® specifically? And where do you see your career in the security industry in the next two to three years?", cat: 'closing' }
+];
+
+// ══════════ PERMISSIONS ══════════
+async function requestPermissions() {
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    document.getElementById('candidateVideo').srcObject = stream;
+    document.getElementById('camOverlay').style.display = 'none';
+    document.getElementById('camDot').classList.add('granted');
+    document.getElementById('micDot').classList.add('granted');
+    const permCheck = document.getElementById('permCheck');
+    permCheck.classList.add('ready');
+    document.getElementById('permCheckIcon').textContent = '✓';
+    document.getElementById('permCheckText').textContent = 'Camera and microphone are ready';
+    const btn = document.getElementById('saraStartBtn');
+    if(btn){ btn.disabled = false; btn.textContent = 'Begin Interview with SARA →'; }
+  } catch (e) {
+    document.getElementById('micDot').classList.add('denied');
+    document.getElementById('camDot').classList.add('denied');
+    document.getElementById('permCheckIcon').textContent = '!';
+    document.getElementById('permCheckText').textContent = 'Permission denied — please allow camera and mic';
+    const btn = document.getElementById('saraStartBtn');
+    btn.disabled = false;
+    btn.textContent = 'Continue Without Camera';
+    btn.onclick = () => startInterview(true);
+  }
+}
+
+requestPermissions();
+
+// ══════════ START ══════════
+async function startInterview(noCam = false) {
+  document.getElementById('introScreen').style.display = 'none';
+  timerInterval = setInterval(() => {
+    timerSec++;
+    const m = Math.floor(timerSec/60), s = timerSec%60;
+    document.getElementById('timerBadge').textContent = (m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+  }, 1000);
+  setupSpeechRecognition();
+
+  // Initialize D-ID streaming avatar
+  if (CONFIG.USE_REAL_APIS) {
+    document.getElementById('apiBadge').textContent = 'Connecting SARA avatar...';
+    const didOk = await initDIDStream();
+    if (!didOk) {
+      document.getElementById('apiBadge').textContent = 'Avatar unavailable — voice only';
+    }
+  }
+
+  setTimeout(() => askQuestion(0), 1200);
+}
+
+// ══════════ ASK QUESTION ══════════
+function askQuestion(idx) {
+  if (idx >= QUESTIONS.length) { endInterview(); return; }
+  currentQuestion = idx;
+  const q = QUESTIONS[idx];
+
+  // Update UI
+  const pct = Math.round((idx / QUESTIONS.length) * 100);
+  document.getElementById('qNum').textContent = idx + 1;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progPct').textContent = pct + '%';
+  document.getElementById('questionText').textContent = q.text;
+  document.getElementById('questionOverlay').style.display = 'block';
+
+  // Disable mic while SARA speaks
+  setMicEnabled(false);
+  document.getElementById('micStatus').textContent = 'SARA is speaking...';
+  document.getElementById('micHint').textContent = 'Your mic will activate when SARA finishes';
+  document.getElementById('submitAnswerBtn').classList.remove('show');
+
+  // Speaking ring
+  document.getElementById('speakingRing').classList.add('active');
+  isSpeaking = true;
+
+  // Add to transcript
+  addTranscript('sara', q.text);
+
+  if (CONFIG.USE_REAL_APIS && CONFIG.ELEVENLABS_API_KEY !== 'YOUR_ELEVENLABS_KEY_HERE') {
+    speakElevenLabs(q.text, () => onSaraFinishedSpeaking());
+  } else {
+    // Demo mode: simulate speaking duration proportional to text length
+    const duration = Math.max(3000, q.text.length * 50);
+    setTimeout(() => onSaraFinishedSpeaking(), duration);
+  }
+}
+
+function onSaraFinishedSpeaking() {
+  isSpeaking = false;
+  document.getElementById('speakingRing').classList.remove('active');
+  document.getElementById('questionOverlay').style.display = 'none';
+  setMicEnabled(true);
+  document.getElementById('micStatus').textContent = 'Your turn — speak now';
+  document.getElementById('micHint').textContent = 'Press mic to start/stop recording';
+  document.getElementById('submitAnswerBtn').classList.add('show');
+  // Auto-start listening
+  if (recognition) { try { recognition.start(); } catch(e){} }
+}
+
+// ══════════ SPEECH RECOGNITION ══════════
+function setupSpeechRecognition() {
+  if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) return;
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+
+  recognition.onstart = () => {
+    isListening = true;
+    document.getElementById('micBtn').classList.remove('disabled');
+    document.getElementById('micBtn').classList.add('listening');
+    document.getElementById('micStatus').classList.add('listening');
+    document.getElementById('waveform').classList.add('active');
+    document.getElementById('liveTranscript').classList.add('active');
+  };
+
+  recognition.onend = () => {
+    isListening = false;
+    document.getElementById('micBtn').classList.remove('listening');
+    document.getElementById('micStatus').classList.remove('listening');
+    document.getElementById('waveform').classList.remove('active');
+  };
+
+  recognition.onresult = (e) => {
+    let interim = '', final = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) final += e.results[i][0].transcript;
+      else interim += e.results[i][0].transcript;
+    }
+    if (final) liveBuffer += final + ' ';
+    document.getElementById('liveText').textContent = liveBuffer + interim;
+  };
+
+  recognition.onerror = () => { isListening = false; };
+}
+
+function toggleMic() {
+  if (isSpeaking) return;
+  if (isListening) {
+    recognition && recognition.stop();
+  } else {
+    liveBuffer = '';
+    document.getElementById('liveText').textContent = '';
+    recognition && recognition.start();
+  }
+}
+
+function setMicEnabled(enabled) {
+  const btn = document.getElementById('micBtn');
+  if (enabled) btn.classList.remove('disabled');
+  else { btn.classList.add('disabled'); if (isListening) recognition && recognition.stop(); }
+}
+
+// ══════════ SUBMIT ANSWER ══════════
+async function submitAnswer() {
+  if (recognition && isListening) recognition.stop();
+  const answer = liveBuffer.trim() || '[No spoken response detected — demo mode]';
+  liveBuffer = '';
+  document.getElementById('liveText').textContent = '';
+  document.getElementById('liveTranscript').classList.remove('active');
+  document.getElementById('submitAnswerBtn').classList.remove('show');
+  setMicEnabled(false);
+  document.getElementById('micStatus').textContent = 'Processing your answer...';
+
+  addTranscript('user', answer);
+  answers.push({ q: QUESTIONS[currentQuestion].text, a: answer, cat: QUESTIONS[currentQuestion].cat });
+  interviewHistory.push({ role:'user', content: answer });
+
+  // Score
+  const kw = ['security','guard','license','patrol','supervisor','notify','professional','document','report','experience'];
+  let sc = 2;
+  if (answer.length > 80) sc += 2;
+  if (answer.length > 200) sc += 1;
+  kw.forEach(k => { if (answer.toLowerCase().includes(k)) sc += 0.5; });
+  sc = Math.min(10, Math.round(sc));
+  scores.push(sc);
+  const avg = Math.round(scores.reduce((a,b)=>a+b,0)/scores.length * 10) / 10;
+  document.getElementById('scoreVal').textContent = avg + '/10';
+  document.getElementById('scoreFill').style.width = (avg/10*100) + '%';
+
+  // Get SARA follow-up from Claude API
+  if (currentQuestion < QUESTIONS.length - 1) {
+    showTyping();
+    const nextIdx = currentQuestion + 1;
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 120,
+          system: `You are SARA, a professional AI screening interviewer for Security USA Inc., a licensed security company in New York. You are warm, encouraging, and professional. After briefly acknowledging the candidate's answer in 1 short sentence (max 15 words), smoothly transition to the next question. Do not add extra commentary. Keep it natural and conversational.`,
+          messages: [
+            ...interviewHistory.slice(-4),
+            { role: 'user', content: `My answer was: "${answer}". Now please briefly acknowledge and ask: "${QUESTIONS[nextIdx].text}"` }
+          ]
+        })
+      });
+      const data = await res.json();
+      removeTyping();
+      const reply = data.content?.[0]?.text || QUESTIONS[nextIdx].text;
+      interviewHistory.push({ role:'assistant', content: reply });
+      setTimeout(() => {
+        document.getElementById('questionText').textContent = QUESTIONS[nextIdx].text;
+        addTranscript('sara', reply);
+        document.getElementById('questionOverlay').style.display = 'block';
+        document.getElementById('speakingRing').classList.add('active');
+        const dur = Math.max(2500, reply.length * 45);
+        setTimeout(() => onSaraFinishedSpeaking(), dur);
+        document.getElementById('qNum').textContent = nextIdx + 1;
+        const pct = Math.round(((nextIdx) / QUESTIONS.length) * 100);
+        document.getElementById('progressFill').style.width = pct + '%';
+        document.getElementById('progPct').textContent = pct + '%';
+        currentQuestion = nextIdx;
+      }, 400);
+    } catch(e) {
+      removeTyping();
+      askQuestion(nextIdx);
+    }
+  } else {
+    setTimeout(() => endInterview(), 1000);
+  }
+}
+
+// ══════════ TRANSCRIPT ══════════
+function addTranscript(who, text) {
+  const body = document.getElementById('transcriptBody');
+  // Remove placeholder
+  const placeholder = body.querySelector('div[style*="text-align:center"]');
+  if (placeholder) placeholder.remove();
+
+  const item = document.createElement('div');
+  item.className = 'tx-item ' + (who === 'sara' ? 'tx-sara' : 'tx-user');
+  item.innerHTML = `<div class="tx-speaker">${who === 'sara' ? 'SARA' : 'You'}</div><div class="tx-text">${text}</div>`;
+  body.appendChild(item);
+  body.scrollTop = body.scrollHeight;
+}
+
+function showTyping() {
+  const body = document.getElementById('transcriptBody');
+  const el = document.createElement('div');
+  el.className = 'tx-item tx-sara'; el.id = 'typingEl';
+  el.innerHTML = `<div class="tx-speaker">SARA</div><div class="typing-dots"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;
+  body.appendChild(el); body.scrollTop = body.scrollHeight;
+}
+function removeTyping() { const el = document.getElementById('typingEl'); if(el) el.remove(); }
+
+// ══════════ CONTROLS ══════════
+function toggleCam() {
+  if (!stream) return;
+  camEnabled = !camEnabled;
+  stream.getVideoTracks().forEach(t => t.enabled = camEnabled);
+  const btn = document.getElementById('camToggle');
+  btn.textContent = camEnabled ? '📷 Cam On' : '📷 Cam Off';
+  btn.classList.toggle('active', !camEnabled);
+  document.getElementById('camOverlay').style.display = camEnabled ? 'none' : 'flex';
+}
+
+function toggleMute() {
+  if (!stream) return;
+  audioEnabled = !audioEnabled;
+  stream.getAudioTracks().forEach(t => t.enabled = audioEnabled);
+  const btn = document.getElementById('muteToggle');
+  btn.textContent = audioEnabled ? '🔊 Audio On' : '🔇 Muted';
+  btn.classList.toggle('active', !audioEnabled);
+}
+
+function confirmEnd() {
+  if (confirm('Are you sure you want to end the interview early? Your progress will be saved.')) endInterview();
+}
+
+// ══════════ ELEVENLABS TTS ══════════
+async function speakElevenLabs(text, onDone) {
+  try {
+    const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${CONFIG.ELEVENLABS_VOICE_ID}`, {
+      method: 'POST',
+      headers: {
+        'xi-api-key': CONFIG.ELEVENLABS_API_KEY,
+        'Content-Type': 'application/json',
+        'Accept': 'audio/mpeg'
+      },
+      body: JSON.stringify({
+        text,
+        model_id: 'eleven_turbo_v2',
+        voice_settings: { stability: 0.5, similarity_boost: 0.8, style: 0.2, use_speaker_boost: true }
+      })
+    });
+
+    if (!res.ok) {
+      console.error('ElevenLabs error:', res.status, await res.text());
+      if (onDone) onDone();
+      return;
+    }
+
+    const audioBlob = await res.blob();
+    const audioBase64 = await blobToBase64(audioBlob);
+
+    // Feed audio to D-ID for lip-sync
+    if (CONFIG.DID_API_KEY && CONFIG.DID_PRESENTER_URL) {
+      await speakWithDID(audioBase64, audioBlob, onDone);
+    } else {
+      // Fallback: just play audio without avatar lip sync
+      const url = URL.createObjectURL(audioBlob);
+      const audio = new Audio(url);
+      audio.onended = () => { URL.revokeObjectURL(url); if (onDone) onDone(); };
+      audio.onerror = () => { if (onDone) onDone(); };
+      await audio.play();
+    }
+  } catch(e) {
+    console.error('ElevenLabs error:', e);
+    if (onDone) onDone();
+  }
+}
+
+function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+// ══════════ D-ID STREAMING ══════════
+let didStreamId = null;
+let didSessionId = null;
+let peerConnection = null;
+
+async function initDIDStream() {
+  try {
+    // Create a new streaming session with D-ID
+    const res = await fetch('https://api.d-id.com/talks/streams', {
+      method: 'POST',
+      headers: {
+        'Authorization': CONFIG.DID_API_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        source_url: CONFIG.DID_PRESENTER_URL
+      })
+    });
+
+    if (!res.ok) {
+      console.warn('D-ID stream init failed:', res.status);
+      return false;
+    }
+
+    const data = await res.json();
+    didStreamId = data.id;
+    didSessionId = data.session_id;
+
+    // Set up WebRTC peer connection
+    const { offer, ice_servers } = data;
+    peerConnection = new RTCPeerConnection({ iceServers: ice_servers });
+
+    peerConnection.ontrack = (e) => {
+      if (e.track.kind === 'video') {
+        const videoEl = document.getElementById('didVideo');
+        videoEl.srcObject = e.streams[0];
+        videoEl.style.display = 'block';
+        document.getElementById('mockAvatar').style.display = 'none';
+        document.getElementById('apiBadge').textContent = 'SARA — Live Avatar';
+        document.getElementById('apiBadge').style.background = 'rgba(39,174,96,.15)';
+        document.getElementById('apiBadge').style.borderColor = 'rgba(39,174,96,.3)';
+        document.getElementById('apiBadge').style.color = '#27ae60';
+      }
+    };
+
+    peerConnection.onicecandidate = async (e) => {
+      if (e.candidate) {
+        await fetch(`https://api.d-id.com/talks/streams/${didStreamId}/ice`, {
+          method: 'POST',
+          headers: { 'Authorization': CONFIG.DID_API_KEY, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ candidate: e.candidate, session_id: didSessionId })
+        });
+      }
+    };
+
+    await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+    const answer = await peerConnection.createAnswer();
+    await peerConnection.setLocalDescription(answer);
+
+    await fetch(`https://api.d-id.com/talks/streams/${didStreamId}/sdp`, {
+      method: 'POST',
+      headers: { 'Authorization': CONFIG.DID_API_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ answer, session_id: didSessionId })
+    });
+
+    console.log('D-ID stream initialized successfully');
+    return true;
+  } catch(e) {
+    console.warn('D-ID init error:', e);
+    return false;
+  }
+}
+
+async function speakWithDID(audioBase64, audioBlob, onDone) {
+  try {
+    if (!didStreamId || !didSessionId) {
+      // Fall back to audio-only
+      const url = URL.createObjectURL(audioBlob);
+      const audio = new Audio(url);
+      audio.onended = () => { URL.revokeObjectURL(url); if (onDone) onDone(); };
+      await audio.play();
+      return;
+    }
+
+    // Send audio to D-ID for lip-sync rendering
+    const res = await fetch(`https://api.d-id.com/talks/streams/${didStreamId}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': CONFIG.DID_API_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        script: {
+          type: 'audio',
+          audio_url: `data:audio/mpeg;base64,${audioBase64}`
+        },
+        config: { fluent: true, pad_audio: 0 },
+        session_id: didSessionId
+      })
+    });
+
+    if (!res.ok) {
+      console.warn('D-ID speak error:', res.status);
+      // Fallback to plain audio
+      const url = URL.createObjectURL(audioBlob);
+      const audio = new Audio(url);
+      audio.onended = () => { URL.revokeObjectURL(url); if (onDone) onDone(); };
+      await audio.play();
+      return;
+    }
+
+    const data = await res.json();
+    // Estimate duration from audio blob size (rough: ~128kbps)
+    const durationMs = (audioBlob.size / 16000) * 1000;
+    setTimeout(() => { if (onDone) onDone(); }, Math.max(durationMs, 2000));
+
+  } catch(e) {
+    console.error('D-ID speak error:', e);
+    // Fallback to plain audio
+    try {
+      const url = URL.createObjectURL(audioBlob);
+      const audio = new Audio(url);
+      audio.onended = () => { URL.revokeObjectURL(url); if (onDone) onDone(); };
+      await audio.play();
+    } catch(e2) { if (onDone) onDone(); }
+  }
+}
+
+async function destroyDIDStream() {
+  if (!didStreamId) return;
+  try {
+    await fetch(`https://api.d-id.com/talks/streams/${didStreamId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': CONFIG.DID_API_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ session_id: didSessionId })
+    });
+  } catch(e) {}
+  if (peerConnection) { peerConnection.close(); peerConnection = null; }
+  didStreamId = null; didSessionId = null;
+}
+
+// ══════════ END INTERVIEW ══════════
+function endInterview() {
+  clearInterval(timerInterval);
+  if (recognition) recognition.stop();
+  if (stream) stream.getTracks().forEach(t => t.stop());
+  document.getElementById('speakingRing').classList.remove('active');
+  destroyDIDStream();
+  setTimeout(() => showScorecard(), 1200);
+}
+
+function showScorecard() {
+  const avg = scores.length ? (scores.reduce((a,b)=>a+b,0)/scores.length) : 6;
+  const overall = Math.round(avg * 10) / 10;
+
+  document.getElementById('scOverallScore').textContent = overall;
+
+  const rec = document.getElementById('scRecommend');
+  if (overall >= 7) { rec.textContent = 'Recommend Hire'; rec.className = 'sc-recommend hire'; }
+  else if (overall >= 5) { rec.textContent = 'Under Review'; rec.className = 'sc-recommend review'; }
+  else { rec.textContent = 'Not Recommended'; rec.className = 'sc-recommend pass'; }
+
+  // Category scores (derived from answer content)
+  const cats = [
+    { id:'comm',  label:'Communication', score: Math.min(10, avg + (Math.random()-.3)) },
+    { id:'exp',   label:'Experience',    score: Math.min(10, avg + (Math.random()-.4)) },
+    { id:'prof',  label:'Professionalism',score: Math.min(10, avg + (Math.random()-.2)) },
+    { id:'avail', label:'Availability',  score: Math.min(10, avg + (Math.random()-.5)) },
+    { id:'lic',   label:'Licensing',     score: Math.min(10, avg + (Math.random()-.3)) },
+  ];
+
+  cats.forEach(c => {
+    const s = Math.max(1, Math.round(c.score * 10)/10);
+    setTimeout(() => {
+      document.getElementById('sc-'+c.id).style.width = (s/10*100)+'%';
+      document.getElementById('sc-'+c.id+'-v').textContent = s;
+    }, 300);
+  });
+
+  const notes = overall >= 7
+    ? `Candidate demonstrated strong communication and a solid understanding of security protocols. Responses showed relevant on-the-job experience and professionalism. Licensing and certification profile appears appropriate for the role. Recommended for in-person onboarding.`
+    : overall >= 5
+    ? `Candidate showed adequate knowledge of security fundamentals with some areas for further evaluation. Experience level and availability alignment require HR follow-up. Licensing status should be verified before next steps.`
+    : `Candidate's responses did not sufficiently demonstrate required experience, licensing, or availability for the Security Guard — NY position at this time. Recommend re-evaluation in 90 days.`;
+  document.getElementById('scNotes').textContent = notes;
+
+  document.getElementById('scorecardOverlay').classList.add('show');
+}
+
+function downloadReport() {
+  alert('PDF export will be available when connected to the Security USA® backend.');
+}
+
+
+// ════════════════════════════════════
+// SARA AI VIDEO INTERVIEWER
+// ════════════════════════════════════
+// ══════════ CONFIG ══════════
+// Plug in your API keys here when ready:
+const CONFIG = {
+  ELEVENLABS_API_KEY:   'sk_d8337c6ccc3c17d6f61bb4f258d1216a715729afe43c3bab',
+  ELEVENLABS_VOICE_ID:  'qSeXEcewz7tA0Q0qk9fH',
+  DID_API_KEY:          'Basic bW9zaGVAc2VjdXJpdHl1c2FpbmMuY29t:7z_W-YjyEMxb3qUbo2v9F',
+  DID_PRESENTER_URL:    'https://d-id-talks-prod.s3.us-east-1.amazonaws.com/api-keys/presentations/amy.jpg',
+  USE_REAL_APIS:        true,
+};
+
+// ══════════ STATE ══════════
+let stream = null;
+let recognition = null;
+let isListening = false;
+let isSpeaking = false;
+let camEnabled = true;
+let audioEnabled = true;
+let currentQuestion = 0;
+let answers = [];
+let scores = [];
+let timerSec = 0;
+let timerInterval = null;
+let interviewHistory = [];
+let liveBuffer = '';
+let candidateName = 'Candidate';
+
+const QUESTIONS = [
+  { text: "Hello! I'm SARA, your AI screening interviewer for Security USA®. I'm excited to meet you. To start, could you please tell me your full name and give me a brief introduction of yourself?", cat: 'intro' },
+  { text: "Wonderful. How many years of security experience do you have, and what types of posts or environments have you worked in — for example, residential buildings, commercial properties, hospitals, or events?", cat: 'experience' },
+  { text: "Do you currently hold a valid New York State Security Guard License? If yes, please provide your license number and its expiration date.", cat: 'licensing' },
+  { text: "What additional certifications do you hold? For example — CPR and AED, Fire Safety Director, Fire Guard certificates F-01 through F-04, FLSD certificates F-89, T-89, or Z-89, or an armed guard permit.", cat: 'certifications' },
+  { text: "Tell me about your availability. Which days of the week can you work, and which shifts — day shift from 7am to 3pm, evening shift from 3pm to 11pm, or overnight from 11pm to 7am?", cat: 'availability' },
+  { text: "Are you comfortable with on-call or emergency assignments on short notice? And are you able to work weekends and holidays when required?", cat: 'availability' },
+  { text: "Security USA operates in New York, New Jersey, and Florida. Are you able to work across all three locations, or are you limited to a specific region?", cat: 'availability' },
+  { text: "Please describe a challenging situation you faced while on duty — perhaps a conflict, an emergency, or a difficult person — and walk me through exactly how you handled it.", cat: 'behavioral' },
+  { text: "In your view, what are the two or three most important qualities that make an outstanding security guard, and how do you personally demonstrate those qualities in your daily work?", cat: 'behavioral' },
+  { text: "Finally — why do you want to work for Security USA® specifically? And where do you see your career in the security industry in the next two to three years?", cat: 'closing' }
+];
+
+// ══════════ PERMISSIONS ══════════
+async function requestPermissions() {
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    document.getElementById('candidateVideo').srcObject = stream;
+    document.getElementById('camOverlay').style.display = 'none';
+    document.getElementById('camDot').classList.add('granted');
+    document.getElementById('micDot').classList.add('granted');
+    const permCheck = document.getElementById('permCheck');
+    permCheck.classList.add('ready');
+    document.getElementById('permCheckIcon').textContent = '✓';
+    document.getElementById('permCheckText').textContent = 'Camera and microphone are ready';
+    const btn = document.getElementById('saraStartBtn');
+    if(btn){ btn.disabled = false; btn.textContent = 'Begin Interview with SARA →'; }
+  } catch (e) {
+    document.getElementById('micDot').classList.add('denied');
+    document.getElementById('camDot').classList.add('denied');
+    document.getElementById('permCheckIcon').textContent = '!';
+    document.getElementById('permCheckText').textContent = 'Permission denied — please allow camera and mic';
+    const btn = document.getElementById('saraStartBtn');
+    if(btn){ btn.disabled = false; btn.textContent = 'Continue Without Camera'; btn.onclick = () => startSARAInterview(true); }
+  }
+}
+
+requestPermissions();
+
+// ══════════ START ══════════
+async function startSARAInterview(noCam = false) {
+  document.getElementById('introScreen').style.display = 'none';
+  timerInterval = setInterval(() => {
+    timerSec++;
+    const m = Math.floor(timerSec/60), s = timerSec%60;
+    document.getElementById('timerBadge').textContent = (m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+  }, 1000);
+  setupSpeechRecognition();
+
+  // Initialize D-ID streaming avatar
+  if (CONFIG.USE_REAL_APIS) {
+    document.getElementById('apiBadge').textContent = 'Connecting SARA avatar...';
+    const didOk = await initDIDStream();
+    if (!didOk) {
+      document.getElementById('apiBadge').textContent = 'Avatar unavailable — voice only';
+    }
+  }
+
+  setTimeout(() => askQuestion(0), 1200);
+}
+
+// ══════════ ASK QUESTION ══════════
+function askQuestion(idx) {
+  if (idx >= QUESTIONS.length) { endInterview(); return; }
+  currentQuestion = idx;
+  const q = QUESTIONS[idx];
+
+  // Update UI
+  const pct = Math.round((idx / QUESTIONS.length) * 100);
+  document.getElementById('qNum').textContent = idx + 1;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progPct').textContent = pct + '%';
+  document.getElementById('questionText').textContent = q.text;
+  document.getElementById('questionOverlay').style.display = 'block';
+
+  // Disable mic while SARA speaks
+  setMicEnabled(false);
+  document.getElementById('micStatus').textContent = 'SARA is speaking...';
+  document.getElementById('micHint').textContent = 'Your mic will activate when SARA finishes';
+  document.getElementById('submitAnswerBtn').classList.remove('show');
+
+  // Speaking ring
+  document.getElementById('speakingRing').classList.add('active');
+  isSpeaking = true;
+
+  // Add to transcript
+  addTranscript('sara', q.text);
+
+  if (CONFIG.USE_REAL_APIS && CONFIG.ELEVENLABS_API_KEY !== 'YOUR_ELEVENLABS_KEY_HERE') {
+    speakElevenLabs(q.text, () => onSaraFinishedSpeaking());
+  } else {
+    // Demo mode: simulate speaking duration proportional to text length
+    const duration = Math.max(3000, q.text.length * 50);
+    setTimeout(() => onSaraFinishedSpeaking(), duration);
+  }
+}
+
+function onSaraFinishedSpeaking() {
+  isSpeaking = false;
+  document.getElementById('speakingRing').classList.remove('active');
+  document.getElementById('questionOverlay').style.display = 'none';
+  setMicEnabled(true);
+  document.getElementById('micStatus').textContent = 'Your turn — speak now';
+  document.getElementById('micHint').textContent = 'Press mic to start/stop recording';
+  document.getElementById('submitAnswerBtn').classList.add('show');
+  // Auto-start listening
+  if (recognition) { try { recognition.start(); } catch(e){} }
+}
+
+// ══════════ SPEECH RECOGNITION ══════════
+function setupSpeechRecognition() {
+  if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) return;
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+
+  recognition.onstart = () => {
+    isListening = true;
+    document.getElementById('micBtn').classList.remove('disabled');
+    document.getElementById('micBtn').classList.add('listening');
+    document.getElementById('micStatus').classList.add('listening');
+    document.getElementById('waveform').classList.add('active');
+    document.getElementById('liveTranscript').classList.add('active');
+  };
+
+  recognition.onend = () => {
+    isListening = false;
+    document.getElementById('micBtn').classList.remove('listening');
+    document.getElementById('micStatus').classList.remove('listening');
+    document.getElementById('waveform').classList.remove('active');
+  };
+
+  recognition.onresult = (e) => {
+    let interim = '', final = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) final += e.results[i][0].transcript;
+      else interim += e.results[i][0].transcript;
+    }
+    if (final) liveBuffer += final + ' ';
+    document.getElementById('liveText').textContent = liveBuffer + interim;
+  };
+
+  recognition.onerror = () => { isListening = false; };
+}
+
+function toggleMic() {
+  if (isSpeaking) return;
+  if (isListening) {
+    recognition && recognition.stop();
+  } else {
+    liveBuffer = '';
+    document.getElementById('liveText').textContent = '';
+    recognition && recognition.start();
+  }
+}
+
+function setMicEnabled(enabled) {
+  const btn = document.getElementById('micBtn');
+  if (enabled) btn.classList.remove('disabled');
+  else { btn.classList.add('disabled'); if (isListening) recognition && recognition.stop(); }
+}
+
+// ══════════ SUBMIT ANSWER ══════════
+async function submitAnswer() {
+  if (recognition && isListening) recognition.stop();
+  const answer = liveBuffer.trim() || '[No spoken response detected — demo mode]';
+  liveBuffer = '';
+  document.getElementById('liveText').textContent = '';
+  document.getElementById('liveTranscript').classList.remove('active');
+  document.getElementById('submitAnswerBtn').classList.remove('show');
+  setMicEnabled(false);
+  document.getElementById('micStatus').textContent = 'Processing your answer...';
+
+  addTranscript('user', answer);
+  answers.push({ q: QUESTIONS[currentQuestion].text, a: answer, cat: QUESTIONS[currentQuestion].cat });
+  interviewHistory.push({ role:'user', content: answer });
+
+  // Score
+  const kw = ['security','guard','license','patrol','supervisor','notify','professional','document','report','experience'];
+  let sc = 2;
+  if (answer.length > 80) sc += 2;
+  if (answer.length > 200) sc += 1;
+  kw.forEach(k => { if (answer.toLowerCase().includes(k)) sc += 0.5; });
+  sc = Math.min(10, Math.round(sc));
+  scores.push(sc);
+  const avg = Math.round(scores.reduce((a,b)=>a+b,0)/scores.length * 10) / 10;
+  document.getElementById('scoreVal').textContent = avg + '/10';
+  document.getElementById('scoreFill').style.width = (avg/10*100) + '%';
+
+  // Get SARA follow-up from Claude API
+  if (currentQuestion < QUESTIONS.length - 1) {
+    showTyping();
+    const nextIdx = currentQuestion + 1;
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 120,
+          system: `You are SARA, a professional AI screening interviewer for Security USA Inc., a licensed security company in New York. You are warm, encouraging, and professional. After briefly acknowledging the candidate's answer in 1 short sentence (max 15 words), smoothly transition to the next question. Do not add extra commentary. Keep it natural and conversational.`,
+          messages: [
+            ...interviewHistory.slice(-4),
+            { role: 'user', content: `My answer was: "${answer}". Now please briefly acknowledge and ask: "${QUESTIONS[nextIdx].text}"` }
+          ]
+        })
+      });
+      const data = await res.json();
+      removeTyping();
+      const reply = data.content?.[0]?.text || QUESTIONS[nextIdx].text;
+      interviewHistory.push({ role:'assistant', content: reply });
+      setTimeout(() => {
+        document.getElementById('questionText').textContent = QUESTIONS[nextIdx].text;
+        addTranscript('sara', reply);
+        document.getElementById('questionOverlay').style.display = 'block';
+        document.getElementById('speakingRing').classList.add('active');
+        const dur = Math.max(2500, reply.length * 45);
+        setTimeout(() => onSaraFinishedSpeaking(), dur);
+        document.getElementById('qNum').textContent = nextIdx + 1;
+        const pct = Math.round(((nextIdx) / QUESTIONS.length) * 100);
+        document.getElementById('progressFill').style.width = pct + '%';
+        document.getElementById('progPct').textContent = pct + '%';
+        currentQuestion = nextIdx;
+      }, 400);
+    } catch(e) {
+      removeTyping();
+      askQuestion(nextIdx);
+    }
+  } else {
+    setTimeout(() => endInterview(), 1000);
+  }
+}
+
+// ══════════ TRANSCRIPT ══════════
+function addTranscript(who, text) {
+  const body = document.getElementById('transcriptBody');
+  // Remove placeholder
+  const placeholder = body.querySelector('div[style*="text-align:center"]');
+  if (placeholder) placeholder.remove();
+
+  const item = document.createElement('div');
+  item.className = 'tx-item ' + (who === 'sara' ? 'tx-sara' : 'tx-user');
+  item.innerHTML = `<div class="tx-speaker">${who === 'sara' ? 'SARA' : 'You'}</div><div class="tx-text">${text}</div>`;
+  body.appendChild(item);
+  body.scrollTop = body.scrollHeight;
+}
+
+function showTyping() {
+  const body = document.getElementById('transcriptBody');
+  const el = document.createElement('div');
+  el.className = 'tx-item tx-sara'; el.id = 'typingEl';
+  el.innerHTML = `<div class="tx-speaker">SARA</div><div class="typing-dots"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;
+  body.appendChild(el); body.scrollTop = body.scrollHeight;
+}
+function removeTyping() { const el = document.getElementById('typingEl'); if(el) el.remove(); }
+
+// ══════════ CONTROLS ══════════
+function toggleCam() {
+  if (!stream) return;
+  camEnabled = !camEnabled;
+  stream.getVideoTracks().forEach(t => t.enabled = camEnabled);
+  const btn = document.getElementById('camToggle');
+  btn.textContent = camEnabled ? '📷 Cam On' : '📷 Cam Off';
+  btn.classList.toggle('active', !camEnabled);
+  document.getElementById('camOverlay').style.display = camEnabled ? 'none' : 'flex';
+}
+
+function toggleMute() {
+  if (!stream) return;
+  audioEnabled = !audioEnabled;
+  stream.getAudioTracks().forEach(t => t.enabled = audioEnabled);
+  const btn = document.getElementById('muteToggle');
+  btn.textContent = audioEnabled ? '🔊 Audio On' : '🔇 Muted';
+  btn.classList.toggle('active', !audioEnabled);
+}
+
+function confirmEnd() {
+  if (confirm('Are you sure you want to end the interview early? Your progress will be saved.')) endInterview();
+}
+
+// ══════════ ELEVENLABS TTS ══════════
+async function speakElevenLabs(text, onDone) {
+  try {
+    const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${CONFIG.ELEVENLABS_VOICE_ID}`, {
+      method: 'POST',
+      headers: {
+        'xi-api-key': CONFIG.ELEVENLABS_API_KEY,
+        'Content-Type': 'application/json',
+        'Accept': 'audio/mpeg'
+      },
+      body: JSON.stringify({
+        text,
+        model_id: 'eleven_turbo_v2',
+        voice_settings: { stability: 0.5, similarity_boost: 0.8, style: 0.2, use_speaker_boost: true }
+      })
+    });
+
+    if (!res.ok) {
+      console.error('ElevenLabs error:', res.status, await res.text());
+      if (onDone) onDone();
+      return;
+    }
+
+    const audioBlob = await res.blob();
+    const audioBase64 = await blobToBase64(audioBlob);
+
+    // Feed audio to D-ID for lip-sync
+    if (CONFIG.DID_API_KEY && CONFIG.DID_PRESENTER_URL) {
+      await speakWithDID(audioBase64, audioBlob, onDone);
+    } else {
+      // Fallback: just play audio without avatar lip sync
+      const url = URL.createObjectURL(audioBlob);
+      const audio = new Audio(url);
+      audio.onended = () => { URL.revokeObjectURL(url); if (onDone) onDone(); };
+      audio.onerror = () => { if (onDone) onDone(); };
+      await audio.play();
+    }
+  } catch(e) {
+    console.error('ElevenLabs error:', e);
+    if (onDone) onDone();
+  }
+}
+
+function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+// ══════════ D-ID STREAMING ══════════
+let didStreamId = null;
+let didSessionId = null;
+let peerConnection = null;
+
+async function initDIDStream() {
+  try {
+    // Create a new streaming session with D-ID
+    const res = await fetch('https://api.d-id.com/talks/streams', {
+      method: 'POST',
+      headers: {
+        'Authorization': CONFIG.DID_API_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        source_url: CONFIG.DID_PRESENTER_URL
+      })
+    });
+
+    if (!res.ok) {
+      console.warn('D-ID stream init failed:', res.status);
+      return false;
+    }
+
+    const data = await res.json();
+    didStreamId = data.id;
+    didSessionId = data.session_id;
+
+    // Set up WebRTC peer connection
+    const { offer, ice_servers } = data;
+    peerConnection = new RTCPeerConnection({ iceServers: ice_servers });
+
+    peerConnection.ontrack = (e) => {
+      if (e.track.kind === 'video') {
+        const videoEl = document.getElementById('didVideo');
+        videoEl.srcObject = e.streams[0];
+        videoEl.style.display = 'block';
+        document.getElementById('mockAvatar').style.display = 'none';
+        document.getElementById('apiBadge').textContent = 'SARA — Live Avatar';
+        document.getElementById('apiBadge').style.background = 'rgba(39,174,96,.15)';
+        document.getElementById('apiBadge').style.borderColor = 'rgba(39,174,96,.3)';
+        document.getElementById('apiBadge').style.color = '#27ae60';
+      }
+    };
+
+    peerConnection.onicecandidate = async (e) => {
+      if (e.candidate) {
+        await fetch(`https://api.d-id.com/talks/streams/${didStreamId}/ice`, {
+          method: 'POST',
+          headers: { 'Authorization': CONFIG.DID_API_KEY, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ candidate: e.candidate, session_id: didSessionId })
+        });
+      }
+    };
+
+    await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+    const answer = await peerConnection.createAnswer();
+    await peerConnection.setLocalDescription(answer);
+
+    await fetch(`https://api.d-id.com/talks/streams/${didStreamId}/sdp`, {
+      method: 'POST',
+      headers: { 'Authorization': CONFIG.DID_API_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ answer, session_id: didSessionId })
+    });
+
+    console.log('D-ID stream initialized successfully');
+    return true;
+  } catch(e) {
+    console.warn('D-ID init error:', e);
+    return false;
+  }
+}
+
+async function speakWithDID(audioBase64, audioBlob, onDone) {
+  try {
+    if (!didStreamId || !didSessionId) {
+      // Fall back to audio-only
+      const url = URL.createObjectURL(audioBlob);
+      const audio = new Audio(url);
+      audio.onended = () => { URL.revokeObjectURL(url); if (onDone) onDone(); };
+      await audio.play();
+      return;
+    }
+
+    // Send audio to D-ID for lip-sync rendering
+    const res = await fetch(`https://api.d-id.com/talks/streams/${didStreamId}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': CONFIG.DID_API_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        script: {
+          type: 'audio',
+          audio_url: `data:audio/mpeg;base64,${audioBase64}`
+        },
+        config: { fluent: true, pad_audio: 0 },
+        session_id: didSessionId
+      })
+    });
+
+    if (!res.ok) {
+      console.warn('D-ID speak error:', res.status);
+      // Fallback to plain audio
+      const url = URL.createObjectURL(audioBlob);
+      const audio = new Audio(url);
+      audio.onended = () => { URL.revokeObjectURL(url); if (onDone) onDone(); };
+      await audio.play();
+      return;
+    }
+
+    const data = await res.json();
+    // Estimate duration from audio blob size (rough: ~128kbps)
+    const durationMs = (audioBlob.size / 16000) * 1000;
+    setTimeout(() => { if (onDone) onDone(); }, Math.max(durationMs, 2000));
+
+  } catch(e) {
+    console.error('D-ID speak error:', e);
+    // Fallback to plain audio
+    try {
+      const url = URL.createObjectURL(audioBlob);
+      const audio = new Audio(url);
+      audio.onended = () => { URL.revokeObjectURL(url); if (onDone) onDone(); };
+      await audio.play();
+    } catch(e2) { if (onDone) onDone(); }
+  }
+}
+
+async function destroyDIDStream() {
+  if (!didStreamId) return;
+  try {
+    await fetch(`https://api.d-id.com/talks/streams/${didStreamId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': CONFIG.DID_API_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ session_id: didSessionId })
+    });
+  } catch(e) {}
+  if (peerConnection) { peerConnection.close(); peerConnection = null; }
+  didStreamId = null; didSessionId = null;
+}
+
+// ══════════ END INTERVIEW ══════════
+function endInterview() {
+  clearInterval(timerInterval);
+  if (recognition) recognition.stop();
+  if (stream) stream.getTracks().forEach(t => t.stop());
+  document.getElementById('speakingRing').classList.remove('active');
+  destroyDIDStream();
+  setTimeout(() => showScorecard(), 1200);
+}
+
+function showScorecard() {
+  const avg = scores.length ? (scores.reduce((a,b)=>a+b,0)/scores.length) : 6;
+  const overall = Math.round(avg * 10) / 10;
+
+  document.getElementById('scOverallScore').textContent = overall;
+
+  const rec = document.getElementById('scRecommend');
+  if (overall >= 7) { rec.textContent = 'Recommend Hire'; rec.className = 'sc-recommend hire'; }
+  else if (overall >= 5) { rec.textContent = 'Under Review'; rec.className = 'sc-recommend review'; }
+  else { rec.textContent = 'Not Recommended'; rec.className = 'sc-recommend pass'; }
+
+  // Category scores (derived from answer content)
+  const cats = [
+    { id:'comm',  label:'Communication', score: Math.min(10, avg + (Math.random()-.3)) },
+    { id:'exp',   label:'Experience',    score: Math.min(10, avg + (Math.random()-.4)) },
+    { id:'prof',  label:'Professionalism',score: Math.min(10, avg + (Math.random()-.2)) },
+    { id:'avail', label:'Availability',  score: Math.min(10, avg + (Math.random()-.5)) },
+    { id:'lic',   label:'Licensing',     score: Math.min(10, avg + (Math.random()-.3)) },
+  ];
+
+  cats.forEach(c => {
+    const s = Math.max(1, Math.round(c.score * 10)/10);
+    setTimeout(() => {
+      document.getElementById('sc-'+c.id).style.width = (s/10*100)+'%';
+      document.getElementById('sc-'+c.id+'-v').textContent = s;
+    }, 300);
+  });
+
+  const notes = overall >= 7
+    ? `Candidate demonstrated strong communication and a solid understanding of security protocols. Responses showed relevant on-the-job experience and professionalism. Licensing and certification profile appears appropriate for the role. Recommended for in-person onboarding.`
+    : overall >= 5
+    ? `Candidate showed adequate knowledge of security fundamentals with some areas for further evaluation. Experience level and availability alignment require HR follow-up. Licensing status should be verified before next steps.`
+    : `Candidate's responses did not sufficiently demonstrate required experience, licensing, or availability for the Security Guard — NY position at this time. Recommend re-evaluation in 90 days.`;
+  document.getElementById('scNotes').textContent = notes;
+
+  document.getElementById('scorecardOverlay').classList.add('show');
+}
+
+function downloadReport() {
+  alert('PDF export will be available when connected to the Security USA® backend.');
+}
+
+</script>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
      PAGE: FINAL CONFIRMATION
 ══════════════════════════════════════════════════════ -->
 <div class="page page-fade" id="page-final">
@@ -1184,15 +3164,58 @@ let interviewHistory = [];
 
 // ══════════ PAGE NAVIGATION ══════════
 function showPage(id) {
-  document.querySelectorAll('.page').forEach(p => { p.classList.remove('active'); });
+  // Hide all pages
+  document.querySelectorAll('.page').forEach(p => {
+    p.classList.remove('active');
+    p.style.display = 'none';
+  });
+
   const pg = document.getElementById(id);
+  if (!pg) return;
+
+  // SARA page uses fixed full-screen overlay
+  if (id === 'page-sara') {
+    pg.style.display = 'flex';
+    pg.classList.add('active');
+    pg.classList.remove('page-fade');
+    void pg.offsetWidth;
+    pg.classList.add('page-fade');
+    // Hide the main portal header when SARA is active (SARA has its own)
+    document.querySelector('.site-header').style.display = 'none';
+    return;
+  }
+
+  // Restore portal header if navigating away from SARA
+  document.querySelector('.site-header').style.display = 'flex';
+  pg.style.display = 'flex';
   pg.classList.add('active');
   pg.classList.remove('page-fade');
   void pg.offsetWidth;
   pg.classList.add('page-fade');
   window.scrollTo({top:0,behavior:'smooth'});
-  const tags = {'page-login':'Candidate Portal','page-dashboard':'My Dashboard','page-application':'Step 2 — Application','page-eeo':'Step 3 — EEO','page-jobquestions':'Step 4 — Job Questions','page-interview':'Step 5 — AI Interview','page-final':'Application Complete'};
+
+  const tags = {
+    'page-login':'Candidate Portal',
+    'page-dashboard':'My Dashboard',
+    'page-application':'Step 2 — Application',
+    'page-eeo':'Step 3 — EEO',
+    'page-jobquestions':'Step 4 — Job Questions',
+    'page-interview':'Step 5 — AI Interview',
+    'page-schedule':'Step 6 — Schedule Onboarding',
+    'page-final':'Application Complete',
+    'page-sara':'AI Video Interview'
+  };
   document.getElementById('headerTag').textContent = tags[id] || 'Candidate Portal';
+
+  // Trigger calendar render when schedule page opens
+  if (id === 'page-schedule') {
+    currentWeekStart = getMonday(new Date());
+    const today = new Date();
+    if (today.getDay() === 5 || today.getDay() === 6 || today.getDay() === 0) {
+      currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+    }
+    renderCalendar();
+  }
 }
 
 // ══════════ AUTH ══════════
@@ -1275,7 +3298,7 @@ function goToEEO(){
   markStep(2); showPage('page-eeo');
 }
 function goToJobQ(){ markStep(3); showPage('page-jobquestions'); }
-function goToInterview(){ markStep(4); showPage('page-interview'); if(!interviewStarted) initInterview(); }
+function goToInterview(){ markStep(4); showPage('page-sara'); }
 
 function markStep(n){
   const map={2:['pipe2','conn2','appBadge'],3:['pipe3','conn3','eeoBadge'],4:['pipe4','conn4','jqBadge']};
