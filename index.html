@@ -710,7 +710,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
 
             <div style="margin-top:1.75rem;">
               <p class="auth-agree">By proceeding you agree to Security USA's <a href="https://www.securityusainc.com/privacy-policy" target="_blank">Privacy Policy</a>.</p>
-              <button class="btn-full" onclick="doRegister()">Create Profile &amp; Continue →</button>
+              <button class="btn-full" id="registerSubmitBtn" onclick="doRegister()">Create Profile &amp; Continue →</button>
               <button class="btn-full-out" onclick="switchTab('login')">Already have an account? Sign In</button>
             </div>
           </div>
@@ -738,7 +738,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
             <div style="text-align:right;margin:-6px 0 16px;">
               <a style="font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:1.5px;color:var(--gray);text-transform:uppercase;text-decoration:none;" href="#">Forgot password?</a>
             </div>
-            <button class="btn-full" onclick="doLogin()">Sign In →</button>
+            <button class="btn-full" id="loginSubmitBtn" onclick="doLogin()">Sign In →</button>
             <button class="btn-full-out" onclick="switchTab('reg')">New applicant? Create an account</button>
           </div>
 
@@ -1616,74 +1616,179 @@ function switchTab(t) {
   document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',(i===0&&t==='reg')||(i===1&&t==='login')));
   document.getElementById('pane-reg').classList.toggle('active',t==='reg');
   document.getElementById('pane-login').classList.toggle('active',t==='login');
+  // Clear errors on tab switch
+  var le = document.getElementById('login-error-msg');
+  var re = document.getElementById('register-error-msg');
+  if (le) le.style.display = 'none';
+  if (re) re.style.display = 'none';
 }
 function tpw(id,btn){const el=document.getElementById(id);const s=el.type==='password';el.type=s?'text':'password';btn.textContent=s?'Hide':'Show';}
 
 async function doRegister() {
-  const email=document.getElementById('rEmail').value.trim();
-  const pw=document.getElementById('rPw').value,pw2=document.getElementById('rPw2').value;
-  const first=document.getElementById('rFirst').value.trim(),last=document.getElementById('rLast').value.trim();
-  if(!email||!first||!last){alert('Please fill in your name and email.');return;}
-  if(!pw){alert('Please create a password.');return;}
-  if(pw!==pw2){alert('Passwords do not match.');return;}
+  const email = document.getElementById('rEmail').value.trim();
+  const pw    = document.getElementById('rPw').value;
+  const pw2   = document.getElementById('rPw2').value;
+  const first = document.getElementById('rFirst').value.trim();
+  const last  = document.getElementById('rLast').value.trim();
+
+  // Validate all fields
+  if (!first || !last) {
+    showRegisterError('Please enter your first and last name.');
+    return;
+  }
+  if (!email) {
+    showRegisterError('Please enter your email address.');
+    return;
+  }
+  if (!isValidEmail(email)) {
+    showRegisterError('Please enter a valid email address (e.g. name@email.com).');
+    return;
+  }
+  if (!pw) {
+    showRegisterError('Please create a password.');
+    return;
+  }
+  if (pw.length < 8) {
+    showRegisterError('Password must be at least 8 characters long.');
+    return;
+  }
+  if (pw !== pw2) {
+    showRegisterError('Passwords do not match. Please re-enter.');
+    return;
+  }
+
+  const btn = document.getElementById('registerSubmitBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Creating Account...'; }
 
   try {
-    // Create auth user
     const { data, error } = await supabase.auth.signUp({
       email, password: pw,
       options: { data: { first_name: first, last_name: last } }
     });
-    if (error) throw error;
 
-    // Save candidate profile
+    if (error) {
+      if (error.message.includes('already registered') || error.message.includes('User already registered')) {
+        showRegisterError('This email is already registered. Please sign in instead.');
+      } else if (error.message.includes('password')) {
+        showRegisterError('Password is too weak. Use at least 8 characters with letters and numbers.');
+      } else {
+        showRegisterError(error.message);
+      }
+      if (btn) { btn.disabled = false; btn.textContent = 'Create Profile & Continue →'; }
+      return;
+    }
+
+    // Save candidate profile to Supabase
+    const refNum = 'SUSA-' + Math.floor(100000+Math.random()*900000);
     if (data.user) {
       await supabase.from('candidates').upsert({
         id: data.user.id,
         first_name: first,
         last_name: last,
         email: email,
-        ref_number: 'SUSA-' + Math.floor(100000+Math.random()*900000)
+        ref_number: refNum
       });
     }
 
     userName = first + ' ' + last;
-    userRef  = 'SUSA-' + Math.floor(100000+Math.random()*900000);
+    userRef  = refNum;
     loginSuccess();
+
   } catch(e) {
-    console.warn('Register error:', e.message);
-    // Fallback - proceed anyway for demo
-    userName = first + ' ' + last;
-    userRef  = 'SUSA-' + Math.floor(100000+Math.random()*900000);
-    loginSuccess();
+    console.error('Register error:', e.message);
+    showRegisterError('Something went wrong. Please try again.');
+    if (btn) { btn.disabled = false; btn.textContent = 'Create Profile & Continue →'; }
   }
 }
+
+// ── AUTH HELPERS ──
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function showLoginError(msg) {
+  var el = document.getElementById('login-error-msg');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'login-error-msg';
+    el.style.cssText = 'background:#fef2f2;border:1px solid #fecaca;border-radius:4px;padding:.75rem 1rem;font-size:.9rem;color:#c0392b;margin-bottom:1rem;font-family:Barlow,sans-serif;';
+    var form = document.getElementById('pane-login');
+    if (form) form.insertBefore(el, form.querySelector('.btn-full'));
+  }
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function showRegisterError(msg) {
+  var el = document.getElementById('register-error-msg');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'register-error-msg';
+    el.style.cssText = 'background:#fef2f2;border:1px solid #fecaca;border-radius:4px;padding:.75rem 1rem;font-size:.9rem;color:#c0392b;margin-bottom:1rem;font-family:Barlow,sans-serif;';
+    var form = document.getElementById('pane-reg');
+    if (form) {
+      var submitBtn = form.querySelector('.btn-full');
+      if (submitBtn) form.insertBefore(el, submitBtn);
+      else form.appendChild(el);
+    }
+  }
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
 async function doLogin() {
-  const email=document.getElementById('lEmail').value.trim();
-  const pw=document.getElementById('lPw').value;
-  if(!email||!pw){alert('Please enter your email and password.');return;}
+  const email = document.getElementById('lEmail').value.trim();
+  const pw    = document.getElementById('lPw').value;
+
+  // Basic validation
+  if (!email || !pw) {
+    showLoginError('Please enter your email and password.');
+    return;
+  }
+  if (!isValidEmail(email)) {
+    showLoginError('Please enter a valid email address.');
+    return;
+  }
+  if (pw.length < 6) {
+    showLoginError('Password must be at least 6 characters.');
+    return;
+  }
+
+  const btn = document.getElementById('loginSubmitBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Signing in...'; }
 
   try {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password: pw });
-    if (error) throw error;
+    if (error) {
+      // Show the real Supabase error - don't fall through
+      if (error.message.includes('Invalid login') || error.message.includes('invalid_credentials')) {
+        showLoginError('Incorrect email or password. Please try again.');
+      } else if (error.message.includes('Email not confirmed')) {
+        showLoginError('Please check your email and confirm your account first.');
+      } else {
+        showLoginError(error.message);
+      }
+      if (btn) { btn.disabled = false; btn.textContent = 'Sign In →'; }
+      return;
+    }
 
     // Fetch candidate profile
     const { data: profile } = await supabase.from('candidates')
       .select('*').eq('id', data.user.id).single();
 
     if (profile) {
-      userName = (profile.first_name || '') + ' ' + (profile.last_name || '');
+      userName = ((profile.first_name || '') + ' ' + (profile.last_name || '')).trim();
       userRef  = profile.ref_number || 'SUSA-' + Math.floor(100000+Math.random()*900000);
     } else {
       userName = email.split('@')[0];
       userRef  = 'SUSA-' + Math.floor(100000+Math.random()*900000);
     }
     loginSuccess();
+
   } catch(e) {
-    console.warn('Login error:', e.message);
-    // Fallback for demo
-    userName = email.split('@')[0];
-    userRef  = 'SUSA-' + Math.floor(100000+Math.random()*900000);
-    loginSuccess();
+    console.error('Login error:', e.message);
+    showLoginError('Something went wrong. Please try again.');
+    if (btn) { btn.disabled = false; btn.textContent = 'Sign In →'; }
   }
 }
 function loginSuccess(){
