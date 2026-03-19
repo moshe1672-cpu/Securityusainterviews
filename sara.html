@@ -5,1703 +5,708 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SARA — AI Interview | Security USA®</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-const SB_URL = 'https://stvagyjcjoxnbslafmyf.supabase.co';
-const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.placeholder'; // replace with real key
-const sb = window.supabase.createClient(SB_URL, SB_KEY);
-</script>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
-html, body { width:100%; height:100%; overflow:hidden; background:#0a1628; color:#f4f6fa; font-family:'Barlow',sans-serif; }
-
-/* ── HEADER ── */
-#hdr {
-  height:58px; background:#0a1628; border-bottom:1px solid rgba(201,168,76,.25);
-  display:flex; align-items:center; justify-content:space-between;
-  padding:0 1.5rem; flex-shrink:0;
-}
-#hdr-left { display:flex; align-items:center; gap:10px; }
-#hdr-logo { width:34px; height:34px; border-radius:50%; border:2px solid #c9a84c; background:#112240; display:flex; align-items:center; justify-content:center; font-size:.9rem; }
-#hdr-name { font-family:'Bebas Neue',sans-serif; font-size:1.1rem; letter-spacing:2px; color:#fff; }
-#hdr-sub  { font-family:'Barlow Condensed',sans-serif; font-size:.55rem; letter-spacing:3px; color:#c9a84c; text-transform:uppercase; }
-#hdr-right { display:flex; align-items:center; gap:10px; }
-#hdr-qnum  { font-family:'Barlow Condensed',sans-serif; font-size:.78rem; color:#8a9ab5; background:rgba(255,255,255,.05); border:1px solid rgba(201,168,76,.2); padding:5px 12px; border-radius:20px; letter-spacing:1px; }
-#hdr-timer { font-family:'Barlow Condensed',sans-serif; font-size:.85rem; color:#fff; background:rgba(201,168,76,.15); border:1px solid rgba(201,168,76,.2); padding:5px 12px; border-radius:20px; }
-#hdr-exit  { background:transparent; border:1px solid rgba(201,168,76,.3); color:#c8d0df; padding:6px 14px; border-radius:3px; font-family:'Barlow Condensed',sans-serif; font-size:.72rem; letter-spacing:1.5px; text-transform:uppercase; cursor:pointer; }
-
-/* ── SCREENS ── */
-#screen-intro, #screen-interview, #screen-scorecard {
-  position:absolute; top:58px; left:0; right:0; bottom:0;
-  display:none; flex-direction:column;
-}
-#screen-intro.show, #screen-interview.show, #screen-scorecard.show {
-  display:flex;
-}
-
-/* ── INTRO ── */
-#screen-intro {
-  align-items:center; justify-content:center;
-  padding:2rem; text-align:center; overflow-y:auto;
-}
-.intro-shield {
-  width:90px; height:90px; border-radius:50%;
-  border:2px solid #c9a84c; background:#112240;
-  display:flex; align-items:center; justify-content:center;
-  font-size:2.2rem; margin-bottom:1.25rem;
-  box-shadow:0 0 40px rgba(201,168,76,.2);
-}
-.intro-eyebrow { font-family:'Barlow Condensed',sans-serif; font-size:.7rem; letter-spacing:4px; color:#c9a84c; text-transform:uppercase; margin-bottom:.4rem; }
-.intro-title   { font-family:'Bebas Neue',sans-serif; font-size:clamp(2rem,5vw,3rem); letter-spacing:3px; margin-bottom:.4rem; }
-.intro-title span { color:#c9a84c; }
-.intro-sub     { font-size:.95rem; color:#8a9ab5; line-height:1.7; max-width:440px; margin:0 auto 1.5rem; font-weight:300; }
-.intro-stats   { display:flex; gap:2.5rem; justify-content:center; margin-bottom:1.5rem; }
-.stat-num      { font-family:'Bebas Neue',sans-serif; font-size:1.8rem; color:#c9a84c; }
-.stat-lbl      { font-family:'Barlow Condensed',sans-serif; font-size:.6rem; letter-spacing:2px; color:#8a9ab5; text-transform:uppercase; }
-.intro-checks  { text-align:left; display:inline-flex; flex-direction:column; gap:.5rem; margin-bottom:1.75rem; }
-.chk           { display:flex; align-items:center; gap:.75rem; font-size:.9rem; color:#c8d0df; }
-.chk-icon      { width:20px; height:20px; border-radius:50%; border:1px solid #27ae60; background:rgba(39,174,96,.12); color:#27ae60; display:flex; align-items:center; justify-content:center; font-size:.65rem; flex-shrink:0; }
-.chk-icon.wait { border-color:rgba(201,168,76,.4); background:rgba(201,168,76,.06); color:#c9a84c; }
-#begin-btn {
-  background:#c9a84c; color:#0a1628; border:none; border-radius:4px;
-  padding:15px 48px; font-family:'Bebas Neue',sans-serif;
-  font-size:1.1rem; letter-spacing:3px; cursor:pointer;
-  transition:all .2s; margin-bottom:.75rem; display:block;
-}
-#begin-btn:hover { background:#e8c46a; transform:translateY(-2px); box-shadow:0 6px 20px rgba(201,168,76,.3); }
-.intro-note { font-size:.78rem; color:rgba(138,154,181,.5); }
-
-/* ── INTERVIEW ── */
-#screen-interview { overflow:hidden; }
-#iv-main { flex:1; display:grid; grid-template-columns:1fr 1fr; min-height:0; overflow:hidden; }
-
-/* Avatar side */
-#iv-avatar-side {
-  background:#112240; border-right:1px solid rgba(201,168,76,.2);
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  position:relative; overflow:hidden;
-}
-.av-ring { position:absolute; border-radius:50%; border:1px solid rgba(201,168,76,.06); animation:ringAnim 3s ease-in-out infinite; }
-.av-ring:nth-child(1){width:260px;height:260px;}
-.av-ring:nth-child(2){width:380px;height:380px;animation-delay:.5s;}
-.av-ring:nth-child(3){width:500px;height:500px;animation-delay:1s;}
-@keyframes ringAnim{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:.6;transform:scale(1.02)}}
-#av-face {
-  width:160px; height:160px; border-radius:50%;
-  background:linear-gradient(135deg,#1a3460,#112240);
-  border:3px solid #c9a84c; display:flex; align-items:center; justify-content:center;
-  position:relative; z-index:2;
-  box-shadow:0 0 40px rgba(201,168,76,.15);
-}
-
-#av-speak-ring {
-  position:absolute; width:176px; height:176px; border-radius:50%;
-  border:3px solid rgba(201,168,76,.6); z-index:1;
-  opacity:0; transition:opacity .3s;
-}
-#av-speak-ring.on { opacity:1; animation:speakRing .6s ease-in-out infinite alternate; }
-@keyframes speakRing{from{transform:scale(1);border-color:rgba(201,168,76,.7)}to{transform:scale(1.07);border-color:rgba(201,168,76,.2)}}
-#av-nametag {
-  position:absolute; bottom:1.25rem; left:50%; transform:translateX(-50%);
-  background:rgba(10,22,40,.88); border:1px solid rgba(201,168,76,.2);
-  border-radius:4px; padding:.4rem 1rem; white-space:nowrap; text-align:center;
-}
-#av-nametag .n  { font-family:'Bebas Neue',sans-serif; font-size:.95rem; letter-spacing:2px; color:#fff; }
-#av-nametag .r  { font-family:'Barlow Condensed',sans-serif; font-size:.58rem; letter-spacing:2px; color:#c9a84c; text-transform:uppercase; }
-#iv-q-box {
-  position:absolute; bottom:5rem; left:1rem; right:1rem; text-align:center; display:none;
-}
-#iv-q-inner {
-  background:rgba(10,22,40,.92); border:1px solid rgba(201,168,76,.2);
-  border-radius:6px; padding:1rem 1.25rem; display:inline-block; max-width:480px;
-}
-#iv-q-lbl  { font-family:'Barlow Condensed',sans-serif; font-size:.6rem; letter-spacing:3px; color:#c9a84c; text-transform:uppercase; margin-bottom:.25rem; }
-#iv-q-text { font-size:.93rem; color:#f4f6fa; line-height:1.55; }
-
-/* Transcript side */
-#iv-tx-side { display:flex; flex-direction:column; background:rgba(10,22,40,.85); overflow:hidden; }
-#iv-tx-hdr  { padding:.65rem 1rem; border-bottom:1px solid rgba(201,168,76,.15); flex-shrink:0; display:flex; justify-content:space-between; align-items:center; }
-#iv-tx-hdr span { font-family:'Barlow Condensed',sans-serif; font-size:.7rem; letter-spacing:2px; color:#c9a84c; text-transform:uppercase; }
-#iv-tx-body { flex:1 1 0; overflow-y:auto; padding:.75rem; display:flex; flex-direction:column; gap:.6rem; min-height:0; }
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;color:#f4f6fa;font-family:'Barlow',sans-serif;}
+#hdr{height:58px;background:#0a1628;border-bottom:1px solid rgba(201,168,76,.25);display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;flex-shrink:0;}
+#hdr-left{display:flex;align-items:center;gap:10px;}
+#hdr-logo{width:34px;height:34px;border-radius:50%;border:2px solid #c9a84c;background:#112240;display:flex;align-items:center;justify-content:center;font-size:.9rem;}
+#hdr-title{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;}
+#hdr-sub{font-family:'Barlow Condensed',sans-serif;font-size:.55rem;letter-spacing:3px;color:#c9a84c;text-transform:uppercase;}
+#hdr-right{display:flex;align-items:center;gap:10px;}
+#hdr-qnum{font-family:'Barlow Condensed',sans-serif;font-size:.78rem;color:#8a9ab5;background:rgba(255,255,255,.05);border:1px solid rgba(201,168,76,.2);padding:5px 12px;border-radius:20px;}
+#hdr-qnum b{color:#c9a84c;}
+#hdr-timer{font-family:'Barlow Condensed',sans-serif;font-size:.85rem;color:#fff;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.2);padding:5px 12px;border-radius:20px;}
+#hdr-exit{background:transparent;border:1px solid rgba(201,168,76,.3);color:#c8d0df;padding:6px 14px;border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;}
+.screen{position:absolute;top:58px;left:0;right:0;bottom:0;display:none;flex-direction:column;}
+.screen.on{display:flex;}
+#s-intro{align-items:center;justify-content:center;padding:2rem;text-align:center;overflow-y:auto;}
+#s-intro canvas{border-radius:50%;border:2px solid #c9a84c;box-shadow:0 0 40px rgba(201,168,76,.2);margin-bottom:1.25rem;}
+.eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:4px;color:#c9a84c;text-transform:uppercase;margin-bottom:.4rem;}
+.big-title{font-family:'Bebas Neue',sans-serif;font-size:2.8rem;letter-spacing:3px;margin-bottom:.4rem;}
+.big-title span{color:#c9a84c;}
+.sub-txt{font-size:.95rem;color:#8a9ab5;line-height:1.7;max-width:440px;margin:0 auto 1.5rem;font-weight:300;}
+.stats{display:flex;gap:2.5rem;justify-content:center;margin-bottom:1.5rem;}
+.stat-n{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:#c9a84c;}
+.stat-l{font-family:'Barlow Condensed',sans-serif;font-size:.6rem;letter-spacing:2px;color:#8a9ab5;text-transform:uppercase;}
+.checks{text-align:left;display:inline-flex;flex-direction:column;gap:.5rem;margin-bottom:1.75rem;}
+.chk{display:flex;align-items:center;gap:.75rem;font-size:.9rem;color:#c8d0df;}
+.chk-i{width:20px;height:20px;border-radius:50%;border:1px solid #27ae60;background:rgba(39,174,96,.12);color:#27ae60;display:flex;align-items:center;justify-content:center;font-size:.65rem;flex-shrink:0;}
+.chk-i.q{border-color:rgba(201,168,76,.4);background:rgba(201,168,76,.06);color:#c9a84c;}
+#begin-btn{background:#c9a84c;color:#0a1628;border:none;border-radius:4px;padding:15px 48px;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:3px;cursor:pointer;transition:all .2s;display:block;margin-bottom:.75rem;}
+#begin-btn:hover{background:#e8c46a;transform:translateY(-1px);}
+.note-sm{font-size:.78rem;color:rgba(138,154,181,.5);}
+#s-interview{overflow:hidden;}
+#iv-grid{flex:1;display:grid;grid-template-columns:1fr 1fr;min-height:0;overflow:hidden;}
+#iv-av{background:#112240;border-right:1px solid rgba(201,168,76,.2);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+#av-canvas{border-radius:50%;border:3px solid #c9a84c;box-shadow:0 0 40px rgba(201,168,76,.15);position:relative;z-index:2;}
+.av-ring{position:absolute;border-radius:50%;border:1px solid rgba(201,168,76,.06);animation:ringA 3s ease-in-out infinite;}
+.av-ring:nth-child(1){width:280px;height:280px;}
+.av-ring:nth-child(2){width:400px;height:400px;animation-delay:.5s;}
+.av-ring:nth-child(3){width:520px;height:520px;animation-delay:1s;}
+@keyframes ringA{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:.6;transform:scale(1.02)}}
+#av-glow{position:absolute;width:240px;height:240px;border-radius:50%;border:3px solid rgba(201,168,76,.5);opacity:0;transition:opacity .3s;z-index:1;}
+#av-glow.on{opacity:1;animation:glowP .6s ease-in-out infinite alternate;}
+@keyframes glowP{from{transform:scale(1);border-color:rgba(201,168,76,.7)}to{transform:scale(1.08);border-color:rgba(201,168,76,.2)}}
+#iv-nametag{position:absolute;bottom:1.25rem;left:50%;transform:translateX(-50%);background:rgba(10,22,40,.88);border:1px solid rgba(201,168,76,.2);border-radius:4px;padding:.4rem 1rem;white-space:nowrap;text-align:center;}
+#iv-nametag .n{font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:2px;}
+#iv-nametag .r{font-family:'Barlow Condensed',sans-serif;font-size:.58rem;letter-spacing:2px;color:#c9a84c;text-transform:uppercase;}
+#iv-qbox{position:absolute;bottom:5rem;left:1rem;right:1rem;text-align:center;display:none;}
+#iv-qinner{background:rgba(10,22,40,.92);border:1px solid rgba(201,168,76,.2);border-radius:6px;padding:1rem 1.25rem;display:inline-block;max-width:480px;}
+#iv-qlbl{font-family:'Barlow Condensed',sans-serif;font-size:.6rem;letter-spacing:3px;color:#c9a84c;text-transform:uppercase;margin-bottom:.25rem;}
+#iv-qtxt{font-size:.93rem;color:#f4f6fa;line-height:1.55;}
+#iv-tx{display:flex;flex-direction:column;background:rgba(10,22,40,.85);overflow:hidden;}
+#iv-tx-hdr{padding:.65rem 1rem;border-bottom:1px solid rgba(201,168,76,.15);flex-shrink:0;display:flex;justify-content:space-between;align-items:center;}
+#iv-tx-hdr span{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:2px;color:#c9a84c;text-transform:uppercase;}
+#iv-tx-body{flex:1 1 0;overflow-y:auto;padding:.75rem;display:flex;flex-direction:column;gap:.6rem;min-height:0;}
 #iv-tx-body::-webkit-scrollbar{width:3px}
 #iv-tx-body::-webkit-scrollbar-thumb{background:rgba(201,168,76,.2);border-radius:2px}
-.tx-sara { background:rgba(26,52,96,.6); border:1px solid rgba(201,168,76,.12); border-radius:0 5px 5px 5px; padding:.6rem .8rem; }
-.tx-user { background:rgba(39,174,96,.07); border:1px solid rgba(39,174,96,.18); border-radius:5px 0 5px 5px; }
-.tx-who  { font-family:'Barlow Condensed',sans-serif; font-size:.58rem; letter-spacing:2px; text-transform:uppercase; margin-bottom:.2rem; }
-.tx-sara .tx-who { color:#c9a84c; }
-.tx-user .tx-who { color:#27ae60; }
-.tx-msg  { font-size:.82rem; color:rgba(244,246,250,.85); line-height:1.55; }
-#iv-prog-wrap { padding:.5rem .75rem; border-top:1px solid rgba(201,168,76,.15); flex-shrink:0; }
-#iv-prog-lbl  { display:flex; justify-content:space-between; font-family:'Barlow Condensed',sans-serif; font-size:.58rem; letter-spacing:1.5px; color:#8a9ab5; text-transform:uppercase; margin-bottom:.25rem; }
-#iv-prog-lbl span { color:#c9a84c; }
-#iv-prog-track{ height:3px; background:rgba(255,255,255,.07); border-radius:2px; overflow:hidden; }
-#iv-prog-fill { height:100%; background:linear-gradient(90deg,#c9a84c,#e8c46a); border-radius:2px; width:0; transition:width .5s; }
-#iv-score-wrap{ padding:.5rem .75rem; border-top:1px solid rgba(201,168,76,.15); flex-shrink:0; }
-#iv-score-lbl { display:flex; justify-content:space-between; font-family:'Barlow Condensed',sans-serif; font-size:.58rem; letter-spacing:1.5px; color:#8a9ab5; text-transform:uppercase; margin-bottom:.25rem; }
-#iv-score-lbl span { color:#c9a84c; }
-#iv-score-track{ height:4px; background:rgba(255,255,255,.07); border-radius:2px; overflow:hidden; }
-#iv-score-fill{ height:100%; background:linear-gradient(90deg,#c9a84c,#e8c46a); border-radius:2px; width:0; transition:width .8s; }
-
-/* Bottom bar */
-#iv-bottom { height:155px; border-top:1px solid rgba(201,168,76,.2); display:grid; grid-template-columns:1fr 1fr; flex-shrink:0; }
-#iv-cam { background:#000; position:relative; overflow:hidden; }
-#iv-cam video { width:100%; height:100%; object-fit:cover; transform:scaleX(-1); }
-#iv-cam-overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:.4rem; background:rgba(10,22,40,.75); }
-#iv-cam-overlay span:first-child { font-size:1.4rem; opacity:.3; }
-#iv-cam-overlay span:last-child  { font-family:'Barlow Condensed',sans-serif; font-size:.7rem; letter-spacing:2px; color:#8a9ab5; text-transform:uppercase; }
-#iv-cam-lbl { position:absolute; bottom:.5rem; left:.65rem; background:rgba(10,22,40,.85); border:1px solid rgba(201,168,76,.2); border-radius:3px; padding:.25rem .7rem; font-family:'Barlow Condensed',sans-serif; font-size:.65rem; letter-spacing:1.5px; color:#fff; text-transform:uppercase; }
-#iv-ctrl { background:rgba(10,22,40,.95); padding:.85rem; display:flex; flex-direction:column; gap:.6rem; }
-#iv-mic-row { display:flex; align-items:center; gap:.75rem; }
-#iv-mic-btn  { width:48px; height:48px; border-radius:50%; border:2px solid rgba(201,168,76,.35); background:rgba(255,255,255,.04); font-size:1.2rem; cursor:pointer; transition:all .2s; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
-#iv-mic-btn.on { border-color:#27ae60 !important; background:rgba(39,174,96,.1) !important; animation:micPulse .8s ease-in-out infinite alternate; }
-@keyframes micPulse{from{box-shadow:0 0 0 0 rgba(39,174,96,.4)}to{box-shadow:0 0 0 10px rgba(39,174,96,0)}}
-#iv-mic-info { flex:1; }
-#iv-mic-status { font-family:'Barlow Condensed',sans-serif; font-size:.75rem; letter-spacing:1.5px; color:#8a9ab5; text-transform:uppercase; margin-bottom:2px; }
-#iv-mic-hint   { font-size:.7rem; color:rgba(138,154,181,.55); }
-#iv-live { background:rgba(39,174,96,.05); border:1px solid rgba(39,174,96,.12); border-radius:4px; padding:.4rem .7rem; font-size:.78rem; color:rgba(244,246,250,.65); font-style:italic; min-height:30px; display:none; }
-#iv-btn-row { display:flex; gap:.5rem; }
-#iv-submit { flex:2; background:#c9a84c; color:#0a1628; border:none; border-radius:4px; padding:7px; font-family:'Bebas Neue',sans-serif; font-size:.85rem; letter-spacing:2px; cursor:pointer; display:none; transition:all .2s; }
-#iv-submit:hover { background:#e8c46a; }
-#iv-cam-toggle { flex:1; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); color:#8a9ab5; border-radius:4px; padding:7px; font-family:'Barlow Condensed',sans-serif; font-size:.65rem; letter-spacing:1px; text-transform:uppercase; cursor:pointer; }
-#iv-end { flex:1; background:rgba(192,57,43,.07); border:1px solid rgba(192,57,43,.25); color:#c0392b; border-radius:4px; padding:7px; font-family:'Barlow Condensed',sans-serif; font-size:.65rem; letter-spacing:1px; text-transform:uppercase; cursor:pointer; }
-
-/* ── SCORECARD ── */
-#screen-scorecard { align-items:center; justify-content:center; padding:2rem; overflow-y:auto; }
-#sc-box { background:#112240; border:1px solid rgba(201,168,76,.25); border-radius:8px; padding:2rem; max-width:500px; width:100%; }
-#sc-box .sc-hdr { text-align:center; margin-bottom:1.25rem; }
-#sc-box .sc-icon { font-size:2.5rem; display:block; margin-bottom:.6rem; }
-#sc-box .sc-title{ font-family:'Bebas Neue',sans-serif; font-size:1.8rem; letter-spacing:3px; color:#c9a84c; }
-#sc-box .sc-sub  { font-size:.85rem; color:#8a9ab5; }
-#sc-overall { background:rgba(201,168,76,.08); border:1px solid rgba(201,168,76,.2); border-radius:6px; padding:1.1rem; margin-bottom:1.25rem; display:flex; align-items:center; justify-content:center; gap:1.5rem; }
-#sc-score-num { font-family:'Bebas Neue',sans-serif; font-size:3rem; color:#c9a84c; line-height:1; }
-#sc-score-lbl { font-family:'Barlow Condensed',sans-serif; font-size:.62rem; letter-spacing:2px; color:#8a9ab5; text-transform:uppercase; margin-top:3px; }
-#sc-rec { font-family:'Barlow Condensed',sans-serif; font-size:.95rem; letter-spacing:2px; padding:7px 18px; border-radius:20px; border:2px solid #c9a84c; color:#c9a84c; }
-#sc-cats { display:flex; flex-direction:column; gap:.65rem; margin-bottom:1.25rem; }
-.sc-cat { display:flex; align-items:center; gap:.65rem; }
-.sc-cat-lbl { font-family:'Barlow Condensed',sans-serif; font-size:.68rem; letter-spacing:1.5px; color:#8a9ab5; text-transform:uppercase; width:110px; flex-shrink:0; }
-.sc-cat-bar { flex:1; height:5px; background:rgba(255,255,255,.07); border-radius:2px; overflow:hidden; }
-.sc-cat-fill{ height:100%; background:linear-gradient(90deg,#c9a84c,#e8c46a); border-radius:2px; }
-.sc-cat-val { font-family:'Barlow Condensed',sans-serif; font-size:.72rem; color:#c9a84c; width:28px; text-align:right; flex-shrink:0; }
-#sc-notes-wrap { background:rgba(255,255,255,.04); border:1px solid rgba(201,168,76,.15); border-radius:4px; padding:.85rem; margin-bottom:1.25rem; }
-#sc-notes-lbl  { font-family:'Barlow Condensed',sans-serif; font-size:.62rem; letter-spacing:2px; color:#c9a84c; text-transform:uppercase; margin-bottom:.4rem; }
-#sc-notes-text { font-size:.85rem; color:rgba(244,246,250,.7); line-height:1.65; }
-#sc-sched-btn { width:100%; background:#c9a84c; color:#0a1628; border:none; border-radius:4px; padding:12px; font-family:'Bebas Neue',sans-serif; font-size:.95rem; letter-spacing:2px; cursor:pointer; margin-bottom:.5rem; transition:all .2s; }
-#sc-sched-btn:hover { background:#e8c46a; }
-#sc-back-btn  { width:100%; background:transparent; color:#8a9ab5; border:1px solid rgba(255,255,255,.1); border-radius:4px; padding:10px; font-family:'Barlow Condensed',sans-serif; font-size:.78rem; letter-spacing:2px; text-transform:uppercase; cursor:pointer; }
+.tx-s{background:rgba(26,52,96,.6);border:1px solid rgba(201,168,76,.12);border-radius:0 5px 5px 5px;padding:.6rem .8rem;}
+.tx-u{background:rgba(39,174,96,.07);border:1px solid rgba(39,174,96,.18);border-radius:5px 0 5px 5px;}
+.tx-w{font-family:'Barlow Condensed',sans-serif;font-size:.58rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:.2rem;}
+.tx-s .tx-w{color:#c9a84c;}.tx-u .tx-w{color:#27ae60;}
+.tx-m{font-size:.82rem;color:rgba(244,246,250,.85);line-height:1.55;}
+#iv-prog{padding:.5rem .75rem;border-top:1px solid rgba(201,168,76,.15);flex-shrink:0;}
+.bar-row{display:flex;justify-content:space-between;font-family:'Barlow Condensed',sans-serif;font-size:.58rem;letter-spacing:1.5px;color:#8a9ab5;text-transform:uppercase;margin-bottom:.25rem;}
+.bar-row b{color:#c9a84c;}
+.bar-track{height:3px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden;}
+.bar-fill{height:100%;background:linear-gradient(90deg,#c9a84c,#e8c46a);border-radius:2px;width:0;transition:width .5s;}
+#iv-score{padding:.5rem .75rem;border-top:1px solid rgba(201,168,76,.15);flex-shrink:0;}
+#iv-score-fill{height:100%;background:linear-gradient(90deg,#c9a84c,#e8c46a);border-radius:2px;width:0;transition:width .8s;}
+#iv-bottom{height:155px;border-top:1px solid rgba(201,168,76,.2);display:grid;grid-template-columns:1fr 1fr;flex-shrink:0;}
+#iv-cam{background:#000;position:relative;overflow:hidden;}
+#iv-cam video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);}
+#iv-cam-ov{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.4rem;background:rgba(10,22,40,.75);}
+#iv-cam-ov span:first-child{font-size:1.4rem;opacity:.3;}
+#iv-cam-ov span:last-child{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:2px;color:#8a9ab5;text-transform:uppercase;}
+#iv-cam-lbl{position:absolute;bottom:.5rem;left:.65rem;background:rgba(10,22,40,.85);border:1px solid rgba(201,168,76,.2);border-radius:3px;padding:.25rem .7rem;font-family:'Barlow Condensed',sans-serif;font-size:.65rem;letter-spacing:1.5px;text-transform:uppercase;}
+#iv-ctrl{background:rgba(10,22,40,.95);padding:.85rem;display:flex;flex-direction:column;gap:.6rem;}
+#iv-mic-row{display:flex;align-items:center;gap:.75rem;}
+#iv-mic-btn{width:48px;height:48px;border-radius:50%;border:2px solid rgba(201,168,76,.35);background:rgba(255,255,255,.04);font-size:1.2rem;cursor:pointer;transition:all .2s;flex-shrink:0;}
+#iv-mic-btn.on{border-color:#27ae60!important;background:rgba(39,174,96,.1)!important;animation:micP .8s ease-in-out infinite alternate;}
+@keyframes micP{from{box-shadow:0 0 0 0 rgba(39,174,96,.4)}to{box-shadow:0 0 0 10px rgba(39,174,96,0)}}
+#iv-mic-status{font-family:'Barlow Condensed',sans-serif;font-size:.75rem;letter-spacing:1.5px;color:#8a9ab5;text-transform:uppercase;margin-bottom:2px;}
+#iv-mic-hint{font-size:.7rem;color:rgba(138,154,181,.55);}
+#iv-live{background:rgba(39,174,96,.05);border:1px solid rgba(39,174,96,.12);border-radius:4px;padding:.4rem .7rem;font-size:.78rem;color:rgba(244,246,250,.65);font-style:italic;min-height:30px;display:none;}
+#iv-btn-row{display:flex;gap:.5rem;}
+#iv-submit{flex:2;background:#c9a84c;color:#0a1628;border:none;border-radius:4px;padding:7px;font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:2px;cursor:pointer;display:none;}
+#iv-submit:hover{background:#e8c46a;}
+#iv-camtog,#iv-end{flex:1;border-radius:4px;padding:7px;font-family:'Barlow Condensed',sans-serif;font-size:.65rem;letter-spacing:1px;text-transform:uppercase;cursor:pointer;}
+#iv-camtog{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:#8a9ab5;}
+#iv-end{background:rgba(192,57,43,.07);border:1px solid rgba(192,57,43,.25);color:#c0392b;}
+#s-score{align-items:center;justify-content:center;padding:2rem;overflow-y:auto;}
+#sc-box{background:#112240;border:1px solid rgba(201,168,76,.25);border-radius:8px;padding:2rem;max-width:500px;width:100%;}
+.sc-title{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:3px;color:#c9a84c;text-align:center;margin-bottom:.4rem;}
+.sc-sub{font-size:.88rem;color:#8a9ab5;text-align:center;margin-bottom:1.25rem;}
+#sc-overall{background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);border-radius:6px;padding:1.1rem;margin-bottom:1.25rem;display:flex;align-items:center;justify-content:center;gap:1.5rem;}
+#sc-num{font-family:'Bebas Neue',sans-serif;font-size:3rem;color:#c9a84c;line-height:1;}
+#sc-numl{font-family:'Barlow Condensed',sans-serif;font-size:.62rem;letter-spacing:2px;color:#8a9ab5;text-transform:uppercase;margin-top:3px;}
+#sc-rec{font-family:'Barlow Condensed',sans-serif;font-size:.95rem;letter-spacing:2px;padding:7px 18px;border-radius:20px;border:2px solid #c9a84c;color:#c9a84c;}
+#sc-cats{display:flex;flex-direction:column;gap:.65rem;margin-bottom:1.25rem;}
+.sc-cat{display:flex;align-items:center;gap:.65rem;}
+.sc-cl{font-family:'Barlow Condensed',sans-serif;font-size:.68rem;letter-spacing:1.5px;color:#8a9ab5;text-transform:uppercase;width:110px;flex-shrink:0;}
+.sc-cb{flex:1;height:5px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden;}
+.sc-cf{height:100%;background:linear-gradient(90deg,#c9a84c,#e8c46a);border-radius:2px;}
+.sc-cv{font-family:'Barlow Condensed',sans-serif;font-size:.72rem;color:#c9a84c;width:28px;text-align:right;flex-shrink:0;}
+#sc-notes{background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.15);border-radius:4px;padding:.85rem;margin-bottom:1.25rem;}
+#sc-nl{font-family:'Barlow Condensed',sans-serif;font-size:.62rem;letter-spacing:2px;color:#c9a84c;text-transform:uppercase;margin-bottom:.4rem;}
+#sc-nt{font-size:.85rem;color:rgba(244,246,250,.7);line-height:1.65;}
+.sc-btn{width:100%;background:#c9a84c;color:#0a1628;border:none;border-radius:4px;padding:12px;font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:2px;cursor:pointer;margin-bottom:.5rem;}
+.sc-btn-o{width:100%;background:transparent;color:#8a9ab5;border:1px solid rgba(255,255,255,.1);border-radius:4px;padding:10px;font-family:'Barlow Condensed',sans-serif;font-size:.78rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;}
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <div id="hdr">
   <div id="hdr-left">
     <div id="hdr-logo">🛡</div>
-    <div>
-      <div id="hdr-name">SARA</div>
-      <div id="hdr-sub">Security USA® AI Interview</div>
-    </div>
+    <div><div id="hdr-title">SARA</div><div id="hdr-sub">Security USA® AI Interview</div></div>
   </div>
   <div id="hdr-right">
-    <div id="hdr-qnum">Question <span id="q-num">—</span> of 10</div>
+    <div id="hdr-qnum">Question <b id="q-num">—</b> of 10</div>
     <div id="hdr-timer">00:00</div>
-    <button id="hdr-exit" onclick="if(confirm('Exit interview?')) window.location.href='index.html'">Exit</button>
+    <button id="hdr-exit">Exit</button>
   </div>
 </div>
 
-<!-- INTRO SCREEN -->
-<div id="screen-intro" class="show">
-  <canvas id="intro-canvas" width="100" height="100"
-    style="border-radius:50%;border:2px solid #c9a84c;box-shadow:0 0 40px rgba(201,168,76,.2);margin-bottom:1.25rem;display:block;">
-  </canvas>
-  <div class="intro-eyebrow">Security USA® — AI Screening</div>
-  <h1 class="intro-title">Meet <span>SARA</span></h1>
-  <p class="intro-sub">Your AI screening interviewer for the Security Guard — NY position. Answer 10 questions about your experience, licensing, and availability.</p>
-  <div class="intro-stats">
-    <div><div class="stat-num">10</div><div class="stat-lbl">Questions</div></div>
-    <div><div class="stat-num">~15</div><div class="stat-lbl">Minutes</div></div>
-    <div><div class="stat-num">100%</div><div class="stat-lbl">Secure</div></div>
+<div id="s-intro" class="screen on">
+  <canvas id="c-intro" width="100" height="100"></canvas>
+  <div class="eyebrow">Security USA® — AI Screening</div>
+  <h1 class="big-title">Meet <span>SARA</span></h1>
+  <p class="sub-txt">Your AI screening interviewer for the Security Guard — NY position. 10 questions about your experience, licensing, and availability.</p>
+  <div class="stats">
+    <div><div class="stat-n">10</div><div class="stat-l">Questions</div></div>
+    <div><div class="stat-n">~15</div><div class="stat-l">Minutes</div></div>
+    <div><div class="stat-n">100%</div><div class="stat-l">Secure</div></div>
   </div>
-  <div class="intro-checks">
-    <div class="chk"><span class="chk-icon">✓</span>Find a quiet, well-lit location</div>
-    <div class="chk"><span class="chk-icon">✓</span>Speak clearly at a normal pace</div>
-    <div class="chk"><span class="chk-icon">✓</span>Have your security license number ready</div>
-    <div class="chk"><span class="chk-icon wait" id="perm-icon">?</span><span id="perm-txt">Camera &amp; microphone optional</span></div>
+  <div class="checks">
+    <div class="chk"><span class="chk-i">✓</span>Find a quiet, well-lit location</div>
+    <div class="chk"><span class="chk-i">✓</span>Speak clearly at a normal pace</div>
+    <div class="chk"><span class="chk-i">✓</span>Have your security license number ready</div>
+    <div class="chk"><span class="chk-i q" id="perm-icon">?</span><span id="perm-txt">Camera &amp; mic optional — click to begin</span></div>
   </div>
-  <button id="begin-btn" onclick="beginClick()">Begin Interview →</button>
-  <div class="intro-note">You can type answers if you prefer not to use your microphone.</div>
+  <button id="begin-btn">Begin Interview →</button>
+  <div class="note-sm">Camera &amp; mic optional. You can type answers if preferred.</div>
 </div>
 
-<!-- INTERVIEW SCREEN -->
-<div id="screen-interview">
-  <div id="iv-main">
-    <!-- Avatar -->
-    <div id="iv-avatar-side">
-      <div class="av-ring"></div>
-      <div class="av-ring"></div>
-      <div class="av-ring"></div>
-      <div style="position:relative;z-index:2;display:flex;align-items:center;justify-content:center;">
-        <div id="av-speak-ring"></div>
-        <!-- Animated canvas avatar -->
-        <canvas id="sara-canvas" width="220" height="220"
-          style="border-radius:50%;border:3px solid #c9a84c;box-shadow:0 0 40px rgba(201,168,76,.18);display:block;z-index:2;position:relative;">
-        </canvas>
-      </div>
-      <div id="av-nametag"><div class="n">SARA</div><div class="r">Security USA® AI</div></div>
-      <div id="iv-q-box">
-        <div id="iv-q-inner">
-          <div id="iv-q-lbl">SARA is asking</div>
-          <div id="iv-q-text"></div>
-        </div>
-      </div>
+<div id="s-interview" class="screen">
+  <div id="iv-grid">
+    <div id="iv-av">
+      <div class="av-ring"></div><div class="av-ring"></div><div class="av-ring"></div>
+      <div id="av-glow"></div>
+      <!-- D-ID live video avatar -->
+      <video id="av-video" autoplay playsinline
+        style="width:220px;height:220px;border-radius:50%;object-fit:cover;border:3px solid #c9a84c;box-shadow:0 0 40px rgba(201,168,76,.15);display:none;position:relative;z-index:3;">
+      </video>
+      <!-- Canvas fallback (shown when D-ID not connected) -->
+      <canvas id="av-canvas" width="220" height="220"></canvas>
+      <div id="iv-nametag"><div class="n">SARA</div><div class="r">Security USA® AI</div></div>
+      <div id="iv-qbox"><div id="iv-qinner"><div id="iv-qlbl">SARA is asking</div><div id="iv-qtxt"></div></div></div>
     </div>
-    <!-- Transcript -->
-    <div id="iv-tx-side">
-      <div id="iv-tx-hdr"><span>Live Transcript</span><span style="color:#8a9ab5;font-family:'Barlow Condensed',sans-serif;font-size:.6rem;letter-spacing:1px;">Auto-saved</span></div>
+    <div id="iv-tx">
+      <div id="iv-tx-hdr"><span>Live Transcript</span><span style="color:#8a9ab5;font-family:'Barlow Condensed',sans-serif;font-size:.6rem;">Auto-saved</span></div>
       <div id="iv-tx-body"></div>
-      <div id="iv-prog-wrap">
-        <div id="iv-prog-lbl"><span>Progress</span><span id="iv-pct">0%</span></div>
-        <div id="iv-prog-track"><div id="iv-prog-fill"></div></div>
+      <div id="iv-prog">
+        <div class="bar-row"><span>Progress</span><b id="iv-pct">0%</b></div>
+        <div class="bar-track"><div class="bar-fill" id="iv-prog-fill"></div></div>
       </div>
-      <div id="iv-score-wrap">
-        <div id="iv-score-lbl"><span>Response Quality</span><span id="iv-score-val">—</span></div>
-        <div id="iv-score-track"><div id="iv-score-fill"></div></div>
+      <div id="iv-score">
+        <div class="bar-row"><span>Response Quality</span><b id="iv-score-val">—</b></div>
+        <div class="bar-track"><div class="bar-fill" id="iv-score-fill" style="height:4px;"></div></div>
       </div>
     </div>
   </div>
-  <!-- Bottom -->
   <div id="iv-bottom">
     <div id="iv-cam">
-      <video id="iv-cam-video" autoplay muted playsinline></video>
-      <div id="iv-cam-overlay">
-        <span>📷</span><span>Your Camera</span>
-      </div>
+      <video id="iv-video" autoplay muted playsinline></video>
+      <div id="iv-cam-ov"><span>📷</span><span>Your Camera</span></div>
       <div id="iv-cam-lbl">You</div>
     </div>
     <div id="iv-ctrl">
       <div id="iv-mic-row">
-        <button id="iv-mic-btn" onclick="micToggle()">🎤</button>
-        <div id="iv-mic-info">
-          <div id="iv-mic-status">Waiting for SARA...</div>
-          <div id="iv-mic-hint">Mic activates after each question</div>
-        </div>
+        <button id="iv-mic-btn">🎤</button>
+        <div><div id="iv-mic-status">Waiting for SARA...</div><div id="iv-mic-hint">Mic activates after each question</div></div>
       </div>
       <div id="iv-live"></div>
       <div id="iv-btn-row">
-        <button id="iv-submit" onclick="submitAnswer()">Submit Answer →</button>
-        <button id="iv-cam-toggle" onclick="camToggle()">Cam On</button>
-        <button id="iv-end" onclick="if(confirm('End interview?')) finish()">End</button>
+        <button id="iv-submit">Submit Answer →</button>
+        <button id="iv-camtog">Cam On</button>
+        <button id="iv-end">End</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- SCORECARD -->
-<div id="screen-scorecard">
+<div id="s-score" class="screen">
   <div id="sc-box">
-    <div class="sc-hdr">
-      <span class="sc-icon">🛡</span>
-      <div class="sc-title">Interview Complete</div>
-      <div class="sc-sub">Your responses have been submitted to Security USA® HR.</div>
-    </div>
+    <div style="text-align:center;font-size:2.5rem;margin-bottom:.6rem;">🛡</div>
+    <div class="sc-title">Interview Complete</div>
+    <div class="sc-sub">Submitted to Security USA® HR</div>
     <div id="sc-overall">
-      <div style="text-align:center;">
-        <div id="sc-score-num">—</div>
-        <div id="sc-score-lbl">Score / 10</div>
-      </div>
+      <div style="text-align:center;"><div id="sc-num">—</div><div id="sc-numl">Score / 10</div></div>
       <div id="sc-rec">Under Review</div>
     </div>
     <div id="sc-cats"></div>
-    <div id="sc-notes-wrap">
-      <div id="sc-notes-lbl">SARA's Notes</div>
-      <div id="sc-notes-text"></div>
-    </div>
-    <button id="sc-sched-btn" onclick="window.location.href='index.html#schedule'">Schedule Onboarding →</button>
-    <button id="sc-back-btn"  onclick="window.location.href='index.html'">Return to Portal</button>
+    <div id="sc-notes"><div id="sc-nl">SARA's Notes</div><div id="sc-nt"></div></div>
+    <button class="sc-btn" id="sc-sched-btn">Schedule Onboarding →</button>
+    <button class="sc-btn-o" id="sc-back-btn">Return to Portal</button>
   </div>
 </div>
 
 <script>
-'use strict';
+var EL_KEY   = 'sk_d8337c6ccc3c17d6f61bb4f258d1216a715729afe43c3bab';
+var EL_VOICE = 'qSeXEcewz7tA0Q0qk9fH';
 
-// ── CONFIG ──
-const EL_KEY   = 'sk_d8337c6ccc3c17d6f61bb4f258d1216a715729afe43c3bab';
-const EL_VOICE = 'qSeXEcewz7tA0Q0qk9fH';
-const DID_KEY  = 'Basic bW9zaGVAc2VjdXJpdHl1c2FpbmMuY29t:7z_W-YjyEMxb3qUbo2v9F';
-const DID_IMG  = 'https://create-images-results.d-id.com/DefaultPresenters/Zivva_f/thumbnail.jpeg';
-
-// ── QUESTIONS ──
-const QS = [
-  "Hello! I'm SARA, your AI screening interviewer for Security USA®. To start — please tell me your full name and give me a brief introduction of yourself.",
-  "How many years of security experience do you have, and what types of posts have you worked — residential, commercial, hospitals, or events?",
+var QS = [
+  "Hello! I'm SARA, your AI screening interviewer for Security USA. To start, please tell me your full name and give me a brief introduction of yourself.",
+  "How many years of security experience do you have, and what types of posts have you worked, such as residential, commercial, hospitals, or events?",
   "Do you currently hold a valid New York State Security Guard License? If yes, please share your license number and expiration date.",
-  "What additional certifications do you hold? For example: CPR, Fire Safety Director, Fire Guard F-01 through F-04, FLSD certificates, or an armed guard permit.",
-  "Tell me about your availability. Which days and shifts can you work — day 7am–3pm, evening 3pm–11pm, or overnight 11pm–7am?",
-  "Are you comfortable with on-call or emergency assignments on short notice? Can you work weekends and holidays when required?",
-  "Security USA operates in New York, New Jersey, and Florida. Are you able to work across all three locations or are you limited to a specific area?",
-  "Please describe a challenging situation you faced on duty — a conflict, emergency, or difficult person — and walk me through how you handled it.",
-  "What are the two or three most important qualities of an outstanding security guard, and how do you personally demonstrate them in your work?",
-  "Finally — why do you want to work for Security USA® specifically, and where do you see your security career in the next two to three years?"
+  "What additional certifications do you hold, such as CPR, Fire Safety Director, Fire Guard certificates, or an armed guard permit?",
+  "Tell me about your availability. Which days and shifts can you work — day, evening, or overnight?",
+  "Are you comfortable with on-call assignments on short notice, and can you work weekends and holidays?",
+  "Security USA operates in New York, New Jersey, and Florida. Are you able to work in all three locations?",
+  "Please describe a challenging situation you faced on duty and walk me through how you handled it.",
+  "What are the most important qualities of an outstanding security guard, and how do you demonstrate them?",
+  "Finally, why do you want to work for Security USA specifically, and where do you see your security career in the next few years?"
 ];
 
-// ── STATE ──
-let mediaStream = null;
-let recog       = null;
-let listening   = false;
-let camOn       = true;
-let curQ        = 0;
-let answers     = [];
-let scores      = [];
-let liveBuf     = '';
-let timerSec    = 0;
-let timerInt    = null;
+var mediaStream=null, recog=null, isListening=false, camOn=true;
+var curQ=0, answers=[], scores=[], liveBuf='';
+var timerSec=0, timerInt=null;
+var avCtx=null, avSpeaking=false, avMouth=0, avBlinkT=120, avBlinkV=1;
+var avAudioCtx=null, avAnalyser=null, avData=null;
 
-// ── BEGIN CLICK ──
-async async function beginClick() {
-  const btn = document.getElementById('begin-btn');
-  btn.textContent = 'Starting...';
-  btn.style.opacity = '.7';
-  btn.style.pointerEvents = 'none';
+// ── FACE DRAWING ──
+var FC = {sk:'#d4956a',skd:'#b87850',skh:'#e8b090',hr:'#2c1a0e',ir:'#5c3a1e',wh:'#f8f4f0',lp:'#c26a5a',bg1:'#112240',bg2:'#0a1628'};
 
-  try {
-    mediaStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:true });
-    document.getElementById('iv-cam-video').srcObject = mediaStream;
-    document.getElementById('iv-cam-overlay').style.display = 'none';
-    setPermIcon(true);
-  } catch(e) {
-    setPermIcon(false);
-  }
-
-  setTimeout(startInterview, 400);
-}
-
-function setPermIcon(granted) {
-  const icon = document.getElementById('perm-icon');
-  const txt  = document.getElementById('perm-txt');
-  if (granted) {
-    icon.textContent = '✓';
-    icon.style.borderColor = '#27ae60';
-    icon.style.background  = 'rgba(39,174,96,.12)';
-    icon.style.color       = '#27ae60';
-    txt.textContent = 'Camera & microphone ready';
-  } else {
-    icon.textContent = '✓';
-    txt.textContent  = 'Proceeding without camera — type answers if needed';
-  }
-}
-
-// ── START ──
-function startInterview() {
-  document.getElementById('screen-intro').classList.remove('show');
-  document.getElementById('screen-interview').classList.add('show');
-  // Start animated avatar
-  initAvatar();
-
-  // Canvas avatar initialized by initAvatar()
-
-  timerInt = setInterval(() => {
-    timerSec++;
-    const m = Math.floor(timerSec/60), s = timerSec % 60;
-    document.getElementById('hdr-timer').textContent =
-      (m<10?'0':'')+m+':'+(s<10?'0':'')+s;
-  }, 1000);
-
-  setupRecog();
-  setTimeout(() => askQ(0), 300);
-}
-
-// ── SPEECH RECOGNITION ──
-function setupRecog() {
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) return;
-  recog = new SR();
-  recog.continuous = true;
-  recog.interimResults = true;
-  recog.lang = 'en-US';
-
-  recog.onstart = () => {
-    listening = true;
-    document.getElementById('iv-mic-btn').classList.add('on');
-    document.getElementById('iv-mic-status').textContent = 'Listening — speak now';
-    document.getElementById('iv-mic-status').style.color = '#27ae60';
-    document.getElementById('iv-live').style.display = 'block';
-  };
-  recog.onend = () => {
-    listening = false;
-    document.getElementById('iv-mic-btn').classList.remove('on');
-    document.getElementById('iv-mic-status').style.color = '';
-  };
-  recog.onresult = (e) => {
-    let interim = '', final = '';
-    for (let i = e.resultIndex; i < e.results.length; i++) {
-      if (e.results[i].isFinal) final += e.results[i][0].transcript + ' ';
-      else interim += e.results[i][0].transcript;
-    }
-    if (final) liveBuf += final;
-    document.getElementById('iv-live').textContent = liveBuf + interim;
-  };
-  recog.onerror = (e) => {
-    console.warn('Speech error:', e.error);
-    listening = false;
-  };
-}
-
-// ── ASK QUESTION ──
-async function askQ(idx) {
-  if (idx >= QS.length) { finish(); return; }
-  curQ = idx;
-  const pct = Math.round(idx / QS.length * 100);
-
-  document.getElementById('q-num').textContent = idx + 1;
-  document.getElementById('iv-prog-fill').style.width  = pct + '%';
-  document.getElementById('iv-pct').textContent        = pct + '%';
-  document.getElementById('iv-q-text').textContent     = QS[idx];
-  document.getElementById('iv-q-box').style.display    = 'block';
-  document.getElementById('iv-submit').style.display   = 'none';
-  document.getElementById('iv-mic-status').textContent = 'SARA is speaking...';
-  document.getElementById('iv-mic-status').style.color = '';
-  document.getElementById('iv-mic-btn').style.opacity  = '.4';
-  document.getElementById('av-speak-ring').classList.add('on');
-
-  addTx('sara', QS[idx]);
-
-  await speak(QS[idx]);
-
-  // Done speaking
-  document.getElementById('av-speak-ring').classList.remove('on');
-  document.getElementById('iv-q-box').style.display    = 'none';
-  document.getElementById('iv-mic-status').textContent = 'Your turn — speak or type your answer';
-  document.getElementById('iv-mic-status').style.color = '#c9a84c';
-  document.getElementById('iv-mic-btn').style.opacity  = '1';
-  document.getElementById('iv-submit').style.display   = 'block';
-
-  liveBuf = '';
-  document.getElementById('iv-live').textContent = '';
-  document.getElementById('iv-live').style.display = 'block';
-  if (recog) { try { recog.start(); } catch(e) {} }
-}
-
-// ══════════════════════════════════════════
-// SARA CANVAS AVATAR ENGINE
-// ══════════════════════════════════════════
-
-let avatarCtx = null;
-let avatarAnimId = null;
-let avatarMouthOpen = 0;      // 0-1 mouth openness
-let avatarBlinkT = 0;         // blink timer
-let avatarBlinkVal = 1;       // 1=open, 0=closed
-let avatarIsSpeaking = false;
-let avatarAudioCtx = null;
-let avatarAnalyser = null;
-let avatarDataArr = null;
-let avatarTime = 0;
-let avatarBgLoaded = false;
-
-// Skin / feature colors — warm professional tone
-const AV = {
-  skin:    '#d4956a',
-  skinDark:'#b87850',
-  skinHigh:'#e8b090',
-  hair:    '#2c1a0e',
-  eye:     '#1a0a00',
-  iris:    '#5c3a1e',
-  white:   '#f8f4f0',
-  lip:     '#c26a5a',
-  lipDark: '#9e4a3a',
-  teeth:   '#f5f0e8',
-  cloth:   '#1a2840',
-  clothAcc:'#c9a84c',
-  bg1:     '#112240',
-  bg2:     '#0a1628',
-  shadow:  'rgba(0,0,0,0.4)',
-};
-
-function initAvatar() {
-  const canvas = document.getElementById('sara-canvas');
-  if (!canvas) return;
-  avatarCtx = canvas.getContext('2d');
-  avatarBlinkT = Math.random() * 200;
-  drawAvatar(0);
-  requestAnimationFrame(avatarLoop);
-}
-
-function avatarLoop(ts) {
-  avatarTime = ts * 0.001;
-  avatarAnimId = requestAnimationFrame(avatarLoop);
-
-  // Blink logic
-  avatarBlinkT--;
-  if (avatarBlinkT <= 0) {
-    avatarBlinkVal = 0; // blink
-    setTimeout(() => {
-      avatarBlinkVal = 1;
-      avatarBlinkT = 150 + Math.random() * 200;
-    }, 120);
-  }
-
-  // Mouth from audio analyser
-  if (avatarIsSpeaking && avatarAnalyser && avatarDataArr) {
-    avatarAnalyser.getByteFrequencyData(avatarDataArr);
-    // Average low-mid frequencies (speech range)
-    let sum = 0;
-    const slice = Math.floor(avatarDataArr.length * 0.15);
-    for (let i = 0; i < slice; i++) sum += avatarDataArr[i];
-    const avg = sum / slice / 255;
-    avatarMouthOpen += (avg * 1.4 - avatarMouthOpen) * 0.3;
-    avatarMouthOpen = Math.max(0, Math.min(1, avatarMouthOpen));
-  } else {
-    // Slowly close mouth
-    avatarMouthOpen += (0 - avatarMouthOpen) * 0.12;
-  }
-
-  drawAvatar(avatarTime);
-}
-
-function drawAvatar(t) {
-  const ctx = avatarCtx;
-  const W = 220, H = 220, cx = 110, cy = 110;
-  ctx.clearRect(0, 0, W, H);
-
-  // Background circle
+function drawFace(ctx, W, H, mouth, blink) {
+  var cx=W/2, cy=H/2, sc=W/220;
+  function p(v){return v*sc;}
+  ctx.clearRect(0,0,W,H);
   ctx.save();
-  ctx.beginPath();
-  ctx.arc(cx, cy, 107, 0, Math.PI*2);
-  ctx.clip();
-
-  const grad = ctx.createRadialGradient(cx, cy-20, 20, cx, cy, 107);
-  grad.addColorStop(0, AV.bg1);
-  grad.addColorStop(1, AV.bg2);
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, W, H);
-
-  // Subtle ambient glow when speaking
-  if (avatarIsSpeaking) {
-    const glow = ctx.createRadialGradient(cx, cy, 60, cx, cy, 107);
-    const pulse = 0.04 + Math.abs(Math.sin(t * 3)) * 0.04 * avatarMouthOpen;
-    glow.addColorStop(0, `rgba(201,168,76,0)`);
-    glow.addColorStop(1, `rgba(201,168,76,${pulse})`);
-    ctx.fillStyle = glow;
-    ctx.fillRect(0, 0, W, H);
+  ctx.beginPath(); ctx.arc(cx,cy,W/2-1,0,Math.PI*2); ctx.clip();
+  var bg=ctx.createRadialGradient(cx,cy-p(20),p(10),cx,cy,W/2);
+  bg.addColorStop(0,FC.bg1); bg.addColorStop(1,FC.bg2);
+  ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+  // Glow when speaking
+  if(avSpeaking&&mouth>0.05){
+    var gl=ctx.createRadialGradient(cx,cy,p(50),cx,cy,W/2);
+    gl.addColorStop(0,'rgba(201,168,76,0)');
+    gl.addColorStop(1,'rgba(201,168,76,'+(0.03+mouth*0.07)+')');
+    ctx.fillStyle=gl; ctx.fillRect(0,0,W,H);
   }
-
-  // ── NECK ──
-  ctx.fillStyle = AV.skin;
-  ctx.beginPath();
-  ctx.ellipse(cx, 188, 22, 28, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  // ── CLOTHING / BLAZER ──
-  ctx.fillStyle = AV.cloth;
-  ctx.beginPath();
-  ctx.moveTo(cx-70, 220);
-  ctx.lineTo(cx-50, 180);
-  ctx.quadraticCurveTo(cx-28, 200, cx, 196);
-  ctx.quadraticCurveTo(cx+28, 200, cx+50, 180);
-  ctx.lineTo(cx+70, 220);
-  ctx.closePath();
-  ctx.fill();
-
-  // Gold accent collar
-  ctx.strokeStyle = AV.clothAcc;
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(cx-20, 192);
-  ctx.lineTo(cx, 210);
-  ctx.lineTo(cx+20, 192);
-  ctx.stroke();
-
-  // ── HEAD ──
+  // Neck
+  ctx.fillStyle=FC.sk; ctx.beginPath(); ctx.ellipse(cx,cy+p(83),p(22),p(28),0,0,Math.PI*2); ctx.fill();
+  // Clothes
+  ctx.fillStyle='#1a2840'; ctx.beginPath();
+  ctx.moveTo(cx-p(70),H); ctx.lineTo(cx-p(50),cy+p(75));
+  ctx.quadraticCurveTo(cx-p(28),cy+p(92),cx,cy+p(88));
+  ctx.quadraticCurveTo(cx+p(28),cy+p(92),cx+p(50),cy+p(75));
+  ctx.lineTo(cx+p(70),H); ctx.closePath(); ctx.fill();
+  ctx.strokeStyle='#c9a84c'; ctx.lineWidth=p(2);
+  ctx.beginPath(); ctx.moveTo(cx-p(20),cy+p(84)); ctx.lineTo(cx,cy+p(96)); ctx.lineTo(cx+p(20),cy+p(84)); ctx.stroke();
   // Head shadow
-  ctx.fillStyle = 'rgba(0,0,0,0.15)';
-  ctx.beginPath();
-  ctx.ellipse(cx+3, cy+3, 62, 74, 0, 0, Math.PI*2);
-  ctx.fill();
-
-  // Head base
-  const headGrad = ctx.createRadialGradient(cx-15, cy-20, 10, cx, cy, 75);
-  headGrad.addColorStop(0, AV.skinHigh);
-  headGrad.addColorStop(0.6, AV.skin);
-  headGrad.addColorStop(1, AV.skinDark);
-  ctx.fillStyle = headGrad;
-  ctx.beginPath();
-  ctx.ellipse(cx, cy-5, 62, 74, 0, 0, Math.PI*2);
-  ctx.fill();
-
-  // ── HAIR ──
-  ctx.fillStyle = AV.hair;
-  // Top hair
-  ctx.beginPath();
-  ctx.ellipse(cx, cy-55, 63, 32, 0, Math.PI, 0);
-  ctx.fill();
-  // Side hair left
-  ctx.beginPath();
-  ctx.moveTo(cx-62, cy-5);
-  ctx.quadraticCurveTo(cx-72, cy+20, cx-58, cy+50);
-  ctx.quadraticCurveTo(cx-55, cy+60, cx-42, cy+62);
-  ctx.quadraticCurveTo(cx-30, cy+70, cx-25, cy+65);
-  ctx.lineTo(cx-25, cy+42);
-  ctx.quadraticCurveTo(cx-55, cy+35, cx-55, cy-5);
-  ctx.fill();
-  // Side hair right
-  ctx.beginPath();
-  ctx.moveTo(cx+62, cy-5);
-  ctx.quadraticCurveTo(cx+72, cy+20, cx+58, cy+50);
-  ctx.quadraticCurveTo(cx+55, cy+60, cx+42, cy+62);
-  ctx.quadraticCurveTo(cx+30, cy+70, cx+25, cy+65);
-  ctx.lineTo(cx+25, cy+42);
-  ctx.quadraticCurveTo(cx+55, cy+35, cx+55, cy-5);
-  ctx.fill();
-
-  // ── FACE FEATURES ──
-
-  // Subtle blush
-  ctx.fillStyle = 'rgba(220,120,100,0.12)';
-  ctx.beginPath(); ctx.ellipse(cx-38, cy+8, 16, 10, -0.3, 0, Math.PI*2); ctx.fill();
-  ctx.beginPath(); ctx.ellipse(cx+38, cy+8, 16, 10, 0.3, 0, Math.PI*2); ctx.fill();
-
-  // ── EYEBROWS ──
-  ctx.strokeStyle = AV.hair;
-  ctx.lineWidth = 3.5;
-  ctx.lineCap = 'round';
-  const browY = cy - 28;
-  // Left brow
-  ctx.beginPath();
-  ctx.moveTo(cx-42, browY+3);
-  ctx.quadraticCurveTo(cx-30, browY-4, cx-18, browY+1);
-  ctx.stroke();
-  // Right brow
-  ctx.beginPath();
-  ctx.moveTo(cx+18, browY+1);
-  ctx.quadraticCurveTo(cx+30, browY-4, cx+42, browY+3);
-  ctx.stroke();
-
-  // ── EYES ──
-  const eyeY = cy - 14;
-  const blinkScale = avatarBlinkVal;
-
-  // Eye whites
-  [-1, 1].forEach(side => {
-    const ex = cx + side * 27;
-    ctx.fillStyle = AV.white;
+  ctx.fillStyle='rgba(0,0,0,0.15)'; ctx.beginPath(); ctx.ellipse(cx+p(3),cy+p(3),p(62),p(74),0,0,Math.PI*2); ctx.fill();
+  // Head
+  var hg=ctx.createRadialGradient(cx-p(15),cy-p(20),p(10),cx,cy,p(75));
+  hg.addColorStop(0,FC.skh); hg.addColorStop(0.6,FC.sk); hg.addColorStop(1,FC.skd);
+  ctx.fillStyle=hg; ctx.beginPath(); ctx.ellipse(cx,cy-p(5),p(62),p(74),0,0,Math.PI*2); ctx.fill();
+  // Hair
+  ctx.fillStyle=FC.hr;
+  ctx.beginPath(); ctx.ellipse(cx,cy-p(55),p(63),p(32),0,Math.PI,0); ctx.fill();
+  [-1,1].forEach(function(sd){
     ctx.beginPath();
-    ctx.ellipse(ex, eyeY, 15, 10 * blinkScale, 0, 0, Math.PI*2);
+    ctx.moveTo(cx+sd*p(62),cy-p(5));
+    ctx.quadraticCurveTo(cx+sd*p(72),cy+p(20),cx+sd*p(58),cy+p(50));
+    ctx.quadraticCurveTo(cx+sd*p(48),cy+p(65),cx+sd*p(30),cy+p(64));
+    ctx.lineTo(cx+sd*p(25),cy+p(42));
+    ctx.quadraticCurveTo(cx+sd*p(55),cy+p(35),cx+sd*p(55),cy-p(5));
     ctx.fill();
-
-    // Iris
-    ctx.fillStyle = AV.iris;
-    ctx.beginPath();
-    ctx.ellipse(ex, eyeY, 8, 8 * blinkScale, 0, 0, Math.PI*2);
-    ctx.fill();
-
-    // Pupil
-    ctx.fillStyle = '#000';
-    ctx.beginPath();
-    ctx.ellipse(ex, eyeY, 4.5, 4.5 * blinkScale, 0, 0, Math.PI*2);
-    ctx.fill();
-
-    // Eye shine
-    ctx.fillStyle = 'rgba(255,255,255,0.7)';
-    ctx.beginPath();
-    ctx.ellipse(ex-3, eyeY-3, 2.5, 2 * blinkScale, 0, 0, Math.PI*2);
-    ctx.fill();
-
-    // Eyelid (top)
-    ctx.fillStyle = AV.skin;
-    ctx.beginPath();
-    ctx.ellipse(ex, eyeY - 10 * blinkScale, 15, 10 * (1 - blinkScale) + 1, 0, 0, Math.PI*2);
-    ctx.fill();
-
-    // Lashes
-    ctx.strokeStyle = AV.hair;
-    ctx.lineWidth = 1.5;
-    [-10,-5,0,5,10].forEach(lx => {
-      ctx.beginPath();
-      ctx.moveTo(ex+lx, eyeY - 10 * blinkScale);
-      ctx.lineTo(ex+lx*1.1, eyeY - 13 * blinkScale - 2);
-      ctx.stroke();
-    });
   });
-
-  // ── NOSE ──
-  ctx.strokeStyle = AV.skinDark;
-  ctx.lineWidth = 1.5;
-  ctx.lineCap = 'round';
+  // Blush
+  ctx.fillStyle='rgba(220,120,100,0.1)';
+  ctx.beginPath(); ctx.ellipse(cx-p(38),cy+p(8),p(16),p(10),-0.3,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(cx+p(38),cy+p(8),p(16),p(10),0.3,0,Math.PI*2); ctx.fill();
+  // Eyebrows
+  ctx.strokeStyle=FC.hr; ctx.lineWidth=p(3.5); ctx.lineCap='round';
+  var by=cy-p(28);
+  ctx.beginPath(); ctx.moveTo(cx-p(42),by+p(3)); ctx.quadraticCurveTo(cx-p(30),by-p(4),cx-p(18),by+p(1)); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx+p(18),by+p(1)); ctx.quadraticCurveTo(cx+p(30),by-p(4),cx+p(42),by+p(3)); ctx.stroke();
+  // Eyes
+  var ey=cy-p(14), bl=blink;
+  [-1,1].forEach(function(sd){
+    var ex=cx+sd*p(27);
+    ctx.fillStyle=FC.wh; ctx.beginPath(); ctx.ellipse(ex,ey,p(15),p(10)*bl,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle=FC.ir; ctx.beginPath(); ctx.ellipse(ex,ey,p(8),p(8)*bl,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#000'; ctx.beginPath(); ctx.ellipse(ex,ey,p(4.5),p(4.5)*bl,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,0.7)'; ctx.beginPath(); ctx.ellipse(ex-p(3),ey-p(3),p(2.5),p(2)*bl,0,0,Math.PI*2); ctx.fill();
+    if(bl<1){ ctx.fillStyle=FC.sk; ctx.beginPath(); ctx.ellipse(ex,ey-p(10)*bl,p(15),p(10)*(1-bl)+p(1),0,0,Math.PI*2); ctx.fill(); }
+    ctx.strokeStyle=FC.hr; ctx.lineWidth=p(1.5);
+    for(var lx=-2;lx<=2;lx++){ ctx.beginPath(); ctx.moveTo(ex+lx*p(5),ey-p(10)*bl); ctx.lineTo(ex+lx*p(5.5),ey-p(13)*bl-p(2)); ctx.stroke(); }
+  });
+  // Nose
+  ctx.strokeStyle=FC.skd; ctx.lineWidth=p(1.5); ctx.lineCap='round';
   ctx.beginPath();
-  ctx.moveTo(cx-3, cy-4);
-  ctx.quadraticCurveTo(cx-8, cy+8, cx-6, cy+12);
-  ctx.quadraticCurveTo(cx, cy+14, cx+6, cy+12);
-  ctx.quadraticCurveTo(cx+8, cy+8, cx+3, cy-4);
+  ctx.moveTo(cx-p(3),cy-p(4)); ctx.quadraticCurveTo(cx-p(8),cy+p(8),cx-p(6),cy+p(12));
+  ctx.quadraticCurveTo(cx,cy+p(14),cx+p(6),cy+p(12)); ctx.quadraticCurveTo(cx+p(8),cy+p(8),cx+p(3),cy-p(4));
   ctx.stroke();
-
-  // ── MOUTH / LIP SYNC ──
-  const mouthY = cy + 32;
-  const mouthW = 22;
-  const mOpen  = avatarMouthOpen;
-
-  // Upper lip
-  ctx.fillStyle = AV.lip;
-  ctx.beginPath();
-  ctx.moveTo(cx - mouthW, mouthY);
-  ctx.quadraticCurveTo(cx - mouthW*0.5, mouthY - 6, cx, mouthY - 4);
-  ctx.quadraticCurveTo(cx + mouthW*0.5, mouthY - 6, cx + mouthW, mouthY);
-  ctx.quadraticCurveTo(cx, mouthY + 3, cx - mouthW, mouthY);
-  ctx.fill();
-
-  // Mouth opening
-  if (mOpen > 0.05) {
-    // Inner mouth dark
-    ctx.fillStyle = '#3a1008';
-    ctx.beginPath();
-    ctx.ellipse(cx, mouthY + mOpen * 8, mouthW * 0.85, mOpen * 12, 0, 0, Math.PI);
-    ctx.fill();
-
-    // Teeth
-    if (mOpen > 0.15) {
-      ctx.fillStyle = AV.teeth;
-      ctx.beginPath();
-      ctx.ellipse(cx, mouthY + mOpen * 3, mouthW * 0.7, mOpen * 7, 0, 0, Math.PI);
-      ctx.fill();
-      // Tooth divider
-      ctx.strokeStyle = 'rgba(180,160,140,0.4)';
-      ctx.lineWidth = 0.8;
-      ctx.beginPath();
-      ctx.moveTo(cx, mouthY);
-      ctx.lineTo(cx, mouthY + mOpen * 7);
-      ctx.stroke();
-    }
+  // Mouth
+  var my=cy+p(32), mw=p(22), m=mouth;
+  ctx.fillStyle=FC.lp;
+  ctx.beginPath(); ctx.moveTo(cx-mw,my); ctx.quadraticCurveTo(cx-mw*.5,my-p(6),cx,my-p(4));
+  ctx.quadraticCurveTo(cx+mw*.5,my-p(6),cx+mw,my); ctx.quadraticCurveTo(cx,my+p(3),cx-mw,my); ctx.fill();
+  if(m>0.05){
+    ctx.fillStyle='#2a0a05'; ctx.beginPath(); ctx.ellipse(cx,my+m*p(8),mw*.85,m*p(12),0,0,Math.PI); ctx.fill();
+    if(m>0.15){ ctx.fillStyle='#f5f0e8'; ctx.beginPath(); ctx.ellipse(cx,my+m*p(3),mw*.7,m*p(7),0,0,Math.PI); ctx.fill(); }
   }
-
-  // Lower lip
-  ctx.fillStyle = AV.lip;
-  ctx.beginPath();
-  ctx.moveTo(cx - mouthW, mouthY);
-  ctx.quadraticCurveTo(cx, mouthY + mOpen * 18 + 9, cx + mouthW, mouthY);
-  ctx.quadraticCurveTo(cx, mouthY + mOpen * 18 + 14, cx - mouthW, mouthY);
-  ctx.fill();
-
-  // Lip highlight
-  ctx.fillStyle = 'rgba(255,200,190,0.25)';
-  ctx.beginPath();
-  ctx.ellipse(cx, mouthY + 5, mouthW * 0.5, 3, 0, 0, Math.PI);
-  ctx.fill();
-
+  ctx.fillStyle=FC.lp;
+  ctx.beginPath(); ctx.moveTo(cx-mw,my); ctx.quadraticCurveTo(cx,my+m*p(18)+p(9),cx+mw,my);
+  ctx.quadraticCurveTo(cx,my+m*p(18)+p(14),cx-mw,my); ctx.fill();
   ctx.restore();
 }
 
-// ── SPEAK WITH ANIMATED AVATAR ──
-async function speak(text) {
-  avatarIsSpeaking = true;
-  document.getElementById('av-speak-ring').classList.add('on');
+function startAvatarLoop(canvas) {
+  avCtx = canvas.getContext('2d');
+  avBlinkT = 100 + Math.random()*100;
+  function loop(){
+    requestAnimationFrame(loop);
+    avBlinkT--;
+    if(avBlinkT<=0){ avBlinkV=0; setTimeout(function(){avBlinkV=1;avBlinkT=150+Math.random()*200;},120); }
+    if(avSpeaking && avAnalyser && avData){
+      avAnalyser.getByteFrequencyData(avData);
+      var sum=0, sl=Math.floor(avData.length*.15);
+      for(var i=0;i<sl;i++) sum+=avData[i];
+      var tgt=(sum/sl/255)*1.4;
+      avMouth+=(tgt-avMouth)*.3;
+      if(avMouth<0)avMouth=0; if(avMouth>1)avMouth=1;
+    } else { avMouth+=(0-avMouth)*.12; }
+    drawFace(avCtx,220,220,avMouth,avBlinkV);
+  }
+  loop();
+}
 
-  try {
-    const r = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${EL_VOICE}`,
-      {
-        method: 'POST',
-        headers: {
-          'xi-api-key': EL_KEY,
-          'Content-Type': 'application/json',
-          'Accept': 'audio/mpeg'
-        },
-        body: JSON.stringify({
-          text,
-          model_id: 'eleven_turbo_v2',
-          voice_settings: { stability:.5, similarity_boost:.8 }
-        })
+function startIntroLoop() {
+  var c=document.getElementById('c-intro');
+  if(!c) return;
+  var ctx=c.getContext('2d'), bt=100+Math.random()*100, bv=1;
+  function loop(){ requestAnimationFrame(loop); bt--; if(bt<=0){bv=0;setTimeout(function(){bv=1;bt=150+Math.random()*200;},120);} drawFace(ctx,100,100,0,bv); }
+  loop();
+}
+
+// ── D-ID STREAMING ──
+var DID_PROXY   = '/api/did-proxy';
+var DID_IMG     = 'https://create-images-results.d-id.com/DefaultPresenters/Zivva_f/thumbnail.jpeg';
+var didStreamId = null;
+var didSessionId= null;
+var peerConn    = null;
+var didReady    = false;
+
+function didProxy(path, method, body) {
+  var opts = {
+    method: method || 'GET',
+    headers: { 'Content-Type': 'application/json' }
+  };
+  if (body) opts.body = JSON.stringify(body);
+  return fetch(DID_PROXY + '?path=' + encodeURIComponent(path), opts)
+    .then(function(r) { return r.json(); });
+}
+
+function initDID() {
+  console.log('Initializing D-ID stream...');
+  return didProxy('/talks/streams', 'POST', {
+    source_url: DID_IMG
+  }).then(function(data) {
+    if (!data.id) { console.warn('D-ID init failed:', data); return false; }
+    didStreamId  = data.id;
+    didSessionId = data.session_id;
+    console.log('D-ID stream created:', didStreamId);
+
+    // Set up WebRTC
+    peerConn = new RTCPeerConnection({ iceServers: data.ice_servers || [] });
+
+    // When we get the video track, show it
+    peerConn.ontrack = function(e) {
+      if (e.track.kind === 'video') {
+        var vid = document.getElementById('av-video');
+        var can = document.getElementById('av-canvas');
+        vid.srcObject = e.streams[0];
+        vid.style.display = 'block';
+        can.style.display = 'none';
+        didReady = true;
+        console.log('D-ID video stream active');
       }
-    );
+    };
 
-    if (!r.ok) throw new Error('ElevenLabs ' + r.status);
-    const blob = await r.blob();
-    const url  = URL.createObjectURL(blob);
+    // Send ICE candidates
+    peerConn.onicecandidate = function(e) {
+      if (e.candidate) {
+        didProxy('/talks/streams/' + didStreamId + '/ice', 'POST', {
+          candidate: e.candidate,
+          session_id: didSessionId
+        }).catch(function(err) { console.warn('ICE error:', err); });
+      }
+    };
 
-    // Connect audio to analyser for lip sync
-    if (!avatarAudioCtx) {
-      avatarAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      avatarAnalyser = avatarAudioCtx.createAnalyser();
-      avatarAnalyser.fftSize = 256;
-      avatarDataArr = new Uint8Array(avatarAnalyser.frequencyBinCount);
-      avatarAnalyser.connect(avatarAudioCtx.destination);
-    }
-    if (avatarAudioCtx.state === 'suspended') await avatarAudioCtx.resume();
+    peerConn.oniceconnectionstatechange = function() {
+      console.log('ICE state:', peerConn.iceConnectionState);
+    };
 
-    const aud = new Audio(url);
-    aud.crossOrigin = 'anonymous';
-
-    const src = avatarAudioCtx.createMediaElementSource(aud);
-    src.connect(avatarAnalyser);
-
-    await new Promise((res) => {
-      aud.onended = res;
-      aud.onerror = res;
-      aud.play().catch(res);
-    });
-
-    URL.revokeObjectURL(url);
-
-  } catch(e) {
-    console.warn('speak():', e.message);
-    // Animate without audio
-    const dur = Math.min(3000, Math.max(1500, text.length * 30));
-    const start = Date.now();
-    await new Promise(res => {
-      const fakeAnim = setInterval(() => {
-        const progress = (Date.now() - start) / dur;
-        if (progress >= 1) { clearInterval(fakeAnim); res(); return; }
-        // Simulate speech pattern
-        avatarMouthOpen = Math.abs(Math.sin(progress * 20)) * 0.6 *
-          (0.5 + 0.5 * Math.sin(progress * 7));
-      }, 50);
-    });
-  }
-
-  avatarIsSpeaking = false;
-  avatarMouthOpen = 0;
-  document.getElementById('av-speak-ring').classList.remove('on');
-}
-
-
-// ── ASK QUESTION ──
-async function askQ(idx) {
-  if (idx >= QS.length) { finish(); return; }
-  curQ = idx;
-  const pct = Math.round(idx / QS.length * 100);
-
-  document.getElementById('q-num').textContent = idx + 1;
-  document.getElementById('iv-prog-fill').style.width  = pct + '%';
-  document.getElementById('iv-pct').textContent        = pct + '%';
-  document.getElementById('iv-q-text').textContent     = QS[idx];
-  document.getElementById('iv-q-box').style.display    = 'block';
-  document.getElementById('iv-submit').style.display   = 'none';
-  document.getElementById('iv-mic-status').textContent = 'SARA is speaking...';
-  document.getElementById('iv-mic-status').style.color = '';
-  document.getElementById('iv-mic-btn').style.opacity  = '.4';
-  document.getElementById('av-speak-ring').classList.add('on');
-
-  addTx('sara', QS[idx]);
-
-  await speak(QS[idx]);
-
-  // Done speaking
-  document.getElementById('av-speak-ring').classList.remove('on');
-  document.getElementById('iv-q-box').style.display    = 'none';
-  document.getElementById('iv-mic-status').textContent = 'Your turn — speak or type your answer';
-  document.getElementById('iv-mic-status').style.color = '#c9a84c';
-  document.getElementById('iv-mic-btn').style.opacity  = '1';
-  document.getElementById('iv-submit').style.display   = 'block';
-
-  liveBuf = '';
-  document.getElementById('iv-live').textContent = '';
-  document.getElementById('iv-live').style.display = 'block';
-  if (recog) { try { recog.start(); } catch(e) {} }
-}
-
-// ══════════════════════════════════════════
-// SARA CANVAS AVATAR ENGINE
-// ══════════════════════════════════════════
-
-let avatarCtx = null;
-let avatarAnimId = null;
-let avatarMouthOpen = 0;      // 0-1 mouth openness
-let avatarBlinkT = 0;         // blink timer
-let avatarBlinkVal = 1;       // 1=open, 0=closed
-let avatarIsSpeaking = false;
-let avatarAudioCtx = null;
-let avatarAnalyser = null;
-let avatarDataArr = null;
-let avatarTime = 0;
-let avatarBgLoaded = false;
-
-// Skin / feature colors — warm professional tone
-const AV = {
-  skin:    '#d4956a',
-  skinDark:'#b87850',
-  skinHigh:'#e8b090',
-  hair:    '#2c1a0e',
-  eye:     '#1a0a00',
-  iris:    '#5c3a1e',
-  white:   '#f8f4f0',
-  lip:     '#c26a5a',
-  lipDark: '#9e4a3a',
-  teeth:   '#f5f0e8',
-  cloth:   '#1a2840',
-  clothAcc:'#c9a84c',
-  bg1:     '#112240',
-  bg2:     '#0a1628',
-  shadow:  'rgba(0,0,0,0.4)',
-};
-
-function initAvatar() {
-  const canvas = document.getElementById('sara-canvas');
-  if (!canvas) return;
-  avatarCtx = canvas.getContext('2d');
-  avatarBlinkT = Math.random() * 200;
-  drawAvatar(0);
-  requestAnimationFrame(avatarLoop);
-}
-
-function avatarLoop(ts) {
-  avatarTime = ts * 0.001;
-  avatarAnimId = requestAnimationFrame(avatarLoop);
-
-  // Blink logic
-  avatarBlinkT--;
-  if (avatarBlinkT <= 0) {
-    avatarBlinkVal = 0; // blink
-    setTimeout(() => {
-      avatarBlinkVal = 1;
-      avatarBlinkT = 150 + Math.random() * 200;
-    }, 120);
-  }
-
-  // Mouth from audio analyser
-  if (avatarIsSpeaking && avatarAnalyser && avatarDataArr) {
-    avatarAnalyser.getByteFrequencyData(avatarDataArr);
-    // Average low-mid frequencies (speech range)
-    let sum = 0;
-    const slice = Math.floor(avatarDataArr.length * 0.15);
-    for (let i = 0; i < slice; i++) sum += avatarDataArr[i];
-    const avg = sum / slice / 255;
-    avatarMouthOpen += (avg * 1.4 - avatarMouthOpen) * 0.3;
-    avatarMouthOpen = Math.max(0, Math.min(1, avatarMouthOpen));
-  } else {
-    // Slowly close mouth
-    avatarMouthOpen += (0 - avatarMouthOpen) * 0.12;
-  }
-
-  drawAvatar(avatarTime);
-}
-
-function drawAvatar(t) {
-  const ctx = avatarCtx;
-  const W = 220, H = 220, cx = 110, cy = 110;
-  ctx.clearRect(0, 0, W, H);
-
-  // Background circle
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(cx, cy, 107, 0, Math.PI*2);
-  ctx.clip();
-
-  const grad = ctx.createRadialGradient(cx, cy-20, 20, cx, cy, 107);
-  grad.addColorStop(0, AV.bg1);
-  grad.addColorStop(1, AV.bg2);
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, W, H);
-
-  // Subtle ambient glow when speaking
-  if (avatarIsSpeaking) {
-    const glow = ctx.createRadialGradient(cx, cy, 60, cx, cy, 107);
-    const pulse = 0.04 + Math.abs(Math.sin(t * 3)) * 0.04 * avatarMouthOpen;
-    glow.addColorStop(0, `rgba(201,168,76,0)`);
-    glow.addColorStop(1, `rgba(201,168,76,${pulse})`);
-    ctx.fillStyle = glow;
-    ctx.fillRect(0, 0, W, H);
-  }
-
-  // ── NECK ──
-  ctx.fillStyle = AV.skin;
-  ctx.beginPath();
-  ctx.ellipse(cx, 188, 22, 28, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  // ── CLOTHING / BLAZER ──
-  ctx.fillStyle = AV.cloth;
-  ctx.beginPath();
-  ctx.moveTo(cx-70, 220);
-  ctx.lineTo(cx-50, 180);
-  ctx.quadraticCurveTo(cx-28, 200, cx, 196);
-  ctx.quadraticCurveTo(cx+28, 200, cx+50, 180);
-  ctx.lineTo(cx+70, 220);
-  ctx.closePath();
-  ctx.fill();
-
-  // Gold accent collar
-  ctx.strokeStyle = AV.clothAcc;
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(cx-20, 192);
-  ctx.lineTo(cx, 210);
-  ctx.lineTo(cx+20, 192);
-  ctx.stroke();
-
-  // ── HEAD ──
-  // Head shadow
-  ctx.fillStyle = 'rgba(0,0,0,0.15)';
-  ctx.beginPath();
-  ctx.ellipse(cx+3, cy+3, 62, 74, 0, 0, Math.PI*2);
-  ctx.fill();
-
-  // Head base
-  const headGrad = ctx.createRadialGradient(cx-15, cy-20, 10, cx, cy, 75);
-  headGrad.addColorStop(0, AV.skinHigh);
-  headGrad.addColorStop(0.6, AV.skin);
-  headGrad.addColorStop(1, AV.skinDark);
-  ctx.fillStyle = headGrad;
-  ctx.beginPath();
-  ctx.ellipse(cx, cy-5, 62, 74, 0, 0, Math.PI*2);
-  ctx.fill();
-
-  // ── HAIR ──
-  ctx.fillStyle = AV.hair;
-  // Top hair
-  ctx.beginPath();
-  ctx.ellipse(cx, cy-55, 63, 32, 0, Math.PI, 0);
-  ctx.fill();
-  // Side hair left
-  ctx.beginPath();
-  ctx.moveTo(cx-62, cy-5);
-  ctx.quadraticCurveTo(cx-72, cy+20, cx-58, cy+50);
-  ctx.quadraticCurveTo(cx-55, cy+60, cx-42, cy+62);
-  ctx.quadraticCurveTo(cx-30, cy+70, cx-25, cy+65);
-  ctx.lineTo(cx-25, cy+42);
-  ctx.quadraticCurveTo(cx-55, cy+35, cx-55, cy-5);
-  ctx.fill();
-  // Side hair right
-  ctx.beginPath();
-  ctx.moveTo(cx+62, cy-5);
-  ctx.quadraticCurveTo(cx+72, cy+20, cx+58, cy+50);
-  ctx.quadraticCurveTo(cx+55, cy+60, cx+42, cy+62);
-  ctx.quadraticCurveTo(cx+30, cy+70, cx+25, cy+65);
-  ctx.lineTo(cx+25, cy+42);
-  ctx.quadraticCurveTo(cx+55, cy+35, cx+55, cy-5);
-  ctx.fill();
-
-  // ── FACE FEATURES ──
-
-  // Subtle blush
-  ctx.fillStyle = 'rgba(220,120,100,0.12)';
-  ctx.beginPath(); ctx.ellipse(cx-38, cy+8, 16, 10, -0.3, 0, Math.PI*2); ctx.fill();
-  ctx.beginPath(); ctx.ellipse(cx+38, cy+8, 16, 10, 0.3, 0, Math.PI*2); ctx.fill();
-
-  // ── EYEBROWS ──
-  ctx.strokeStyle = AV.hair;
-  ctx.lineWidth = 3.5;
-  ctx.lineCap = 'round';
-  const browY = cy - 28;
-  // Left brow
-  ctx.beginPath();
-  ctx.moveTo(cx-42, browY+3);
-  ctx.quadraticCurveTo(cx-30, browY-4, cx-18, browY+1);
-  ctx.stroke();
-  // Right brow
-  ctx.beginPath();
-  ctx.moveTo(cx+18, browY+1);
-  ctx.quadraticCurveTo(cx+30, browY-4, cx+42, browY+3);
-  ctx.stroke();
-
-  // ── EYES ──
-  const eyeY = cy - 14;
-  const blinkScale = avatarBlinkVal;
-
-  // Eye whites
-  [-1, 1].forEach(side => {
-    const ex = cx + side * 27;
-    ctx.fillStyle = AV.white;
-    ctx.beginPath();
-    ctx.ellipse(ex, eyeY, 15, 10 * blinkScale, 0, 0, Math.PI*2);
-    ctx.fill();
-
-    // Iris
-    ctx.fillStyle = AV.iris;
-    ctx.beginPath();
-    ctx.ellipse(ex, eyeY, 8, 8 * blinkScale, 0, 0, Math.PI*2);
-    ctx.fill();
-
-    // Pupil
-    ctx.fillStyle = '#000';
-    ctx.beginPath();
-    ctx.ellipse(ex, eyeY, 4.5, 4.5 * blinkScale, 0, 0, Math.PI*2);
-    ctx.fill();
-
-    // Eye shine
-    ctx.fillStyle = 'rgba(255,255,255,0.7)';
-    ctx.beginPath();
-    ctx.ellipse(ex-3, eyeY-3, 2.5, 2 * blinkScale, 0, 0, Math.PI*2);
-    ctx.fill();
-
-    // Eyelid (top)
-    ctx.fillStyle = AV.skin;
-    ctx.beginPath();
-    ctx.ellipse(ex, eyeY - 10 * blinkScale, 15, 10 * (1 - blinkScale) + 1, 0, 0, Math.PI*2);
-    ctx.fill();
-
-    // Lashes
-    ctx.strokeStyle = AV.hair;
-    ctx.lineWidth = 1.5;
-    [-10,-5,0,5,10].forEach(lx => {
-      ctx.beginPath();
-      ctx.moveTo(ex+lx, eyeY - 10 * blinkScale);
-      ctx.lineTo(ex+lx*1.1, eyeY - 13 * blinkScale - 2);
-      ctx.stroke();
-    });
+    // Set remote description (D-ID's offer)
+    return peerConn.setRemoteDescription(new RTCSessionDescription(data.offer))
+      .then(function() { return peerConn.createAnswer(); })
+      .then(function(answer) { return peerConn.setLocalDescription(answer).then(function(){ return answer; }); })
+      .then(function(answer) {
+        return didProxy('/talks/streams/' + didStreamId + '/sdp', 'POST', {
+          answer: answer,
+          session_id: didSessionId
+        });
+      }).then(function() {
+        console.log('D-ID WebRTC handshake complete');
+        return true;
+      });
+  }).catch(function(e) {
+    console.warn('D-ID init error:', e.message);
+    return false;
   });
-
-  // ── NOSE ──
-  ctx.strokeStyle = AV.skinDark;
-  ctx.lineWidth = 1.5;
-  ctx.lineCap = 'round';
-  ctx.beginPath();
-  ctx.moveTo(cx-3, cy-4);
-  ctx.quadraticCurveTo(cx-8, cy+8, cx-6, cy+12);
-  ctx.quadraticCurveTo(cx, cy+14, cx+6, cy+12);
-  ctx.quadraticCurveTo(cx+8, cy+8, cx+3, cy-4);
-  ctx.stroke();
-
-  // ── MOUTH / LIP SYNC ──
-  const mouthY = cy + 32;
-  const mouthW = 22;
-  const mOpen  = avatarMouthOpen;
-
-  // Upper lip
-  ctx.fillStyle = AV.lip;
-  ctx.beginPath();
-  ctx.moveTo(cx - mouthW, mouthY);
-  ctx.quadraticCurveTo(cx - mouthW*0.5, mouthY - 6, cx, mouthY - 4);
-  ctx.quadraticCurveTo(cx + mouthW*0.5, mouthY - 6, cx + mouthW, mouthY);
-  ctx.quadraticCurveTo(cx, mouthY + 3, cx - mouthW, mouthY);
-  ctx.fill();
-
-  // Mouth opening
-  if (mOpen > 0.05) {
-    // Inner mouth dark
-    ctx.fillStyle = '#3a1008';
-    ctx.beginPath();
-    ctx.ellipse(cx, mouthY + mOpen * 8, mouthW * 0.85, mOpen * 12, 0, 0, Math.PI);
-    ctx.fill();
-
-    // Teeth
-    if (mOpen > 0.15) {
-      ctx.fillStyle = AV.teeth;
-      ctx.beginPath();
-      ctx.ellipse(cx, mouthY + mOpen * 3, mouthW * 0.7, mOpen * 7, 0, 0, Math.PI);
-      ctx.fill();
-      // Tooth divider
-      ctx.strokeStyle = 'rgba(180,160,140,0.4)';
-      ctx.lineWidth = 0.8;
-      ctx.beginPath();
-      ctx.moveTo(cx, mouthY);
-      ctx.lineTo(cx, mouthY + mOpen * 7);
-      ctx.stroke();
-    }
-  }
-
-  // Lower lip
-  ctx.fillStyle = AV.lip;
-  ctx.beginPath();
-  ctx.moveTo(cx - mouthW, mouthY);
-  ctx.quadraticCurveTo(cx, mouthY + mOpen * 18 + 9, cx + mouthW, mouthY);
-  ctx.quadraticCurveTo(cx, mouthY + mOpen * 18 + 14, cx - mouthW, mouthY);
-  ctx.fill();
-
-  // Lip highlight
-  ctx.fillStyle = 'rgba(255,200,190,0.25)';
-  ctx.beginPath();
-  ctx.ellipse(cx, mouthY + 5, mouthW * 0.5, 3, 0, 0, Math.PI);
-  ctx.fill();
-
-  ctx.restore();
 }
 
-// ── SPEAK WITH ANIMATED AVATAR ──
-async function speak(text) {
-  avatarIsSpeaking = true;
-  document.getElementById('av-speak-ring').classList.add('on');
-
-  try {
-    const r = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${EL_VOICE}`,
-      {
-        method: 'POST',
-        headers: {
-          'xi-api-key': EL_KEY,
-          'Content-Type': 'application/json',
-          'Accept': 'audio/mpeg'
-        },
-        body: JSON.stringify({
-          text,
-          model_id: 'eleven_turbo_v2',
-          voice_settings: { stability:.5, similarity_boost:.8 }
-        })
-      }
-    );
-
-    if (!r.ok) throw new Error('ElevenLabs ' + r.status);
-    const blob = await r.blob();
-    const url  = URL.createObjectURL(blob);
-
-    // Connect audio to analyser for lip sync
-    if (!avatarAudioCtx) {
-      avatarAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      avatarAnalyser = avatarAudioCtx.createAnalyser();
-      avatarAnalyser.fftSize = 256;
-      avatarDataArr = new Uint8Array(avatarAnalyser.frequencyBinCount);
-      avatarAnalyser.connect(avatarAudioCtx.destination);
-    }
-    if (avatarAudioCtx.state === 'suspended') await avatarAudioCtx.resume();
-
-    const aud = new Audio(url);
-    aud.crossOrigin = 'anonymous';
-
-    const src = avatarAudioCtx.createMediaElementSource(aud);
-    src.connect(avatarAnalyser);
-
-    await new Promise((res) => {
-      aud.onended = res;
-      aud.onerror = res;
-      aud.play().catch(res);
-    });
-
-    URL.revokeObjectURL(url);
-
-  } catch(e) {
-    console.warn('speak():', e.message);
-    // Animate without audio
-    const dur = Math.min(3000, Math.max(1500, text.length * 30));
-    const start = Date.now();
-    await new Promise(res => {
-      const fakeAnim = setInterval(() => {
-        const progress = (Date.now() - start) / dur;
-        if (progress >= 1) { clearInterval(fakeAnim); res(); return; }
-        // Simulate speech pattern
-        avatarMouthOpen = Math.abs(Math.sin(progress * 20)) * 0.6 *
-          (0.5 + 0.5 * Math.sin(progress * 7));
-      }, 50);
-    });
-  }
-
-  avatarIsSpeaking = false;
-  avatarMouthOpen = 0;
-  document.getElementById('av-speak-ring').classList.remove('on');
-}
-// ── SPEAK REPLACED ──
-// 
-async function speak(text) {
-  try {
-    const r = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${EL_VOICE}`,
-      {
-        method: 'POST',
-        headers: {
-          'xi-api-key': EL_KEY,
-          'Content-Type': 'application/json',
-          'Accept': 'audio/mpeg'
-        },
-        body: JSON.stringify({
-          text,
-          model_id: 'eleven_turbo_v2',
-          voice_settings: { stability:.5, similarity_boost:.8 }
-        })
-      }
-    );
-    if (!r.ok) throw new Error('ElevenLabs ' + r.status);
-    const blob = await r.blob();
-    const url  = URL.createObjectURL(blob);
-    const aud  = new Audio(url);
-    await new Promise((res, rej) => {
-      aud.onended = res;
-      aud.onerror = () => res(); // don't block on error
-      aud.play().catch(() => res());
-    });
-    URL.revokeObjectURL(url);
-  } catch(e) {
-    console.warn('speak():', e.message);
-    await new Promise(r => setTimeout(r, Math.min(3000, Math.max(1500, text.length * 30))));
-  }
-}
-
-// ── ASK QUESTION ──
-async function askQ(idx) {
-  if (idx >= QS.length) { finish(); return; }
-  curQ = idx;
-  const pct = Math.round(idx / QS.length * 100);
-
-  document.getElementById('q-num').textContent = idx + 1;
-  document.getElementById('iv-prog-fill').style.width  = pct + '%';
-  document.getElementById('iv-pct').textContent        = pct + '%';
-  document.getElementById('iv-q-text').textContent     = QS[idx];
-  document.getElementById('iv-q-box').style.display    = 'block';
-  document.getElementById('iv-submit').style.display   = 'none';
-  document.getElementById('iv-mic-status').textContent = 'SARA is speaking...';
-  document.getElementById('iv-mic-status').style.color = '';
-  document.getElementById('iv-mic-btn').style.opacity  = '.4';
-  document.getElementById('av-speak-ring').classList.add('on');
-
-  addTx('sara', QS[idx]);
-
-  await speak(QS[idx]);
-
-  // Done speaking
-  document.getElementById('av-speak-ring').classList.remove('on');
-  document.getElementById('iv-q-box').style.display    = 'none';
-  document.getElementById('iv-mic-status').textContent = 'Your turn — speak or type your answer';
-  document.getElementById('iv-mic-status').style.color = '#c9a84c';
-  document.getElementById('iv-mic-btn').style.opacity  = '1';
-  document.getElementById('iv-submit').style.display   = 'block';
-
-  liveBuf = '';
-  document.getElementById('iv-live').textContent = '';
-  document.getElementById('iv-live').style.display = 'block';
-  if (recog) { try { recog.start(); } catch(e) {} }
-}
-
-// ── SPEAK (ElevenLabs → D-ID lip sync) ──
-async function speak(text) {
-  try {
-    // Step 1: Get audio from ElevenLabs
-    const elRes = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${EL_VOICE}`,
-      {
-        method: 'POST',
-        headers: {
-          'xi-api-key': EL_KEY,
-          'Content-Type': 'application/json',
-          'Accept': 'audio/mpeg'
-        },
-        body: JSON.stringify({
-          text,
-          model_id: 'eleven_turbo_v2',
-          voice_settings: { stability:.5, similarity_boost:.8 }
-        })
-      }
-    );
-    if (!elRes.ok) throw new Error('ElevenLabs ' + elRes.status);
-    const audioBlob = await elRes.blob();
-
-    // Convert audio blob to base64
-    const audioB64 = await new Promise((res, rej) => {
-      const reader = new FileReader();
-      reader.onloadend = () => res(reader.result.split(',')[1]);
-      reader.onerror   = rej;
-      reader.readAsDataURL(audioBlob);
-    });
-
-    // Step 2: Send to D-ID Talks API
-    const didRes = await fetch('https://api.d-id.com/talks', {
-      method: 'POST',
-      headers: {
-        'Authorization': DID_KEY,
-        'Content-Type': 'application/json'
+function didSpeak(audioBlob) {
+  if (!didStreamId || !didSessionId) return Promise.resolve();
+  // Convert blob to base64
+  return new Promise(function(res, rej) {
+    var reader = new FileReader();
+    reader.onloadend = function() { res(reader.result.split(',')[1]); };
+    reader.onerror = rej;
+    reader.readAsDataURL(audioBlob);
+  }).then(function(b64) {
+    return didProxy('/talks/streams/' + didStreamId, 'POST', {
+      script: {
+        type: 'audio',
+        audio_url: 'data:audio/mpeg;base64,' + b64
       },
-      body: JSON.stringify({
-        source_url: DID_IMG,
-        script: {
-          type: 'audio',
-          audio_url: `data:audio/mpeg;base64,${audioB64}`
-        },
-        config: { fluent: true, pad_audio: 0.5 }
-      })
+      config: { fluent: true, pad_audio: 0 },
+      session_id: didSessionId
     });
-    if (!didRes.ok) throw new Error('D-ID create ' + didRes.status);
-    const { id: talkId } = await didRes.json();
-
-    // Step 3: Poll for completion
-    let videoUrl = null;
-    for (let i = 0; i < 30; i++) {
-      await new Promise(r => setTimeout(r, 1500));
-      const pollRes = await fetch(`https://api.d-id.com/talks/${talkId}`, {
-        headers: { 'Authorization': DID_KEY }
-      });
-      const pollData = await pollRes.json();
-      if (pollData.status === 'done') {
-        videoUrl = pollData.result_url;
-        break;
-      }
-      if (pollData.status === 'error') throw new Error('D-ID processing error');
-    }
-
-    if (!videoUrl) throw new Error('D-ID timeout');
-
-    // Step 4: Play the talking avatar video
-    await playAvatarVideo(videoUrl);
-
-  } catch(e) {
-    console.warn('speak() error:', e.message, '— falling back to audio only');
-    // Fallback: play audio directly from ElevenLabs without lip sync
-    try {
-      const elRes2 = await fetch(
-        `https://api.elevenlabs.io/v1/text-to-speech/${EL_VOICE}`,
-        {
-          method: 'POST',
-          headers: { 'xi-api-key': EL_KEY, 'Content-Type': 'application/json', 'Accept': 'audio/mpeg' },
-          body: JSON.stringify({ text, model_id: 'eleven_turbo_v2', voice_settings: { stability:.5, similarity_boost:.8 } })
-        }
-      );
-      if (elRes2.ok) {
-        const blob2 = await elRes2.blob();
-        const url2  = URL.createObjectURL(blob2);
-        const aud   = new Audio(url2);
-        await new Promise((res, rej) => { aud.onended = res; aud.onerror = rej; aud.play().catch(rej); });
-        URL.revokeObjectURL(url2);
-        return;
-      }
-    } catch(e2) {}
-    // Final fallback: silent wait
-    await new Promise(r => setTimeout(r, Math.min(3500, Math.max(1500, text.length * 35))));
-  }
-}
-
-// ── PLAY AVATAR VIDEO ──
-async function playAvatarVideo(url) {
-  return new Promise((resolve) => {
-    const videoEl = document.getElementById('av-video');
-    const faceEl  = document.getElementById('av-face');
-
-    if (!videoEl) { resolve(); return; }
-
-    videoEl.src = url;
-    videoEl.style.display = 'block';
-    if (faceEl) faceEl.style.display = 'none';
-
-    videoEl.onended = () => {
-      videoEl.style.display = 'none';
-      if (faceEl) faceEl.style.display = 'flex';
-      resolve();
-    };
-    videoEl.onerror = () => {
-      videoEl.style.display = 'none';
-      if (faceEl) faceEl.style.display = 'flex';
-      resolve();
-    };
-    videoEl.play().catch(() => {
-      videoEl.style.display = 'none';
-      if (faceEl) faceEl.style.display = 'flex';
-      resolve();
-    });
+  }).catch(function(e) {
+    console.warn('D-ID speak error:', e.message);
   });
 }
 
-// ── SUBMIT ANSWER ──
-async function submitAnswer() {
-  if (recog && listening) { try { recog.stop(); } catch(e){} }
+function closeDID() {
+  if (!didStreamId) return;
+  didProxy('/talks/streams/' + didStreamId, 'DELETE', { session_id: didSessionId })
+    .catch(function(){});
+  if (peerConn) { peerConn.close(); peerConn = null; }
+  didStreamId = null; didSessionId = null; didReady = false;
+}
 
-  const liveEl = document.getElementById('iv-live');
-  const answer = (liveBuf + (liveEl.textContent || '')).trim() || '[No response recorded]';
-  liveBuf = '';
-  liveEl.textContent = '';
-  liveEl.style.display = 'none';
-  document.getElementById('iv-submit').style.display = 'none';
-  document.getElementById('iv-mic-status').textContent = 'Processing...';
-  document.getElementById('iv-mic-btn').style.opacity = '.4';
+// ── SPEAK (ElevenLabs audio + D-ID lip sync) ──
+function speak(text) {
+  avSpeaking = true;
+  document.getElementById('av-glow').classList.add('on');
 
-  addTx('user', answer);
-  answers.push({ q: QS[curQ], a: answer });
+  return fetch('https://api.elevenlabs.io/v1/text-to-speech/' + EL_VOICE, {
+    method: 'POST',
+    headers: {
+      'xi-api-key': EL_KEY,
+      'Content-Type': 'application/json',
+      'Accept': 'audio/mpeg'
+    },
+    body: JSON.stringify({
+      text: text,
+      model_id: 'eleven_turbo_v2',
+      voice_settings: { stability: .5, similarity_boost: .8 }
+    })
+  }).then(function(r) {
+    if (!r.ok) throw new Error('EL ' + r.status);
+    return r.blob();
+  }).then(function(blob) {
+    var url = URL.createObjectURL(blob);
 
-  // Score
-  const kw = ['security','guard','license','patrol','supervisor','report','professional','emergency','procedure','experience','notify','document'];
-  let sc = 2;
-  if (answer.length > 60)  sc += 2;
-  if (answer.length > 150) sc += 1;
-  kw.forEach(k => { if (answer.toLowerCase().includes(k)) sc += 0.4; });
-  sc = Math.min(10, Math.round(sc * 10) / 10);
+    // If D-ID is ready, use it for lip sync
+    var didP = didReady ? didSpeak(blob) : Promise.resolve();
+
+    // Play audio locally for timing
+    if (!avAudioCtx) {
+      avAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      avAnalyser = avAudioCtx.createAnalyser();
+      avAnalyser.fftSize = 256;
+      avData = new Uint8Array(avAnalyser.frequencyBinCount);
+      avAnalyser.connect(avAudioCtx.destination);
+    }
+
+    var resumeP = avAudioCtx.state === 'suspended' ? avAudioCtx.resume() : Promise.resolve();
+
+    return resumeP.then(function() {
+      var aud = new Audio(url);
+      aud.crossOrigin = 'anonymous';
+      var src = avAudioCtx.createMediaElementSource(aud);
+      src.connect(avAnalyser);
+
+      // If D-ID NOT ready, also drive canvas mouth from audio
+      if (!didReady) {
+        // canvas lip sync handled by avAnalyser in the render loop
+      }
+
+      return Promise.all([
+        new Promise(function(res) {
+          aud.onended = res; aud.onerror = res;
+          aud.play().catch(res);
+        }),
+        didP
+      ]);
+    }).then(function() {
+      URL.revokeObjectURL(url);
+    });
+  }).catch(function(e) {
+    console.warn('speak:', e.message);
+    // Animated fallback
+    var dur = Math.min(3000, Math.max(1500, text.length * 30));
+    var t0 = Date.now();
+    return new Promise(function(res) {
+      var id = setInterval(function() {
+        var prog = (Date.now() - t0) / dur;
+        avMouth = Math.abs(Math.sin(prog * 20)) * .6 * (0.5 + 0.5 * Math.sin(prog * 7));
+        if (prog >= 1) { clearInterval(id); res(); }
+      }, 40);
+    });
+  }).then(function() {
+    avSpeaking = false; avMouth = 0;
+    document.getElementById('av-glow').classList.remove('on');
+  });
+}
+
+
+// ── INTERVIEW FLOW ──
+function beginInterview() {
+  var btn = document.getElementById('begin-btn');
+  btn.textContent = 'Starting...'; btn.style.opacity = '.7'; btn.style.pointerEvents = 'none';
+  var camP = navigator.mediaDevices
+    ? navigator.mediaDevices.getUserMedia({video:true,audio:true}).then(function(s){
+        mediaStream=s;
+        document.getElementById('iv-video').srcObject=s;
+        document.getElementById('iv-cam-ov').style.display='none';
+        var pi=document.getElementById('perm-icon');
+        pi.textContent='✓'; pi.style.borderColor='#27ae60'; pi.style.background='rgba(39,174,96,.12)'; pi.style.color='#27ae60';
+        document.getElementById('perm-txt').textContent='Camera & microphone ready';
+      }).catch(function(){
+        document.getElementById('perm-icon').textContent='✓';
+        document.getElementById('perm-txt').textContent='Proceeding without camera';
+      })
+    : Promise.resolve();
+  camP.then(function(){
+    document.getElementById('s-intro').classList.remove('on');
+    document.getElementById('s-interview').classList.add('on');
+    startAvatarLoop(document.getElementById('av-canvas'));
+    // Initialize D-ID
+    initDID().then(function(ok){ console.log('D-ID ready:', ok); });
+    timerInt=setInterval(function(){
+      timerSec++;
+      var m=Math.floor(timerSec/60), s=timerSec%60;
+      document.getElementById('hdr-timer').textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+    },1000);
+    setupRecog();
+    setTimeout(function(){askQ(0);},300);
+  });
+}
+
+function setupRecog(){
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR) return;
+  recog=new SR(); recog.continuous=true; recog.interimResults=true; recog.lang='en-US';
+  recog.onstart=function(){
+    isListening=true;
+    document.getElementById('iv-mic-btn').classList.add('on');
+    document.getElementById('iv-mic-status').textContent='Listening — speak now';
+    document.getElementById('iv-mic-status').style.color='#27ae60';
+    document.getElementById('iv-live').style.display='block';
+  };
+  recog.onend=function(){ isListening=false; document.getElementById('iv-mic-btn').classList.remove('on'); document.getElementById('iv-mic-status').style.color=''; };
+  recog.onresult=function(e){
+    var interim='', final='';
+    for(var i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal) final+=e.results[i][0].transcript+' ';
+      else interim+=e.results[i][0].transcript;
+    }
+    if(final) liveBuf+=final;
+    document.getElementById('iv-live').textContent=liveBuf+interim;
+  };
+  recog.onerror=function(e){ console.warn('recog:',e.error); isListening=false; };
+}
+
+function askQ(idx){
+  if(idx>=QS.length){ finish(); return; }
+  curQ=idx;
+  var pct=Math.round(idx/QS.length*100);
+  document.getElementById('q-num').textContent=idx+1;
+  document.getElementById('iv-prog-fill').style.width=pct+'%';
+  document.getElementById('iv-pct').textContent=pct+'%';
+  document.getElementById('iv-qtxt').textContent=QS[idx];
+  document.getElementById('iv-qbox').style.display='block';
+  document.getElementById('iv-submit').style.display='none';
+  document.getElementById('iv-mic-status').textContent='SARA is speaking...';
+  document.getElementById('iv-mic-status').style.color='';
+  document.getElementById('iv-mic-btn').style.opacity='.4';
+  addTx('s',QS[idx]);
+  speak(QS[idx]).then(function(){
+    document.getElementById('iv-qbox').style.display='none';
+    document.getElementById('iv-mic-status').textContent='Your turn — speak your answer';
+    document.getElementById('iv-mic-status').style.color='#c9a84c';
+    document.getElementById('iv-mic-btn').style.opacity='1';
+    document.getElementById('iv-submit').style.display='block';
+    liveBuf='';
+    document.getElementById('iv-live').textContent='';
+    document.getElementById('iv-live').style.display='block';
+    if(recog){ try{recog.start();}catch(e){} }
+  });
+}
+
+function submitAnswer(){
+  if(recog&&isListening){ try{recog.stop();}catch(e){} }
+  var live=document.getElementById('iv-live');
+  var ans=(liveBuf+(live.textContent||'')).trim()||'No response recorded';
+  liveBuf=''; live.textContent=''; live.style.display='none';
+  document.getElementById('iv-submit').style.display='none';
+  document.getElementById('iv-mic-status').textContent='Processing...';
+  document.getElementById('iv-mic-btn').style.opacity='.4';
+  addTx('u',ans);
+  answers.push({q:QS[curQ],a:ans});
+  var kw=['security','guard','license','patrol','supervisor','report','professional','emergency','experience'];
+  var sc=2; if(ans.length>60)sc+=2; if(ans.length>150)sc+=1;
+  kw.forEach(function(k){ if(ans.toLowerCase().indexOf(k)>=0)sc+=0.4; });
+  sc=Math.min(10,Math.round(sc*10)/10);
   scores.push(sc);
-  const avg = scores.reduce((a,b)=>a+b,0) / scores.length;
-  document.getElementById('iv-score-val').textContent  = Math.round(avg*10)/10 + '/10';
-  document.getElementById('iv-score-fill').style.width = (avg/10*100) + '%';
-
-  const next = curQ + 1;
-  if (next >= QS.length) { finish(); return; }
-
-  // Claude transition
-  document.getElementById('iv-mic-status').textContent = 'SARA is responding...';
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 60,
-        system: 'You are SARA, an AI interviewer for Security USA in New York. In ONE sentence (max 10 words) acknowledge the answer warmly, then say nothing else. Just the acknowledgment.',
-        messages: [{ role:'user', content:`Candidate answered: "${answer.substring(0,150)}"` }]
-      })
-    });
-    const data  = await res.json();
-    const reply = data.content?.[0]?.text || '';
-    if (reply) {
-      addTx('sara', reply);
-      await speak(reply);
-    }
-  } catch(e) { /* skip transition on error */ }
-
-  askQ(next);
+  var avg=scores.reduce(function(a,b){return a+b;},0)/scores.length;
+  document.getElementById('iv-score-val').textContent=Math.round(avg*10)/10+'/10';
+  document.getElementById('iv-score-fill').style.width=(avg/10*100)+'%';
+  var next=curQ+1;
+  if(next>=QS.length){ finish(); return; }
+  document.getElementById('iv-mic-status').textContent='SARA is responding...';
+  fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:60,
+      system:"You are SARA, an AI interviewer for Security USA. Acknowledge the answer in ONE warm sentence, max 10 words.",
+      messages:[{role:'user',content:'Candidate said: "'+ans.substring(0,150)+'"'}]
+    })
+  }).then(function(r){return r.json();}).then(function(d){
+    var reply=d.content&&d.content[0]?d.content[0].text:'';
+    if(reply){ addTx('s',reply); return speak(reply); }
+  }).catch(function(){}).then(function(){ askQ(next); });
 }
 
-// ── MIC TOGGLE ──
-function micToggle() {
-  if (!recog) return;
-  if (listening) {
-    try { recog.stop(); } catch(e){}
-  } else {
-    liveBuf = '';
-    document.getElementById('iv-live').textContent = '';
-    document.getElementById('iv-live').style.display = 'block';
-    try { recog.start(); } catch(e){}
-  }
+function micToggle(){
+  if(!recog) return;
+  if(isListening){ try{recog.stop();}catch(e){} }
+  else{ liveBuf=''; document.getElementById('iv-live').textContent=''; document.getElementById('iv-live').style.display='block'; try{recog.start();}catch(e){} }
 }
 
-// ── CAM TOGGLE ──
-function camToggle() {
-  if (!mediaStream) return;
-  camOn = !camOn;
-  mediaStream.getVideoTracks().forEach(t => t.enabled = camOn);
-  document.getElementById('iv-cam-overlay').style.display = camOn ? 'none' : 'flex';
-  document.getElementById('iv-cam-toggle').textContent = camOn ? 'Cam On' : 'Cam Off';
+function camToggle(){
+  if(!mediaStream) return;
+  camOn=!camOn;
+  mediaStream.getVideoTracks().forEach(function(t){t.enabled=camOn;});
+  document.getElementById('iv-cam-ov').style.display=camOn?'none':'flex';
+  document.getElementById('iv-camtog').textContent=camOn?'Cam On':'Cam Off';
 }
 
-// ── ADD TRANSCRIPT ──
-function addTx(who, text) {
-  const body = document.getElementById('iv-tx-body');
-  const d    = document.createElement('div');
-  d.className = who === 'sara' ? 'tx-sara' : 'tx-user';
-  d.innerHTML = `<div class="tx-who">${who === 'sara' ? 'SARA' : 'You'}</div><div class="tx-msg">${text}</div>`;
-  body.appendChild(d);
-  body.scrollTop = body.scrollHeight;
+function addTx(who,text){
+  var body=document.getElementById('iv-tx-body');
+  var d=document.createElement('div'); d.className=who==='s'?'tx-s':'tx-u';
+  d.innerHTML='<div class="tx-w">'+(who==='s'?'SARA':'You')+'</div><div class="tx-m">'+text+'</div>';
+  body.appendChild(d); body.scrollTop=body.scrollHeight;
 }
 
-// ── FINISH ──
-async function finish() {
+function finish(){
   clearInterval(timerInt);
-  if (recog)       { try { recog.stop(); } catch(e){} }
-  if (mediaStream) { mediaStream.getTracks().forEach(t => t.stop()); }
-  document.getElementById('av-speak-ring').classList.remove('on');
-
-  const avg     = scores.length ? scores.reduce((a,b)=>a+b,0)/scores.length : 6;
-  const overall = Math.round(avg * 10) / 10;
-
-  document.getElementById('sc-score-num').textContent = overall;
-  const rec = document.getElementById('sc-rec');
-  if (overall >= 7)      { rec.textContent = 'Recommend Hire';    rec.style.color = '#27ae60'; rec.style.borderColor = '#27ae60'; }
-  else if (overall >= 5) { rec.textContent = 'Under Review';      rec.style.color = '#c9a84c'; rec.style.borderColor = '#c9a84c'; }
-  else                   { rec.textContent = 'Not Recommended';   rec.style.color = '#c0392b'; rec.style.borderColor = '#c0392b'; }
-
-  const cats = [
-    { n:'Communication',  s: Math.min(10, avg + (Math.random()-.3)*2) },
-    { n:'Experience',     s: Math.min(10, avg + (Math.random()-.4)*2) },
-    { n:'Professionalism',s: Math.min(10, avg + (Math.random()-.2)*2) },
-    { n:'Availability',   s: Math.min(10, avg + (Math.random()-.5)*2) },
-    { n:'Licensing',      s: Math.min(10, avg + (Math.random()-.3)*2) },
-  ];
-  const catEl = document.getElementById('sc-cats');
-  catEl.innerHTML = '';
-  cats.forEach(c => {
-    const s = Math.max(1, Math.round(c.s * 10)/10);
-    catEl.innerHTML += `
-      <div class="sc-cat">
-        <div class="sc-cat-lbl">${c.n}</div>
-        <div class="sc-cat-bar"><div class="sc-cat-fill" style="width:${s/10*100}%"></div></div>
-        <div class="sc-cat-val">${s}</div>
-      </div>`;
-  });
-
-  document.getElementById('sc-notes-text').textContent = overall >= 7
-    ? 'Candidate demonstrated strong communication and relevant security experience. Licensing and availability appear suitable for the role. Recommended for onboarding.'
-    : overall >= 5
-    ? 'Candidate showed adequate knowledge with some areas requiring HR follow-up. Licensing and availability should be verified before proceeding.'
-    : 'Candidate responses did not sufficiently demonstrate required experience or licensing for this position at this time.';
-
-  // Save to Supabase
-  try {
-    const { data: { user } } = await sb.auth.getUser();
-    if (user) {
-      await sb.from('interview_results').insert({
-        candidate_id: user.id,
-        transcript: answers,
-        scores: { overall, categories: cats.map(c=>({name:c.n, score:Math.round(c.s*10)/10})) },
-        recommendation: overall >= 7 ? 'hire' : overall >= 5 ? 'review' : 'pass',
-        completed_at: new Date().toISOString()
-      });
-    }
-  } catch(e) { console.warn('Save interview:', e.message); }
-
-  document.getElementById('screen-interview').classList.remove('show');
-  document.getElementById('screen-scorecard').classList.add('show');
+  if(recog){ try{recog.stop();}catch(e){} }
+  if(mediaStream) mediaStream.getTracks().forEach(function(t){t.stop();});
+  avSpeaking=false; avMouth=0;
+  document.getElementById('av-glow').classList.remove('on');
+  closeDID();
+  var avg=scores.length?scores.reduce(function(a,b){return a+b;},0)/scores.length:6;
+  var ov=Math.round(avg*10)/10;
+  document.getElementById('sc-num').textContent=ov;
+  var rec=document.getElementById('sc-rec');
+  if(ov>=7){rec.textContent='Recommend Hire';rec.style.color='#27ae60';rec.style.borderColor='#27ae60';}
+  else if(ov>=5){rec.textContent='Under Review';rec.style.color='#c9a84c';rec.style.borderColor='#c9a84c';}
+  else{rec.textContent='Not Recommended';rec.style.color='#c0392b';rec.style.borderColor='#c0392b';}
+  var cats=[{n:'Communication',s:avg+(Math.random()-.3)*2},{n:'Experience',s:avg+(Math.random()-.4)*2},{n:'Professionalism',s:avg+(Math.random()-.2)*2},{n:'Availability',s:avg+(Math.random()-.5)*2},{n:'Licensing',s:avg+(Math.random()-.3)*2}];
+  document.getElementById('sc-cats').innerHTML=cats.map(function(c){var sv=Math.max(1,Math.min(10,Math.round(c.s*10)/10));return'<div class="sc-cat"><div class="sc-cl">'+c.n+'</div><div class="sc-cb"><div class="sc-cf" style="width:'+(sv/10*100)+'%"></div></div><div class="sc-cv">'+sv+'</div></div>';}).join('');
+  document.getElementById('sc-nt').textContent=ov>=7?'Candidate demonstrated strong communication and relevant security experience. Recommended for onboarding.':ov>=5?'Candidate showed adequate knowledge. Licensing and availability should be verified.':'Candidate responses did not sufficiently demonstrate required experience for this position.';
+  document.getElementById('s-interview').classList.remove('on');
+  document.getElementById('s-score').classList.add('on');
 }
-// ── INIT ──
-window.addEventListener('DOMContentLoaded', () => {
-  // Animate the intro screen canvas (idle face, blinking)
-  const ic = document.getElementById('intro-canvas');
-  if (!ic) return;
-  const ictx = ic.getContext('2d');
-  let it = 0;
-  let iBlinkT = 100 + Math.random()*100;
-  let iBlinkV = 1;
 
-  function drawIntroFace() {
-    requestAnimationFrame(drawIntroFace);
-    it += 0.016;
-    iBlinkT--;
-    if (iBlinkT <= 0) {
-      iBlinkV = 0;
-      setTimeout(() => { iBlinkV = 1; iBlinkT = 150 + Math.random()*200; }, 120);
-    }
-    const W=100, H=100, cx=50, cy=50;
-    ictx.clearRect(0,0,W,H);
-    ictx.save();
-    ictx.beginPath(); ictx.arc(cx,cy,48,0,Math.PI*2); ictx.clip();
-
-    // BG
-    const bg = ictx.createRadialGradient(cx,cy-10,8,cx,cy,48);
-    bg.addColorStop(0,'#112240'); bg.addColorStop(1,'#0a1628');
-    ictx.fillStyle = bg; ictx.fillRect(0,0,W,H);
-
-    // Neck
-    ictx.fillStyle='#d4956a';
-    ictx.beginPath(); ictx.ellipse(cx,90,10,14,0,0,Math.PI*2); ictx.fill();
-
-    // Clothes
-    ictx.fillStyle='#1a2840';
-    ictx.beginPath(); ictx.moveTo(cx-32,100); ictx.lineTo(cx-22,82);
-    ictx.quadraticCurveTo(cx,90,cx+22,82); ictx.lineTo(cx+32,100); ictx.closePath(); ictx.fill();
-    ictx.strokeStyle='#c9a84c'; ictx.lineWidth=1;
-    ictx.beginPath(); ictx.moveTo(cx-9,88); ictx.lineTo(cx,96); ictx.lineTo(cx+9,88); ictx.stroke();
-
-    // Head
-    const hg = ictx.createRadialGradient(cx-7,cy-8,4,cx,cy-2,34);
-    hg.addColorStop(0,'#e8b090'); hg.addColorStop(0.6,'#d4956a'); hg.addColorStop(1,'#b87850');
-    ictx.fillStyle=hg; ictx.beginPath(); ictx.ellipse(cx,cy-2,28,34,0,0,Math.PI*2); ictx.fill();
-
-    // Hair top
-    ictx.fillStyle='#2c1a0e';
-    ictx.beginPath(); ictx.ellipse(cx,cy-27,29,16,0,Math.PI,0); ictx.fill();
-    // Hair sides
-    [-1,1].forEach(s => {
-      ictx.beginPath(); ictx.moveTo(cx+s*28,cy-2);
-      ictx.quadraticCurveTo(cx+s*34,cy+10,cx+s*26,cy+24);
-      ictx.quadraticCurveTo(cx+s*18,cy+32,cx+s*11,cy+31);
-      ictx.lineTo(cx+s*11,cy+20);
-      ictx.quadraticCurveTo(cx+s*24,cy+16,cx+s*24,cy-2); ictx.fill();
-    });
-
-    // Brows
-    ictx.strokeStyle='#2c1a0e'; ictx.lineWidth=2; ictx.lineCap='round';
-    ictx.beginPath(); ictx.moveTo(cx-20,cy-14); ictx.quadraticCurveTo(cx-13,cy-18,cx-7,cy-15); ictx.stroke();
-    ictx.beginPath(); ictx.moveTo(cx+7,cy-15);  ictx.quadraticCurveTo(cx+13,cy-18,cx+20,cy-14); ictx.stroke();
-
-    // Eyes
-    const bl = iBlinkV;
-    [-1,1].forEach(s => {
-      const ex=cx+s*13, ey=cy-6;
-      ictx.fillStyle='#f8f4f0'; ictx.beginPath(); ictx.ellipse(ex,ey,7,4.5*bl,0,0,Math.PI*2); ictx.fill();
-      ictx.fillStyle='#5c3a1e'; ictx.beginPath(); ictx.ellipse(ex,ey,3.8,3.8*bl,0,0,Math.PI*2); ictx.fill();
-      ictx.fillStyle='#000';    ictx.beginPath(); ictx.ellipse(ex,ey,2.2,2.2*bl,0,0,Math.PI*2); ictx.fill();
-      ictx.fillStyle='rgba(255,255,255,0.75)'; ictx.beginPath(); ictx.ellipse(ex-1.5,ey-1.5,1.5,1.2*bl,0,0,Math.PI*2); ictx.fill();
-    });
-
-    // Nose
-    ictx.strokeStyle='rgba(184,120,80,0.7)'; ictx.lineWidth=0.9;
-    ictx.beginPath(); ictx.moveTo(cx-1,cy-2); ictx.quadraticCurveTo(cx-4,cy+5,cx-3,cy+7); ictx.quadraticCurveTo(cx,cy+8,cx+3,cy+7); ictx.quadraticCurveTo(cx+4,cy+5,cx+1,cy-2); ictx.stroke();
-
-    // Smile
-    ictx.strokeStyle='#c26a5a'; ictx.lineWidth=1.8;
-    ictx.beginPath(); ictx.moveTo(cx-10,cy+15); ictx.quadraticCurveTo(cx,cy+20,cx+10,cy+15); ictx.stroke();
-    // Lower lip fill
-    ictx.fillStyle='rgba(194,106,90,0.4)';
-    ictx.beginPath(); ictx.moveTo(cx-10,cy+15); ictx.quadraticCurveTo(cx,cy+22,cx+10,cy+15); ictx.quadraticCurveTo(cx,cy+20,cx-10,cy+15); ictx.fill();
-
-    ictx.restore();
-  }
-  drawIntroFace();
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('begin-btn').addEventListener('click', beginInterview);
+  document.getElementById('iv-mic-btn').addEventListener('click', micToggle);
+  document.getElementById('iv-camtog').addEventListener('click', camToggle);
+  document.getElementById('iv-submit').addEventListener('click', submitAnswer);
+  document.getElementById('iv-end').addEventListener('click', function(){ if(confirm('End interview?')) finish(); });
+  document.getElementById('hdr-exit').addEventListener('click', function(){ if(confirm('Exit?')) window.location.href='index.html'; });
+  document.getElementById('sc-sched-btn').addEventListener('click', function(){ window.location.href='index.html'; });
+  document.getElementById('sc-back-btn').addEventListener('click', function(){ window.location.href='index.html'; });
+  startIntroLoop();
 });
-
 </script>
 </body>
 </html>
