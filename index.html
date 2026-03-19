@@ -17,16 +17,15 @@
   --border:rgba(201,168,76,0.3);--input-bg:#ffffff;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
+html { height:100%; }
 body{
   background:var(--bg);
   color:var(--text);
   font-family:'Barlow',sans-serif;
-  min-height:100vh;
-  overflow-x:hidden;
-  overflow-y:hidden;
+  height:100%;
+  overflow:hidden;
   font-size:16px;
   width:100%;
-  max-width:100vw;
 }
 
 /* PAGE SYSTEM */
@@ -124,18 +123,18 @@ body{
 .dash-hero-btn:hover{background:var(--gold-light);transform:translateY(-1px);}
 
 /* FOOTER */
-.site-footer{background:var(--navy);border-top:1px solid rgba(201,168,76,0.2);padding:1.25rem 2rem;text-align:center;font-size:.7rem;color:#8a9ab5;font-family:'Barlow Condensed',sans-serif;line-height:1.8;flex-shrink:0;margin-top:auto;}
+.site-footer{background:var(--navy);border-top:1px solid rgba(201,168,76,0.2);padding:1.25rem 2rem;text-align:center;font-size:.7rem;color:#8a9ab5;font-family:'Barlow Condensed',sans-serif;line-height:1.8;flex-shrink:0;}
 .site-footer strong{color:var(--gold);}
 .site-footer a{color:#8a9ab5;text-decoration:none;}
 .site-footer a:hover{color:var(--gold);}
 
 /* SCROLLABLE MAIN */
 .main-scroll{
-  flex:1;
-  overflow-y:auto;
+  flex:1 1 0;
+  overflow-y:auto !important;
   overflow-x:hidden;
   width:100%;
-  height:0; /* makes flex child scrollable */
+  min-height:0;
   -webkit-overflow-scrolling:touch;
 }
 .main{
@@ -171,7 +170,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
   background:var(--surface);
   border:1px solid var(--border-l);
   border-radius:6px;
-  overflow:hidden;
+  overflow:visible;
   margin-bottom:1.5rem;
   box-shadow:0 1px 6px rgba(0,0,0,.06);
   width:100%;
@@ -293,7 +292,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
 .left-panel{display:none !important;}
 .left-eyebrow,.left-title,.left-body,.bullets,.bullet,.bullet-dot,.badges,.badge{display:none;}
 /* RIGHT PANEL — full width white */
-.right-panel{flex:1;overflow-y:auto;overflow-x:hidden;padding:2.5rem 2rem;display:flex;flex-direction:column;align-items:center;background:var(--bg);max-height:calc(100vh - 68px - 58px - 60px);}
+.right-panel{flex:1 1 0;overflow-y:auto;overflow-x:hidden;padding:2.5rem 2rem;display:flex;flex-direction:column;align-items:center;background:var(--bg);min-height:0;}
 .auth-card{width:100%;max-width:780px;}
 .tab-row{display:flex;background:var(--surface2);border:1px solid var(--border-l);border-radius:6px 6px 0 0;overflow:hidden;}
 .tab-btn{flex:1;padding:14px;background:none;border:none;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:.88rem;letter-spacing:2px;text-transform:uppercase;color:var(--text3);transition:all .25s;position:relative;}
@@ -361,8 +360,9 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
 .dash-main{
   max-width:1100px;
   margin:0 auto;
-  padding:2rem 1.5rem 4rem;
+  padding:2rem 1.5rem 6rem;
   width:100%;
+  box-sizing:border-box;
 }
 
 /* PIPELINE */
@@ -845,7 +845,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
 <!-- ══════════════════════════════════════════════════════
      PAGE: LOGIN
 ══════════════════════════════════════════════════════ -->
-<div class="page active page-fade" id="page-login" style="display:flex;flex-direction:column;width:100%;min-height:100vh;overflow-x:hidden;">
+<div class="page active page-fade" id="page-login" style="display:flex;flex-direction:column;width:100%;height:100vh;overflow:hidden;">
   <!-- Progress bubbles on login page -->
   <div class="login-progress">
     <div class="login-progress-inner">
@@ -1014,7 +1014,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
 <!-- ══════════════════════════════════════════════════════
      PAGE: DASHBOARD
 ══════════════════════════════════════════════════════ -->
-<div class="page page-fade" id="page-dashboard" style="display:none;flex-direction:column;width:100%;min-height:100vh;overflow-x:hidden;">
+<div class="page page-fade" id="page-dashboard" style="display:none;flex-direction:column;width:100%;height:100vh;overflow:hidden;">
   <div class="dash-hero">
     <div class="dash-hero-inner">
       <div>
@@ -1236,7 +1236,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
 <!-- ══════════════════════════════════════════════════════
      PAGE: APPLICATION (step 2)
 ══════════════════════════════════════════════════════ -->
-<div class="page page-fade" id="page-application" style="display:none;flex-direction:column;width:100%;min-height:100vh;overflow-x:hidden;">
+<div class="page page-fade" id="page-application" style="display:none;flex-direction:column;width:100%;height:100vh;overflow:hidden;">
   <div class="progress-wrap"><div class="progress-inner">
     <div class="prog-step"><div class="prog-circle done">✓</div><div class="prog-label">Profile</div></div>
     <div class="prog-line done"></div>
@@ -1352,7 +1352,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
 <!-- ══════════════════════════════════════════════════════
      PAGE: EEO (step 3)
 ══════════════════════════════════════════════════════ -->
-<div class="page page-fade" id="page-eeo" style="display:none;flex-direction:column;width:100%;min-height:100vh;overflow-x:hidden;">
+<div class="page page-fade" id="page-eeo" style="display:none;flex-direction:column;width:100%;height:100vh;overflow:hidden;">
   <div class="progress-wrap"><div class="progress-inner">
     <div class="prog-step"><div class="prog-circle done">✓</div><div class="prog-label">Profile</div></div><div class="prog-line done"></div>
     <div class="prog-step"><div class="prog-circle done">✓</div><div class="prog-label">Application</div></div><div class="prog-line done"></div>
@@ -1396,7 +1396,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
 <!-- ══════════════════════════════════════════════════════
      PAGE: JOB SPECIFIC QUESTIONS (step 4)
 ══════════════════════════════════════════════════════ -->
-<div class="page page-fade" id="page-jobquestions" style="display:none;flex-direction:column;width:100%;min-height:100vh;overflow-x:hidden;">
+<div class="page page-fade" id="page-jobquestions" style="display:none;flex-direction:column;width:100%;height:100vh;overflow:hidden;">
   <div class="progress-wrap"><div class="progress-inner">
     <div class="prog-step"><div class="prog-circle done">✓</div><div class="prog-label">Profile</div></div><div class="prog-line done"></div>
     <div class="prog-step"><div class="prog-circle done">✓</div><div class="prog-label">Application</div></div><div class="prog-line done"></div>
@@ -1503,7 +1503,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
 <!-- ══════════════════════════════════════════════════════
      PAGE: AI INTERVIEW (step 5)
 ══════════════════════════════════════════════════════ -->
-<div class="page page-fade" id="page-interview" style="display:none;flex-direction:column;width:100%;min-height:100vh;overflow-x:hidden;">
+<div class="page page-fade" id="page-interview" style="display:none;flex-direction:column;width:100%;height:100vh;overflow:hidden;">
   <div class="progress-wrap"><div class="progress-inner">
     <div class="prog-step"><div class="prog-circle done">✓</div><div class="prog-label">Profile</div></div><div class="prog-line done"></div>
     <div class="prog-step"><div class="prog-circle done">✓</div><div class="prog-label">Application</div></div><div class="prog-line done"></div>
@@ -1555,7 +1555,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
 <!-- ══════════════════════════════════════════════════════
      PAGE: SCHEDULE ONBOARDING (step 6)
 ══════════════════════════════════════════════════════ -->
-<div class="page page-fade" id="page-schedule" style="display:none;flex-direction:column;width:100%;min-height:100vh;overflow-x:hidden;">
+<div class="page page-fade" id="page-schedule" style="display:none;flex-direction:column;width:100%;height:100vh;overflow:hidden;">
   <div class="progress-wrap"><div class="progress-inner">
     <div class="prog-step"><div class="prog-circle done">✓</div><div class="prog-label">Profile</div></div><div class="prog-line done"></div>
     <div class="prog-step"><div class="prog-circle done">✓</div><div class="prog-label">Application</div></div><div class="prog-line done"></div>
@@ -2983,7 +2983,7 @@ function downloadReport() {
 <!-- ══════════════════════════════════════════════════════
      PAGE: FINAL CONFIRMATION
 ══════════════════════════════════════════════════════ -->
-<div class="page page-fade" id="page-final" style="display:none;flex-direction:column;width:100%;min-height:100vh;overflow-x:hidden;">
+<div class="page page-fade" id="page-final" style="display:none;flex-direction:column;width:100%;height:100vh;overflow:hidden;">
   <div class="success-screen">
     <div class="success-box">
       <span class="success-icon">🛡️</span>
@@ -3039,8 +3039,8 @@ function showPage(id) {
   pg.style.display = 'flex';
   pg.style.flexDirection = 'column';
   pg.style.width = '100%';
-  pg.style.minHeight = '100vh';
-  pg.style.overflowX = 'hidden';
+  pg.style.height = '100vh';
+  pg.style.overflow = 'hidden';
   pg.classList.remove('page-fade');
   pg.classList.add('active');
   void pg.offsetWidth;
