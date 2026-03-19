@@ -1668,7 +1668,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
     </div>
   </div>
 
-  <button class="intro-start-btn" id="saraStartBtn" onclick="startSARAInterview()" disabled>
+  <button class="intro-start-btn" id="saraStartBtn" onclick="handleSARAStart()">
     Allow Camera & Mic to Begin
   </button>
 </div>
@@ -1910,7 +1910,7 @@ const QUESTIONS = [
 ];
 
 // ══════════ PERMISSIONS ══════════
-async function requestPermissions() {
+// async function requestPermissions() {
   try {
     stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
     document.getElementById('candidateVideo').srcObject = stream;
@@ -1935,7 +1935,7 @@ async function requestPermissions() {
   }
 }
 
-requestPermissions();
+// requestPermissions() is now called when page-sara becomes visible
 
 // ══════════ START ══════════
 async function startInterview(noCam = false) {
@@ -2472,29 +2472,53 @@ const QUESTIONS = [
 async function requestPermissions() {
   try {
     stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-    document.getElementById('candidateVideo').srcObject = stream;
-    document.getElementById('camOverlay').style.display = 'none';
-    document.getElementById('camDot').classList.add('granted');
-    document.getElementById('micDot').classList.add('granted');
+    const vidEl = document.getElementById('candidateVideo');
+    if (vidEl) vidEl.srcObject = stream;
+    const camOverlay = document.getElementById('camOverlay');
+    if (camOverlay) camOverlay.style.display = 'none';
+    const camDot = document.getElementById('camDot');
+    const micDot = document.getElementById('micDot');
+    if (camDot) camDot.classList.add('granted');
+    if (micDot) micDot.classList.add('granted');
     const permCheck = document.getElementById('permCheck');
-    permCheck.classList.add('ready');
-    document.getElementById('permCheckIcon').textContent = '✓';
-    document.getElementById('permCheckText').textContent = 'Camera and microphone are ready';
+    if (permCheck) permCheck.classList.add('ready');
+    const permCheckIcon = document.getElementById('permCheckIcon');
+    const permCheckText = document.getElementById('permCheckText');
+    if (permCheckIcon) permCheckIcon.textContent = '✓';
+    if (permCheckText) permCheckText.textContent = 'Camera and microphone are ready';
     const btn = document.getElementById('saraStartBtn');
-    if(btn){ btn.disabled = false; btn.textContent = 'Begin Interview with SARA →'; }
+    if (btn) { btn.textContent = 'Begin Interview with SARA →'; }
   } catch (e) {
-    document.getElementById('micDot').classList.add('denied');
-    document.getElementById('camDot').classList.add('denied');
-    document.getElementById('permCheckIcon').textContent = '!';
-    document.getElementById('permCheckText').textContent = 'Permission denied — please allow camera and mic';
+    const micDot = document.getElementById('micDot');
+    const camDot = document.getElementById('camDot');
+    if (camDot) camDot.classList.add('denied');
+    if (micDot) micDot.classList.add('denied');
+    const permCheckIcon = document.getElementById('permCheckIcon');
+    const permCheckText = document.getElementById('permCheckText');
+    if (permCheckIcon) permCheckIcon.textContent = '!';
+    if (permCheckText) permCheckText.textContent = 'No camera/mic — you can still proceed';
     const btn = document.getElementById('saraStartBtn');
-    if(btn){ btn.disabled = false; btn.textContent = 'Continue Without Camera'; btn.onclick = () => startSARAInterview(true); }
+    if (btn) { btn.textContent = 'Continue Without Camera →'; btn.onclick = () => startSARAInterview(true); }
   }
 }
 
-requestPermissions();
+// requestPermissions() is now called when page-sara becomes visible
 
 // ══════════ START ══════════
+async function handleSARAStart() {
+  // If permissions not yet granted, request them first then start
+  if (!stream) {
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      document.getElementById('candidateVideo').srcObject = stream;
+      document.getElementById('camOverlay').style.display = 'none';
+    } catch(e) {
+      // Continue without camera
+    }
+  }
+  startSARAInterview(false);
+}
+
 async function startSARAInterview(noCam = false) {
   document.getElementById('introScreen').style.display = 'none';
   timerInterval = setInterval(() => {
@@ -3036,6 +3060,8 @@ function showPage(id) {
     pg.style.overflow = 'hidden';
     pg.classList.add('active');
     if (header) header.style.display = 'none';
+    // Request camera/mic NOW that the page is visible
+    if (typeof requestPermissions === 'function') requestPermissions();
     return;
   }
 
