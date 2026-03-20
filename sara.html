@@ -252,7 +252,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;color:#1a234
 
       <!-- TOP: SARA AI avatar -->
       <div id="iv-sara">
-        <div id="av-idle-photo">
+        <div id="av-idle-photo" style="display:none;">
           <img id="av-photo" src="https://create-images-results.d-id.com/DefaultPresenters/Amber_f/thumbnail.jpeg" onerror="this.style.display='none'">
         </div>
         <div id="did-video-container"></div>
@@ -515,6 +515,7 @@ function startFallback() {
 // ═══════════════════════════
 function goToInterview() {
   document.getElementById('s-intro').classList.remove('on');
+  document.getElementById('av-idle-photo').style.display = 'block';
   document.getElementById('s-interview').classList.add('on');
 
   // Timer
