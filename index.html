@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Security USA® | Candidate Portal</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
@@ -704,7 +705,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
 
             <div style="margin-top:1.75rem;">
               <p class="auth-agree">By proceeding you agree to Security USA's <a href="https://www.securityusainc.com/privacy-policy" target="_blank">Privacy Policy</a>.</p>
-              <button class="btn-full" id="registerSubmitBtn" onclick="doRegister().catch(function(e){alert('Error: '+e.message);document.getElementById('registerSubmitBtn').disabled=false;document.getElementById('registerSubmitBtn').textContent='Create Profile & Continue →'})">Create Profile &amp; Continue →</button>
+              <button class="btn-full" id="registerSubmitBtn" onclick="doRegister()">Create Profile &amp; Continue →</button>
               <button class="btn-full-out" onclick="switchTab('login')">Already have an account? Sign In</button>
             </div>
           </div>
@@ -732,7 +733,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
             <div style="text-align:right;margin:-6px 0 16px;">
               <a style="font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:1.5px;color:var(--gray);text-transform:uppercase;text-decoration:none;" href="#">Forgot password?</a>
             </div>
-            <button class="btn-full" id="loginSubmitBtn" onclick="doLogin().catch(function(e){alert('Error: '+e.message);document.getElementById('loginSubmitBtn').disabled=false;document.getElementById('loginSubmitBtn').textContent='Sign In →'})">Sign In →</button>
+            <button class="btn-full" id="loginSubmitBtn" onclick="doLogin()">Sign In →</button>
             <button class="btn-full-out" onclick="switchTab('reg')">New applicant? Create an account</button>
           </div>
 
@@ -1541,7 +1542,6 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
   <footer class="site-footer"><strong>Security USA, Inc.</strong> &nbsp;·&nbsp; © 2025 All Rights Reserved</footer>
 </div>
 
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script>
 // ══════════ SUPABASE ══════════
 const SUPABASE_URL = 'https://stvagyjcjoxnbslafmyf.supabase.co';
@@ -1631,251 +1631,180 @@ function switchTab(t) {
   document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',(i===0&&t==='reg')||(i===1&&t==='login')));
   document.getElementById('pane-reg').classList.toggle('active',t==='reg');
   document.getElementById('pane-login').classList.toggle('active',t==='login');
-  // Clear errors on tab switch
-  var le = document.getElementById('login-error-msg');
-  var re = document.getElementById('register-error-msg');
-  if (le) le.style.display = 'none';
-  if (re) re.style.display = 'none';
-}
-function tpw(id,btn){const el=document.getElementById(id);const s=el.type==='password';el.type=s?'text':'password';btn.textContent=s?'Hide':'Show';}
-
-
-// ── AUTH HELPERS ──
-function isValidEmail(email) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  hideMsg('login-error-msg');
+  hideMsg('register-error-msg');
 }
 
-function showLoginError(msg) {
-  var el = document.getElementById('login-error-msg');
+function tpw(id,btn){
+  var el=document.getElementById(id);
+  var s=el.type==='password';
+  el.type=s?'text':'password';
+  btn.textContent=s?'Hide':'Show';
+}
+
+function showMsg(id, msg, isError) {
+  var el = document.getElementById(id);
   if (!el) {
     el = document.createElement('div');
-    el.id = 'login-error-msg';
-    el.style.cssText = 'background:#fef2f2;border:1px solid #fecaca;border-left:4px solid #c0392b;border-radius:4px;padding:.75rem 1rem;font-size:.95rem;color:#c0392b;margin-bottom:1rem;';
-    var pane = document.getElementById('pane-login');
-    if (pane) {
-      var btn = pane.querySelector('#loginSubmitBtn');
-      if (btn) pane.insertBefore(el, btn);
-      else pane.appendChild(el);
-    }
+    el.id = id;
+    // Insert before the submit button in the right pane
+    var paneId = id.includes('login') ? 'pane-login' : 'pane-reg';
+    var btnId  = id.includes('login') ? 'loginSubmitBtn' : 'registerSubmitBtn';
+    var pane = document.getElementById(paneId);
+    var btn  = document.getElementById(btnId);
+    if (pane && btn) pane.insertBefore(el, btn);
   }
+  el.style.cssText = isError
+    ? 'display:block;background:#fef2f2;border:1px solid #fca5a5;border-left:4px solid #dc2626;border-radius:6px;padding:.85rem 1rem;font-size:.95rem;color:#dc2626;margin-bottom:1rem;font-weight:500;'
+    : 'display:block;background:#f0fdf4;border:1px solid #86efac;border-left:4px solid #16a34a;border-radius:6px;padding:.85rem 1rem;font-size:.95rem;color:#16a34a;margin-bottom:1rem;font-weight:500;';
   el.textContent = msg;
-  el.style.display = msg ? 'block' : 'none';
 }
 
-function showRegisterError(msg) {
-  var el = document.getElementById('register-error-msg');
-  if (!el) {
-    el = document.createElement('div');
-    el.id = 'register-error-msg';
-    el.style.cssText = 'background:#fef2f2;border:1px solid #fecaca;border-left:4px solid #c0392b;border-radius:4px;padding:.75rem 1rem;font-size:.95rem;color:#c0392b;margin-bottom:1rem;';
-    var pane = document.getElementById('pane-reg');
-    if (pane) {
-      var btn = pane.querySelector('#registerSubmitBtn');
-      if (btn) pane.insertBefore(el, btn);
-      else pane.appendChild(el);
-    }
-  }
-  if (!msg) { el.style.display = 'none'; return; }
-  el.style.cssText = 'background:#fef2f2;border:1px solid #fecaca;border-left:4px solid #c0392b;border-radius:4px;padding:.75rem 1rem;font-size:.95rem;color:#c0392b;margin-bottom:1rem;';
-  el.textContent = msg;
-  el.style.display = 'block';
+function hideMsg(id) {
+  var el = document.getElementById(id);
+  if (el) el.style.display = 'none';
 }
 
-function showRegisterSuccess(msg) {
-  var el = document.getElementById('register-error-msg');
-  if (!el) {
-    el = document.createElement('div');
-    el.id = 'register-error-msg';
-    var pane = document.getElementById('pane-reg');
-    if (pane) {
-      var btn = pane.querySelector('#registerSubmitBtn');
-      if (btn) pane.insertBefore(el, btn);
-      else pane.appendChild(el);
-    }
+function getSB() {
+  // window.supabase is set by the CDN script in <head>
+  if (!window.supabase) {
+    alert('Authentication service failed to load. Please refresh the page (Ctrl+R) and try again.');
+    return null;
   }
-  el.style.cssText = 'background:#f0faf4;border:1px solid #27ae60;border-left:4px solid #27ae60;border-radius:4px;padding:.75rem 1rem;font-size:.95rem;color:#1e7e4a;margin-bottom:1rem;';
-  el.textContent = msg;
-  el.style.display = 'block';
+  return window.supabase.createClient(
+    'https://stvagyjcjoxnbslafmyf.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0dmFneWpjam94bmJzbGFmbXlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NTcxNTIsImV4cCI6MjA4OTQzMzE1Mn0.da_l4ogYdc_XL7DqmK_RmmR6cC_X6Lq102ddnN7QYY4'
+  );
 }
 
 async function doRegister() {
-  const email = document.getElementById('rEmail').value.trim().toLowerCase();
-  const pw    = document.getElementById('rPw').value;
-  const pw2   = document.getElementById('rPw2').value;
-  const first = document.getElementById('rFirst').value.trim();
-  const last  = document.getElementById('rLast').value.trim();
+  var email = document.getElementById('rEmail').value.trim().toLowerCase();
+  var pw    = document.getElementById('rPw').value;
+  var pw2   = document.getElementById('rPw2').value;
+  var first = document.getElementById('rFirst').value.trim();
+  var last  = document.getElementById('rLast').value.trim();
+  var btn   = document.getElementById('registerSubmitBtn');
 
-  // Clear previous errors
-  var existingErr = document.getElementById('register-error-msg');
-  if (existingErr) existingErr.style.display = 'none';
+  hideMsg('register-error-msg');
 
-  // Validation
-  if (!first || !last)      { showRegisterError('Please enter your first and last name.'); return; }
-  if (!email)               { showRegisterError('Please enter your email address.'); return; }
-  if (!isValidEmail(email)) { showRegisterError('Please enter a valid email address.'); return; }
-  if (!pw)                  { showRegisterError('Please create a password.'); return; }
-  if (pw.length < 6)        { showRegisterError('Password must be at least 6 characters.'); return; }
-  if (pw !== pw2)           { showRegisterError('Passwords do not match.'); return; }
+  if (!first)  { showMsg('register-error-msg','Please enter your first name.',true); return; }
+  if (!last)   { showMsg('register-error-msg','Please enter your last name.',true); return; }
+  if (!email)  { showMsg('register-error-msg','Please enter your email address.',true); return; }
+  if (!pw)     { showMsg('register-error-msg','Please create a password.',true); return; }
+  if (pw.length < 6) { showMsg('register-error-msg','Password must be at least 6 characters.',true); return; }
+  if (pw !== pw2)    { showMsg('register-error-msg','Passwords do not match.',true); return; }
 
-  const btn = document.getElementById('registerSubmitBtn');
-  if (btn) { btn.disabled = true; btn.textContent = 'Creating Account...'; }
+  var sb = getSB();
+  if (!sb) return;
 
-  // Init Supabase now (lazy - runs after all scripts loaded)
-  const sb = getSupabase();
-  if (!sb) {
-    showRegisterError('Service unavailable. Please refresh the page and try again.');
-    if (btn) { btn.disabled = false; btn.textContent = 'Create Profile & Continue →'; }
-    return;
-  }
+  btn.disabled = true;
+  btn.textContent = 'Creating account...';
 
   try {
-    console.log('Attempting signUp for:', email);
-    const { data, error } = await sb.auth.signUp({
-      email: email,
-      password: pw,
-      options: { data: { first_name: first, last_name: last } }
-    });
+    var result = await sb.auth.signUp({ email: email, password: pw });
+    console.log('signUp result:', result);
 
-    console.log('signUp result:', { data, error });
-
-    if (error) {
-      console.error('signUp error:', error);
-      if (error.message.includes('already registered') || error.message.includes('already been registered')) {
-        showRegisterError('This email is already registered. Please sign in instead.');
-      } else {
-        showRegisterError(error.message || 'Registration failed. Please try again.');
-      }
-      if (btn) { btn.disabled = false; btn.textContent = 'Create Profile & Continue →'; }
+    if (result.error) {
+      showMsg('register-error-msg', result.error.message, true);
+      btn.disabled = false;
+      btn.textContent = 'Create Profile & Continue →';
       return;
     }
 
-    // Whether email confirmation is required or not, try to sign in immediately
-    if (data.user && !data.session) {
-      // Try signing in directly with the credentials just used
-      console.log('No session yet - attempting immediate sign in...');
-      const { data: signInData, error: signInError } = await sb.auth.signInWithPassword({
+    // Sign in immediately after signup
+    var login = await sb.auth.signInWithPassword({ email: email, password: pw });
+    console.log('signIn result:', login);
+
+    if (login.error) {
+      showMsg('register-error-msg', 'Account created! Please sign in.', false);
+      btn.disabled = false;
+      btn.textContent = 'Create Profile & Continue →';
+      switchTab('login');
+      return;
+    }
+
+    // Save profile
+    var refNum = 'SUSA-' + Math.floor(100000 + Math.random() * 900000);
+    try {
+      await sb.from('candidates').upsert({
+        id: login.data.user.id,
+        first_name: first,
+        last_name: last,
         email: email,
-        password: pw
+        ref_number: refNum
       });
-      if (!signInError && signInData.session) {
-        // Signed in successfully
-        const refNum2 = 'SUSA-' + Math.floor(100000 + Math.random() * 900000);
-        try {
-          await sb.from('candidates').upsert({
-            id: signInData.user.id,
-            first_name: first,
-            last_name: last,
-            email: email,
-            ref_number: refNum2
-          });
-        } catch(e) { console.warn('Profile save:', e.message); }
-        userName = first + ' ' + last;
-        userRef  = refNum2;
-        if (btn) { btn.disabled = false; btn.textContent = 'Create Profile & Continue →'; }
-        loginSuccess();
-        return;
-      }
-      // Sign in failed - email confirmation truly required
-      if (btn) { btn.disabled = false; btn.textContent = 'Create Profile & Continue →'; }
-      showRegisterError('✓ Account created! Please check your email (' + email + ') and click the confirmation link, then sign in.');
-      return;
-    }
-
-    // Session exists - user is logged in immediately (email confirm disabled)
-    const refNum = 'SUSA-' + Math.floor(100000 + Math.random() * 900000);
-
-    // Try to save profile (don't block login if this fails)
-    if (data.user) {
-      try {
-        await sb.from('candidates').upsert({
-          id: data.user.id,
-          first_name: first,
-          last_name: last,
-          email: email,
-          ref_number: refNum
-        });
-        console.log('Profile saved to Supabase');
-      } catch(dbErr) {
-        console.warn('Profile save failed (table may not exist yet):', dbErr.message);
-        // Continue anyway - auth worked
-      }
+    } catch(dbErr) {
+      console.warn('Profile save:', dbErr.message);
     }
 
     userName = first + ' ' + last;
     userRef  = refNum;
-    console.log('Registration successful, proceeding to application');
+    btn.disabled = false;
+    btn.textContent = 'Create Profile & Continue →';
     loginSuccess();
 
-  } catch(e) {
-    console.error('Registration exception:', e);
-    showRegisterError('Something went wrong: ' + e.message);
-    if (btn) { btn.disabled = false; btn.textContent = 'Create Profile & Continue →'; }
+  } catch(err) {
+    console.error('doRegister error:', err);
+    showMsg('register-error-msg', 'Error: ' + err.message, true);
+    btn.disabled = false;
+    btn.textContent = 'Create Profile & Continue →';
   }
 }
 
-
 async function doLogin() {
-  const email = document.getElementById('lEmail').value.trim().toLowerCase();
-  const pw    = document.getElementById('lPw').value;
+  var email = document.getElementById('lEmail').value.trim().toLowerCase();
+  var pw    = document.getElementById('lPw').value;
+  var btn   = document.getElementById('loginSubmitBtn');
 
-  // Basic validation
-  if (!email || !pw) {
-    showLoginError('Please enter your email and password.');
-    return;
-  }
-  if (!isValidEmail(email)) {
-    showLoginError('Please enter a valid email address.');
-    return;
-  }
-  if (pw.length < 6) {
-    showLoginError('Password must be at least 6 characters.');
-    return;
-  }
+  hideMsg('login-error-msg');
 
-  const btn = document.getElementById('loginSubmitBtn');
-  if (btn) { btn.disabled = true; btn.textContent = 'Signing in...'; }
+  if (!email) { showMsg('login-error-msg','Please enter your email.',true); return; }
+  if (!pw)    { showMsg('login-error-msg','Please enter your password.',true); return; }
 
-  const sb = getSupabase();
-  if (!sb) {
-    showLoginError('Login service unavailable. Please contact support.');
-    if (btn) { btn.disabled = false; btn.textContent = 'Sign In →'; }
-    return;
-  }
+  var sb = getSB();
+  if (!sb) return;
+
+  btn.disabled = true;
+  btn.textContent = 'Signing in...';
 
   try {
-    const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
-    if (error) {
-      // Show the real Supabase error - don't fall through
-      if (error.message.includes('Invalid login') || error.message.includes('invalid_credentials')) {
-        showLoginError('Incorrect email or password. Please try again.');
-      } else if (error.message.includes('Email not confirmed')) {
-        showLoginError('Please check your email and confirm your account first.');
-      } else {
-        showLoginError(error.message);
-      }
-      if (btn) { btn.disabled = false; btn.textContent = 'Sign In →'; }
+    var result = await sb.auth.signInWithPassword({ email: email, password: pw });
+    console.log('signIn result:', result);
+
+    if (result.error) {
+      showMsg('login-error-msg', 'Incorrect email or password.', true);
+      btn.disabled = false;
+      btn.textContent = 'Sign In →';
       return;
     }
 
-    // Fetch candidate profile
-    const { data: profile } = await sb.from('candidates')
-      .select('*').eq('id', data.user.id).single();
-
-    if (profile) {
-      userName = ((profile.first_name || '') + ' ' + (profile.last_name || '')).trim();
-      userRef  = profile.ref_number || 'SUSA-' + Math.floor(100000+Math.random()*900000);
-    } else {
+    // Get profile
+    try {
+      var prof = await sb.from('candidates').select('*').eq('id', result.data.user.id).single();
+      if (prof.data) {
+        userName = (prof.data.first_name + ' ' + prof.data.last_name).trim();
+        userRef  = prof.data.ref_number || 'SUSA-' + Math.floor(100000+Math.random()*900000);
+      } else {
+        userName = email.split('@')[0];
+        userRef  = 'SUSA-' + Math.floor(100000+Math.random()*900000);
+      }
+    } catch(e) {
       userName = email.split('@')[0];
       userRef  = 'SUSA-' + Math.floor(100000+Math.random()*900000);
     }
+
+    btn.disabled = false;
+    btn.textContent = 'Sign In →';
     loginSuccess();
 
-  } catch(e) {
-    console.error('Login error:', e.message);
-    showLoginError('Something went wrong. Please try again.');
-    if (btn) { btn.disabled = false; btn.textContent = 'Sign In →'; }
+  } catch(err) {
+    console.error('doLogin error:', err);
+    showMsg('login-error-msg', 'Error: ' + err.message, true);
+    btn.disabled = false;
+    btn.textContent = 'Sign In →';
   }
 }
+
 function loginSuccess(){
   document.getElementById('headerUser').style.display='flex';
   document.getElementById('headerHQ').style.display='none';
@@ -1884,7 +1813,7 @@ function loginSuccess(){
   document.getElementById('dashRef').textContent=userRef;
   document.getElementById('finalRef').textContent='REF # '+userRef;
   document.getElementById('completeName').textContent=userName.split(' ')[0];
-  showPage('page-application'); // Linear flow: start at step 2
+  showPage('page-application');
 }
 function doLogout(){
   document.getElementById('headerUser').style.display='none';
