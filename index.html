@@ -1,4 +1,8 @@
-<!DOCTYPE html>
+{
+  "success": true,
+  "status": 200,
+  "statusText": "OK",
+  "text": "<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1661,7 +1665,6 @@ function getSB() {
 }
 
 async function doRegister() {
-  console.log('doRegister called');
   var email = document.getElementById('rEmail').value.trim().toLowerCase();
   var pw    = document.getElementById('rPw').value;
   var pw2   = document.getElementById('rPw2').value;
@@ -1669,58 +1672,70 @@ async function doRegister() {
   var last  = document.getElementById('rLast').value.trim();
   var btn   = document.getElementById('registerSubmitBtn');
 
-  hideMsg('register-error-msg');
+  // Show red error message on form
+  function err(msg) {
+    var el = document.getElementById('reg-err');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'reg-err';
+      el.style.cssText = 'background:#fee;border:2px solid #c00;border-radius:6px;padding:12px 16px;margin:10px 0;font-size:1rem;color:#c00;font-weight:600;';
+      btn.parentNode.insertBefore(el, btn);
+    }
+    el.textContent = '⚠ ' + msg;
+    el.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Create Profile & Continue →';
+  }
 
-  if (!first)  { showMsg('register-error-msg','Please enter your first name.',true); return; }
-  if (!last)   { showMsg('register-error-msg','Please enter your last name.',true); return; }
-  if (!email)  { showMsg('register-error-msg','Please enter your email address.',true); return; }
-  if (!pw)     { showMsg('register-error-msg','Please create a password.',true); return; }
-  if (pw.length < 6) { showMsg('register-error-msg','Password must be at least 6 characters.',true); return; }
-  if (pw !== pw2)    { showMsg('register-error-msg','Passwords do not match.',true); return; }
+  function ok(msg) {
+    var el = document.getElementById('reg-err');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'reg-err';
+      el.style.cssText = 'background:#efe;border:2px solid #080;border-radius:6px;padding:12px 16px;margin:10px 0;font-size:1rem;color:#060;font-weight:600;';
+      btn.parentNode.insertBefore(el, btn);
+    }
+    el.style.cssText = 'background:#efe;border:2px solid #080;border-radius:6px;padding:12px 16px;margin:10px 0;font-size:1rem;color:#060;font-weight:600;display:block;';
+    el.textContent = '✓ ' + msg;
+  }
 
-  var sb = getSB();
-  if (!sb) return;
+  // Clear old message
+  var old = document.getElementById('reg-err');
+  if (old) old.style.display = 'none';
+
+  if (!first)         { err('Please enter your first name.'); return; }
+  if (!last)          { err('Please enter your last name.'); return; }
+  if (!email)         { err('Please enter your email address.'); return; }
+  if (!pw)            { err('Please create a password.'); return; }
+  if (pw.length < 6)  { err('Password must be at least 6 characters.'); return; }
+  if (pw !== pw2)     { err('Passwords do not match.'); return; }
+
+  if (!window.supabase) { err('Auth service not loaded. Please refresh the page.'); return; }
 
   btn.disabled = true;
   btn.textContent = 'Creating account...';
 
+  var sb = window.supabase.createClient(
+    'https://stvagyjcjoxnbslafmyf.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0dmFneWpjam94bmJzbGFmbXlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NTcxNTIsImV4cCI6MjA4OTQzMzE1Mn0.da_l4ogYdc_XL7DqmK_RmmR6cC_X6Lq102ddnN7QYY4'
+  );
+
   try {
-    var result = await sb.auth.signUp({ email: email, password: pw });
-    console.log('signUp result:', result);
+    var r1 = await sb.auth.signUp({ email: email, password: pw });
+    if (r1.error) { err('Sign up failed: ' + r1.error.message); return; }
 
-    if (result.error) {
-      showMsg('register-error-msg', result.error.message, true);
-      btn.disabled = false;
-      btn.textContent = 'Create Profile & Continue →';
-      return;
-    }
+    var r2 = await sb.auth.signInWithPassword({ email: email, password: pw });
+    if (r2.error) { err('Signed up! Now please Sign In tab with your credentials.'); switchTab('login'); return; }
 
-    // Sign in immediately after signup
-    var login = await sb.auth.signInWithPassword({ email: email, password: pw });
-    console.log('signIn result:', login);
-
-    if (login.error) {
-      showMsg('register-error-msg', 'Account created! Please sign in.', false);
-      btn.disabled = false;
-      btn.textContent = 'Create Profile & Continue →';
-      switchTab('login');
-      return;
-    }
-
-    // Save profile
     var refNum = 'SUSA-' + Math.floor(100000 + Math.random() * 900000);
     try {
       await sb.from('candidates').upsert({
-        id: login.data.user.id,
-        first_name: first,
-        last_name: last,
-        email: email,
-        ref_number: refNum,
+        id: r2.data.user.id,
+        first_name: first, last_name: last,
+        email: email, ref_number: refNum,
         created_at: new Date().toISOString()
       }, { onConflict: 'id' });
-    } catch(dbErr) {
-      console.warn('Profile save:', dbErr.message);
-    }
+    } catch(e) { /* profile save failed but auth worked - continue */ }
 
     userName = first + ' ' + last;
     userRef  = refNum;
@@ -1728,11 +1743,8 @@ async function doRegister() {
     btn.textContent = 'Create Profile & Continue →';
     loginSuccess();
 
-  } catch(err) {
-    console.error('doRegister error:', err);
-    showMsg('register-error-msg', 'Error: ' + err.message, true);
-    btn.disabled = false;
-    btn.textContent = 'Create Profile & Continue →';
+  } catch(e) {
+    err('Error: ' + e.message);
   }
 }
 
@@ -1741,31 +1753,41 @@ async function doLogin() {
   var pw    = document.getElementById('lPw').value;
   var btn   = document.getElementById('loginSubmitBtn');
 
-  hideMsg('login-error-msg');
+  function err(msg) {
+    var el = document.getElementById('login-err');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'login-err';
+      el.style.cssText = 'background:#fee;border:2px solid #c00;border-radius:6px;padding:12px 16px;margin:10px 0;font-size:1rem;color:#c00;font-weight:600;';
+      btn.parentNode.insertBefore(el, btn);
+    }
+    el.textContent = '⚠ ' + msg;
+    el.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Sign In →';
+  }
 
-  if (!email) { showMsg('login-error-msg','Please enter your email.',true); return; }
-  if (!pw)    { showMsg('login-error-msg','Please enter your password.',true); return; }
+  var old = document.getElementById('login-err');
+  if (old) old.style.display = 'none';
 
-  var sb = getSB();
-  if (!sb) return;
+  if (!email) { err('Please enter your email.'); return; }
+  if (!pw)    { err('Please enter your password.'); return; }
+  if (!window.supabase) { err('Auth service not loaded. Please refresh the page.'); return; }
 
   btn.disabled = true;
   btn.textContent = 'Signing in...';
 
+  var sb = window.supabase.createClient(
+    'https://stvagyjcjoxnbslafmyf.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0dmFneWpjam94bmJzbGFmbXlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NTcxNTIsImV4cCI6MjA4OTQzMzE1Mn0.da_l4ogYdc_XL7DqmK_RmmR6cC_X6Lq102ddnN7QYY4'
+  );
+
   try {
-    var result = await sb.auth.signInWithPassword({ email: email, password: pw });
-    console.log('signIn result:', result);
+    var r = await sb.auth.signInWithPassword({ email: email, password: pw });
+    if (r.error) { err('Incorrect email or password.'); return; }
 
-    if (result.error) {
-      showMsg('login-error-msg', 'Incorrect email or password.', true);
-      btn.disabled = false;
-      btn.textContent = 'Sign In →';
-      return;
-    }
-
-    // Get profile
     try {
-      var prof = await sb.from('candidates').select('*').eq('id', result.data.user.id).single();
+      var prof = await sb.from('candidates').select('*').eq('id', r.data.user.id).single();
       if (prof.data) {
         userName = (prof.data.first_name + ' ' + prof.data.last_name).trim();
         userRef  = prof.data.ref_number || 'SUSA-' + Math.floor(100000+Math.random()*900000);
@@ -1781,12 +1803,8 @@ async function doLogin() {
     btn.disabled = false;
     btn.textContent = 'Sign In →';
     loginSuccess();
-
-  } catch(err) {
-    console.error('doLogin error:', err);
-    showMsg('login-error-msg', 'Error: ' + err.message, true);
-    btn.disabled = false;
-    btn.textContent = 'Sign In →';
+  } catch(e) {
+    err('Error: ' + e.message);
   }
 }
 
