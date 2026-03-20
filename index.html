@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Security USA® | Candidate Portal</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
@@ -1542,21 +1541,29 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
   <footer class="site-footer"><strong>Security USA, Inc.</strong> &nbsp;·&nbsp; © 2025 All Rights Reserved</footer>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 // ══════════ SUPABASE ══════════
 const SUPABASE_URL = 'https://stvagyjcjoxnbslafmyf.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0dmFneWpjam94bmJzbGFmbXlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NTcxNTIsImV4cCI6MjA4OTQzMzE1Mn0.da_l4ogYdc_XL7DqmK_RmmR6cC_X6Lq102ddnN7QYY4';
 let supabase = null;
 function getSupabase() {
-  if (!supabase) {
-    try {
-      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      console.log('Supabase initialized OK');
-    } catch(e) {
-      console.error('Supabase init failed:', e);
+  if (supabase) return supabase;
+  try {
+    // Try all possible export names from the UMD bundle
+    const lib = window.supabase || window.Supabase || window.createClient;
+    if (!lib) {
+      console.error('Supabase SDK not loaded. window.supabase =', window.supabase);
+      return null;
     }
+    const createFn = lib.createClient || lib;
+    supabase = createFn(SUPABASE_URL, SUPABASE_KEY);
+    console.log('Supabase initialized OK:', !!supabase);
+    return supabase;
+  } catch(e) {
+    console.error('Supabase init failed:', e.message);
+    return null;
   }
-  return supabase;
 }
 
 // ══════════ STATE ══════════
@@ -1686,25 +1693,35 @@ async function doRegister() {
       return;
     }
 
-    // Check if email confirmation is required
+    // Whether email confirmation is required or not, try to sign in immediately
     if (data.user && !data.session) {
-      // Email confirmation required - tell the user
-      if (btn) { btn.disabled = false; btn.textContent = 'Create Profile & Continue →'; }
-      showRegisterError('');
-      // Show success message instead
-      var errEl = document.getElementById('register-error-msg');
-      if (!errEl) {
-        errEl = document.createElement('div');
-        errEl.id = 'register-error-msg';
-        var form = document.getElementById('pane-reg');
-        if (form) {
-          var submitBtn = form.querySelector('.btn-full');
-          if (submitBtn) form.insertBefore(errEl, submitBtn);
-        }
+      // Try signing in directly with the credentials just used
+      console.log('No session yet - attempting immediate sign in...');
+      const { data: signInData, error: signInError } = await sb.auth.signInWithPassword({
+        email: email,
+        password: pw
+      });
+      if (!signInError && signInData.session) {
+        // Signed in successfully
+        const refNum2 = 'SUSA-' + Math.floor(100000 + Math.random() * 900000);
+        try {
+          await sb.from('candidates').upsert({
+            id: signInData.user.id,
+            first_name: first,
+            last_name: last,
+            email: email,
+            ref_number: refNum2
+          });
+        } catch(e) { console.warn('Profile save:', e.message); }
+        userName = first + ' ' + last;
+        userRef  = refNum2;
+        if (btn) { btn.disabled = false; btn.textContent = 'Create Profile & Continue →'; }
+        loginSuccess();
+        return;
       }
-      errEl.style.cssText = 'background:#f0faf4;border:1px solid #27ae60;border-radius:4px;padding:.75rem 1rem;font-size:.9rem;color:#1e7e4a;margin-bottom:1rem;font-family:Barlow,sans-serif;';
-      errEl.textContent = '✓ Account created! Check your email (' + email + ') and click the confirmation link, then come back to sign in.';
-      errEl.style.display = 'block';
+      // Sign in failed - email confirmation truly required
+      if (btn) { btn.disabled = false; btn.textContent = 'Create Profile & Continue →'; }
+      showRegisterError('✓ Account created! Please check your email (' + email + ') and click the confirmation link, then sign in.');
       return;
     }
 
