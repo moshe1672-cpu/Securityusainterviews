@@ -1642,6 +1642,65 @@ function switchTab(t) {
 }
 function tpw(id,btn){const el=document.getElementById(id);const s=el.type==='password';el.type=s?'text':'password';btn.textContent=s?'Hide':'Show';}
 
+
+// ── AUTH HELPERS ──
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function showLoginError(msg) {
+  var el = document.getElementById('login-error-msg');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'login-error-msg';
+    el.style.cssText = 'background:#fef2f2;border:1px solid #fecaca;border-left:4px solid #c0392b;border-radius:4px;padding:.75rem 1rem;font-size:.95rem;color:#c0392b;margin-bottom:1rem;';
+    var pane = document.getElementById('pane-login');
+    if (pane) {
+      var btn = pane.querySelector('#loginSubmitBtn');
+      if (btn) pane.insertBefore(el, btn);
+      else pane.appendChild(el);
+    }
+  }
+  el.textContent = msg;
+  el.style.display = msg ? 'block' : 'none';
+}
+
+function showRegisterError(msg) {
+  var el = document.getElementById('register-error-msg');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'register-error-msg';
+    el.style.cssText = 'background:#fef2f2;border:1px solid #fecaca;border-left:4px solid #c0392b;border-radius:4px;padding:.75rem 1rem;font-size:.95rem;color:#c0392b;margin-bottom:1rem;';
+    var pane = document.getElementById('pane-reg');
+    if (pane) {
+      var btn = pane.querySelector('#registerSubmitBtn');
+      if (btn) pane.insertBefore(el, btn);
+      else pane.appendChild(el);
+    }
+  }
+  if (!msg) { el.style.display = 'none'; return; }
+  el.style.cssText = 'background:#fef2f2;border:1px solid #fecaca;border-left:4px solid #c0392b;border-radius:4px;padding:.75rem 1rem;font-size:.95rem;color:#c0392b;margin-bottom:1rem;';
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function showRegisterSuccess(msg) {
+  var el = document.getElementById('register-error-msg');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'register-error-msg';
+    var pane = document.getElementById('pane-reg');
+    if (pane) {
+      var btn = pane.querySelector('#registerSubmitBtn');
+      if (btn) pane.insertBefore(el, btn);
+      else pane.appendChild(el);
+    }
+  }
+  el.style.cssText = 'background:#f0faf4;border:1px solid #27ae60;border-left:4px solid #27ae60;border-radius:4px;padding:.75rem 1rem;font-size:.95rem;color:#1e7e4a;margin-bottom:1rem;';
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
 async function doRegister() {
   const email = document.getElementById('rEmail').value.trim().toLowerCase();
   const pw    = document.getElementById('rPw').value;
