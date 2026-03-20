@@ -1544,24 +1544,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
 
 <script>
 // ══════════ SUPABASE ══════════
-const SUPABASE_URL = 'https://stvagyjcjoxnbslafmyf.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0dmFneWpjam94bmJzbGFmbXlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NTcxNTIsImV4cCI6MjA4OTQzMzE1Mn0.da_l4ogYdc_XL7DqmK_RmmR6cC_X6Lq102ddnN7QYY4';
-let supabase = null;
-function getSupabase() {
-  if (supabase) return supabase;
-  try {
-    if (typeof window !== 'undefined' && window.supabase && window.supabase.createClient) {
-      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      console.log('Supabase OK via window.supabase.createClient');
-      return supabase;
-    }
-    console.error('window.supabase not available:', typeof window.supabase);
-    return null;
-  } catch(e) {
-    console.error('getSupabase error:', e.message);
-    return null;
-  }
-}
+
 
 // ══════════ STATE ══════════
 let userName = '', userRef = 'SUSA-000000';
@@ -1732,8 +1715,9 @@ async function doRegister() {
         first_name: first,
         last_name: last,
         email: email,
-        ref_number: refNum
-      });
+        ref_number: refNum,
+        created_at: new Date().toISOString()
+      }, { onConflict: 'id' });
     } catch(dbErr) {
       console.warn('Profile save:', dbErr.message);
     }
@@ -1860,9 +1844,9 @@ async function goToEEO(){
   }
   // Save application to Supabase
   try {
-    const { data: { user } } = await getSupabase().auth.getUser();
+    const { data: { user } } = await getSB().auth.getUser();
     if (user) {
-      await getSupabase().from('applications').upsert({
+      await getSB().from('applications').upsert({
         candidate_id: user.id,
         position: 'Security Guard',
         location: 'NY - Port Washington',
@@ -1875,12 +1859,12 @@ async function goToEEO(){
 }
 async function goToJobQ(){
   try {
-    const { data: { user } } = await getSupabase().auth.getUser();
+    const { data: { user } } = await getSB().auth.getUser();
     const gender   = document.querySelector('#page-eeo select:nth-of-type(1)')?.value || '';
     const race     = document.querySelector('#page-eeo select:nth-of-type(2)')?.value || '';
     const nationality = document.querySelector('#page-eeo select:nth-of-type(3)')?.value || '';
     if (user && gender) {
-      await getSupabase().from('eeo_responses').upsert({
+      await getSB().from('eeo_responses').upsert({
         candidate_id: user.id,
         gender, race, nationality,
         submitted_at: new Date().toISOString()
