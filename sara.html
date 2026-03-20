@@ -33,7 +33,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;color:#1a234
 .screen.on{display:flex;}
 
 /* ── INTRO ── */
-#s-intro{align-items:center;justify-content:center;padding:2rem;text-align:center;overflow-y:auto;background:#f4f6fa;}
+#s-intro{align-items:center;justify-content:center;padding:2rem;text-align:center;overflow-y:auto;background:#f4f6fa;transition:opacity .3s ease;}
 .intro-avatar{width:130px;height:130px;border-radius:50%;overflow:hidden;border:3px solid #c9a84c;box-shadow:0 0 50px rgba(201,168,76,.25);margin-bottom:1.5rem;flex-shrink:0;}
 .intro-avatar img{width:100%;height:100%;object-fit:cover;object-position:top;}
 .eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:.82rem;letter-spacing:4px;color:#8a6f2e;text-transform:uppercase;margin-bottom:.4rem;}
@@ -514,9 +514,14 @@ function startFallback() {
 // GO TO INTERVIEW
 // ═══════════════════════════
 function goToInterview() {
-  document.getElementById('s-intro').classList.remove('on');
-  document.getElementById('av-idle-photo').style.display = 'block';
-  document.getElementById('s-interview').classList.add('on');
+  var intro = document.getElementById('s-intro');
+  intro.style.opacity = '0';
+  setTimeout(function() {
+    intro.classList.remove('on');
+    intro.style.opacity = '1';
+    document.getElementById('av-idle-photo').style.display = 'block';
+    document.getElementById('s-interview').classList.add('on');
+  }, 300);
 
   // Timer
   timerInt = setInterval(function() {
