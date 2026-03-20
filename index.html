@@ -1678,6 +1678,7 @@ function getSB() {
 }
 
 async function doRegister() {
+  console.log('doRegister called');
   var email = document.getElementById('rEmail').value.trim().toLowerCase();
   var pw    = document.getElementById('rPw').value;
   var pw2   = document.getElementById('rPw2').value;
