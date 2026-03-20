@@ -5,17 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Security USA® | Candidate Portal</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-const SUPABASE_URL = 'https://stvagyjcjoxnbslafmyf.supabase.co';
-// PASTE YOUR ANON KEY HERE from Supabase > Settings > API > anon public
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0dmFneWpjam94bmJzbGFmbXlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NTcxNTIsImV4cCI6MjA4OTQzMzE1Mn0.da_l4ogYdc_XL7DqmK_RmmR6cC_X6Lq102ddnN7QYY4';
-let supabase = null;
-try {
-  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-} catch(e) {
-  console.error('Supabase init failed:', e);
-}
-</script>
+
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -1553,6 +1543,22 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
 </div>
 
 <script>
+// ══════════ SUPABASE ══════════
+const SUPABASE_URL = 'https://stvagyjcjoxnbslafmyf.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0dmFneWpjam94bmJzbGFmbXlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NTcxNTIsImV4cCI6MjA4OTQzMzE1Mn0.da_l4ogYdc_XL7DqmK_RmmR6cC_X6Lq102ddnN7QYY4';
+let supabase = null;
+function getSupabase() {
+  if (!supabase) {
+    try {
+      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      console.log('Supabase initialized OK');
+    } catch(e) {
+      console.error('Supabase init failed:', e);
+    }
+  }
+  return supabase;
+}
+
 // ══════════ STATE ══════════
 let userName = '', userRef = 'SUSA-000000';
 let interviewStarted = false, questionIndex = 0, timerInterval = null, elapsed = 0;
@@ -1651,8 +1657,9 @@ async function doRegister() {
   const btn = document.getElementById('registerSubmitBtn');
   if (btn) { btn.disabled = true; btn.textContent = 'Creating Account...'; }
 
-  // Check Supabase is ready
-  if (!supabase) {
+  // Init Supabase now (lazy - runs after all scripts loaded)
+  const sb = getSupabase();
+  if (!sb) {
     showRegisterError('Service unavailable. Please refresh the page and try again.');
     if (btn) { btn.disabled = false; btn.textContent = 'Create Profile & Continue →'; }
     return;
@@ -1660,7 +1667,7 @@ async function doRegister() {
 
   try {
     console.log('Attempting signUp for:', email);
-    const { data, error } = await supabase.auth.signUp({
+    const { data, error } = await sb.auth.signUp({
       email: email,
       password: pw,
       options: { data: { first_name: first, last_name: last } }
@@ -1707,7 +1714,7 @@ async function doRegister() {
     // Try to save profile (don't block login if this fails)
     if (data.user) {
       try {
-        await supabase.from('candidates').upsert({
+        await sb.from('candidates').upsert({
           id: data.user.id,
           first_name: first,
           last_name: last,
@@ -1755,14 +1762,15 @@ async function doLogin() {
   const btn = document.getElementById('loginSubmitBtn');
   if (btn) { btn.disabled = true; btn.textContent = 'Signing in...'; }
 
-  if (!supabase) {
+  const sb = getSupabase();
+  if (!sb) {
     showLoginError('Login service unavailable. Please contact support.');
     if (btn) { btn.disabled = false; btn.textContent = 'Sign In →'; }
     return;
   }
 
   try {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password: pw });
+    const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
     if (error) {
       // Show the real Supabase error - don't fall through
       if (error.message.includes('Invalid login') || error.message.includes('invalid_credentials')) {
@@ -1777,7 +1785,7 @@ async function doLogin() {
     }
 
     // Fetch candidate profile
-    const { data: profile } = await supabase.from('candidates')
+    const { data: profile } = await sb.from('candidates')
       .select('*').eq('id', data.user.id).single();
 
     if (profile) {
@@ -1849,9 +1857,9 @@ async function goToEEO(){
   }
   // Save application to Supabase
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await getSupabase().auth.getUser();
     if (user) {
-      await supabase.from('applications').upsert({
+      await getSupabase().from('applications').upsert({
         candidate_id: user.id,
         position: 'Security Guard',
         location: 'NY - Port Washington',
@@ -1864,12 +1872,12 @@ async function goToEEO(){
 }
 async function goToJobQ(){
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await getSupabase().auth.getUser();
     const gender   = document.querySelector('#page-eeo select:nth-of-type(1)')?.value || '';
     const race     = document.querySelector('#page-eeo select:nth-of-type(2)')?.value || '';
     const nationality = document.querySelector('#page-eeo select:nth-of-type(3)')?.value || '';
     if (user && gender) {
-      await supabase.from('eeo_responses').upsert({
+      await getSupabase().from('eeo_responses').upsert({
         candidate_id: user.id,
         gender, race, nationality,
         submitted_at: new Date().toISOString()
