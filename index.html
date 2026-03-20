@@ -704,7 +704,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
 
             <div style="margin-top:1.75rem;">
               <p class="auth-agree">By proceeding you agree to Security USA's <a href="https://www.securityusainc.com/privacy-policy" target="_blank">Privacy Policy</a>.</p>
-              <button class="btn-full" id="registerSubmitBtn" onclick="doRegister()">Create Profile &amp; Continue →</button>
+              <button class="btn-full" id="registerSubmitBtn" onclick="doRegister().catch(function(e){alert('Error: '+e.message);document.getElementById('registerSubmitBtn').disabled=false;document.getElementById('registerSubmitBtn').textContent='Create Profile & Continue →'})">Create Profile &amp; Continue →</button>
               <button class="btn-full-out" onclick="switchTab('login')">Already have an account? Sign In</button>
             </div>
           </div>
@@ -732,7 +732,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
             <div style="text-align:right;margin:-6px 0 16px;">
               <a style="font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:1.5px;color:var(--gray);text-transform:uppercase;text-decoration:none;" href="#">Forgot password?</a>
             </div>
-            <button class="btn-full" id="loginSubmitBtn" onclick="doLogin()">Sign In →</button>
+            <button class="btn-full" id="loginSubmitBtn" onclick="doLogin().catch(function(e){alert('Error: '+e.message);document.getElementById('loginSubmitBtn').disabled=false;document.getElementById('loginSubmitBtn').textContent='Sign In →'})">Sign In →</button>
             <button class="btn-full-out" onclick="switchTab('reg')">New applicant? Create an account</button>
           </div>
 
@@ -1541,7 +1541,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.6;}
   <footer class="site-footer"><strong>Security USA, Inc.</strong> &nbsp;·&nbsp; © 2025 All Rights Reserved</footer>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script>
 // ══════════ SUPABASE ══════════
 const SUPABASE_URL = 'https://stvagyjcjoxnbslafmyf.supabase.co';
@@ -1550,18 +1550,15 @@ let supabase = null;
 function getSupabase() {
   if (supabase) return supabase;
   try {
-    // Try all possible export names from the UMD bundle
-    const lib = window.supabase || window.Supabase || window.createClient;
-    if (!lib) {
-      console.error('Supabase SDK not loaded. window.supabase =', window.supabase);
-      return null;
+    if (typeof window !== 'undefined' && window.supabase && window.supabase.createClient) {
+      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      console.log('Supabase OK via window.supabase.createClient');
+      return supabase;
     }
-    const createFn = lib.createClient || lib;
-    supabase = createFn(SUPABASE_URL, SUPABASE_KEY);
-    console.log('Supabase initialized OK:', !!supabase);
-    return supabase;
+    console.error('window.supabase not available:', typeof window.supabase);
+    return null;
   } catch(e) {
-    console.error('Supabase init failed:', e.message);
+    console.error('getSupabase error:', e.message);
     return null;
   }
 }
