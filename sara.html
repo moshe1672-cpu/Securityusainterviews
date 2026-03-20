@@ -221,7 +221,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;color:#1a234
 <div id="s-intro" class="screen on">
   <div class="intro-avatar">
     <img src="https://create-images-results.d-id.com/DefaultPresenters/Amber_f/thumbnail.jpeg"
-      id="intro-img"
+      id="intro-img" style="opacity:0;transition:opacity .3s;"
+      onload="this.style.opacity='1'"
       onerror="this.style.display='none'">
   </div>
   <div class="eyebrow">Security USA® — AI Screening</div>
@@ -253,7 +254,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;color:#1a234
       <!-- TOP: SARA AI avatar -->
       <div id="iv-sara">
         <div id="av-idle-photo" style="display:none;">
-          <img id="av-photo" src="https://create-images-results.d-id.com/DefaultPresenters/Amber_f/thumbnail.jpeg" onerror="this.style.display='none'">
+          <img id="av-photo" src="https://create-images-results.d-id.com/DefaultPresenters/Amber_f/thumbnail.jpeg" style="opacity:0;transition:opacity .3s;" onload="this.style.opacity='1'" onerror="this.style.display='none'">
         </div>
         <div id="did-video-container"></div>
         <div id="av-speaking-ring"></div>
@@ -760,17 +761,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('sc-sched').addEventListener('click', function() { window.location.href = 'index.html'; });
   document.getElementById('sc-back').addEventListener('click',  function() { window.location.href = 'index.html'; });
 
-  // Try to load her real photo from D-ID agent
-  fetch('/api/did-proxy?path=' + encodeURIComponent('/agents/' + 'v2_agt_M7ejpYI6'))
-    .then(function(r) { return r.json(); })
-    .then(function(agent) {
-      var url = agent.presenter && agent.presenter.thumbnail;
-      if (url) {
-        document.getElementById('intro-img').src = url;
-        document.getElementById('av-photo').src = url;
-      }
-    })
-    .catch(function() {});
+// D-ID photo fetch removed - using static image
 });
 </script>
 </body>
