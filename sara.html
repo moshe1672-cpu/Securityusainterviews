@@ -6,7 +6,7 @@
 <title>SARA — AI Interview | Security USA®</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
 <!-- D-ID Agents SDK -->
-<script src="https://cdn.jsdelivr.net/npm/@d-id/client-sdk@1.9.0/dist/index.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@d-id/client-sdk@1.9.0/dist/index.umd.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;color:#1a2340;font-family:'Barlow',sans-serif;}
@@ -409,38 +409,47 @@ function setStatus(msg) {
 // D-ID AGENT SDK
 // ═══════════════════════════
 function initDIDAgent() {
-  // Check SDK loaded
-  // Find createAgentManager in all possible locations
+  // Log ALL window properties that have createAgentManager
+  console.log('=== D-ID SDK Debug ===');
+  console.log('window.DID:', typeof window.DID);
+  console.log('window.createAgentManager:', typeof window.createAgentManager);
+  
+  // The D-ID UMD bundle name varies by version - try all known names
   var createFn = null;
-  if (window.DID && window.DID.createAgentManager) {
-    createFn = window.DID.createAgentManager;
-    console.log('D-ID SDK found at window.DID');
-  } else if (window.createAgentManager) {
-    createFn = window.createAgentManager;
-    console.log('D-ID SDK found at window.createAgentManager');
-  } else {
-    // Try iterating window exports
-    for (var key in window) {
-      if (window[key] && typeof window[key].createAgentManager === 'function') {
-        createFn = window[key].createAgentManager.bind(window[key]);
-        console.log('D-ID SDK found at window.' + key);
+  var names = Object.keys(window);
+  for (var i = 0; i < names.length; i++) {
+    var k = names[i];
+    try {
+      if (window[k] && typeof window[k] === 'object' && typeof window[k].createAgentManager === 'function') {
+        createFn = window[k].createAgentManager.bind(window[k]);
+        console.log('Found createAgentManager at window.' + k);
         break;
       }
-    }
+    } catch(e) {}
   }
+  if (!createFn && typeof window.createAgentManager === 'function') {
+    createFn = window.createAgentManager;
+    console.log('Found createAgentManager directly on window');
+  }
+
   if (!createFn) {
-    console.warn('D-ID SDK not found - going to fallback. window.DID =', typeof window.DID);
+    console.error('D-ID SDK not found. Scripts on page:',
+      Array.from(document.scripts).map(function(s){ return s.src || 'inline'; }).join(', '));
+    setAvStatus('No SDK');
     startFallback();
     return;
   }
+
+  console.log('Connecting to agent:', AGENT_ID, 'with key:', CLIENT_KEY.substring(0,10) + '...');
+  setAvStatus('Connecting...');
 
   var auth = { type: 'key', clientKey: CLIENT_KEY };
 
   var callbacks = {
     onSrcObjectReady: function(value) {
-      console.log('D-ID stream ready - showing live video');
+      console.log('✓ D-ID video stream ready!');
       var container = document.getElementById('did-video-container');
-      var idle = document.getElementById('av-idle-photo');
+      var idle      = document.getElementById('av-idle-photo');
       var vid = container.querySelector('video');
       if (!vid) {
         vid = document.createElement('video');
@@ -450,59 +459,47 @@ function initDIDAgent() {
         container.appendChild(vid);
       }
       vid.srcObject = value;
-      vid.play().catch(function(e){ console.warn('video play:', e); });
-      // Hide idle, show live stream
+      vid.play().catch(function(e){ console.warn('video play blocked:', e.message); });
       if (idle) idle.style.display = 'none';
-      container.style.cssText = 'position:absolute;inset:0;display:block;';
+      container.style.cssText = 'position:absolute;inset:0;display:block;z-index:2;';
       saraReady = true;
-      setAvStatus('Live');
+      setAvStatus('Live ✓');
     },
-
     onVideoStateChange: function(state) {
       console.log('Video state:', state);
       saraSpeaking = (state === 'TALKING');
       document.getElementById('av-speaking-ring').classList.toggle('on', saraSpeaking);
-      if (saraSpeaking) {
-        setAvStatus('Speaking...');
-      } else {
-        setAvStatus('Listening');
-      }
+      setAvStatus(saraSpeaking ? 'Speaking...' : 'Listening');
     },
-
     onNewMessage: function(messages, type) {
-      // Agent sent a message back - we don't use this since we control questions
-      console.log('Agent message:', type, messages);
+      console.log('Agent message:', type);
     },
-
     onError: function(error, errorData) {
       console.error('D-ID error:', error, errorData);
-      setAvStatus('Connection issue');
+      setAvStatus('Error: ' + error);
     }
   };
 
-  var streamOptions = {
-    compatibilityMode: 'auto',
-    streamWarmup: true
-  };
-
   try {
-    createFn(AGENT_ID, { auth: auth, callbacks: callbacks, streamOptions: streamOptions })
-      .then(function(manager) {
-        agentManager = manager;
-        console.log('D-ID agent manager created');
-        return agentManager.connect();
-      })
-      .then(function() {
-        console.log('D-ID agent connected');
-        saraReady = true;
-        goToInterview();
-      })
-      .catch(function(e) {
-        console.error('D-ID connect error:', e);
-        startFallback();
-      });
+    createFn(AGENT_ID, {
+      auth: auth,
+      callbacks: callbacks,
+      streamOptions: { compatibilityMode: 'auto', streamWarmup: true }
+    }).then(function(manager) {
+      agentManager = manager;
+      console.log('Agent manager created, connecting...');
+      return agentManager.connect();
+    }).then(function() {
+      console.log('✓ D-ID agent connected!');
+      saraReady = true;
+      goToInterview();
+    }).catch(function(e) {
+      console.error('D-ID connection failed:', e.message || e);
+      setAvStatus('Connect failed');
+      startFallback();
+    });
   } catch(e) {
-    console.error('D-ID init error:', e);
+    console.error('D-ID init threw:', e.message || e);
     startFallback();
   }
 }
