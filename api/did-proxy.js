@@ -1,4 +1,4 @@
-const DID_KEY  = process.env.DID_API_KEY || 'Basic bW9zaGVAc2VjdXJpdHl1c2FpbmMuY29t:7z_W-YjyEMxb3qUbo2v9F';
+const DID_KEY = process.env.DID_API_KEY || 'Basic Ylc5emFHVkFjMlZqZFhKcGRIbDFjMkZwYm1NdVkyOXQ6RHJDZ1RTRVNWeXZIUlZFamN3TlpP';
 const DID_BASE = 'https://api.d-id.com';
 
 module.exports = async function handler(req, res) {
