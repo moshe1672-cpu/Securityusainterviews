@@ -6,7 +6,7 @@
 <title>SARA — AI Interview | Security USA®</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
 <!-- D-ID Agents SDK -->
-<script src="https://cdn.jsdelivr.net/npm/@d-id/client-sdk/dist/index.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@d-id/client-sdk@1.9.0/dist/index.umd.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;color:#1a2340;font-family:'Barlow',sans-serif;}
@@ -410,17 +410,26 @@ function setStatus(msg) {
 // ═══════════════════════════
 function initDIDAgent() {
   // Check SDK loaded
-  if (typeof window.DID === 'undefined' && typeof createAgentManager === 'undefined') {
-    console.warn('D-ID SDK not loaded, using fallback');
-    startFallback();
-    return;
+  // Find createAgentManager in all possible locations
+  var createFn = null;
+  if (window.DID && window.DID.createAgentManager) {
+    createFn = window.DID.createAgentManager;
+    console.log('D-ID SDK found at window.DID');
+  } else if (window.createAgentManager) {
+    createFn = window.createAgentManager;
+    console.log('D-ID SDK found at window.createAgentManager');
+  } else {
+    // Try iterating window exports
+    for (var key in window) {
+      if (window[key] && typeof window[key].createAgentManager === 'function') {
+        createFn = window[key].createAgentManager.bind(window[key]);
+        console.log('D-ID SDK found at window.' + key);
+        break;
+      }
+    }
   }
-
-  var sdk = window.DID || window;
-  var createFn = sdk.createAgentManager || window.createAgentManager;
-
   if (!createFn) {
-    console.warn('createAgentManager not found, using fallback');
+    console.warn('D-ID SDK not found - going to fallback. window.DID =', typeof window.DID);
     startFallback();
     return;
   }
@@ -429,24 +438,24 @@ function initDIDAgent() {
 
   var callbacks = {
     onSrcObjectReady: function(value) {
-      // D-ID is streaming - attach video to our container
-      console.log('D-ID stream ready');
+      console.log('D-ID stream ready - showing live video');
       var container = document.getElementById('did-video-container');
       var idle = document.getElementById('av-idle-photo');
-      // Create video element if not exists
       var vid = container.querySelector('video');
       if (!vid) {
         vid = document.createElement('video');
         vid.autoplay = true;
         vid.playsinline = true;
-        vid.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+        vid.style.cssText = 'width:100%;height:100%;object-fit:cover;object-position:top center;';
         container.appendChild(vid);
       }
       vid.srcObject = value;
-      idle.style.display = 'none';
-      container.style.display = 'flex';
+      vid.play().catch(function(e){ console.warn('video play:', e); });
+      // Hide idle, show live stream
+      if (idle) idle.style.display = 'none';
+      container.style.cssText = 'position:absolute;inset:0;display:block;';
       saraReady = true;
-      setAvStatus('Ready');
+      setAvStatus('Live');
     },
 
     onVideoStateChange: function(state) {
