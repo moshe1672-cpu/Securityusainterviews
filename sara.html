@@ -9,10 +9,11 @@
 <script type="module"
   src="https://agent.d-id.com/v2/index.js"
   data-name="did-agent"
-  data-mode="fabio"
+  data-mode="full"
   data-client-key="ck_M4Mc7iCR6GVnh4h8EW97U"
   data-agent-id="v2_agt_M7ejpYI6"
-  data-monitor="true">
+  data-monitor="true"
+  data-target-id="did-video-container">
 </script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -92,8 +93,26 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;color:#1a234
 }
 #av-idle-photo{position:absolute;inset:0;}
 #av-idle-photo img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block;}
-#did-video-container{position:absolute;inset:0;display:none;}
+#did-video-container{position:absolute;inset:0;display:block;}
 #did-video-container video{width:100%;height:100%;object-fit:cover;object-position:top center;}
+
+/* D-ID agent fills container, all widget chrome hidden */
+did-agent {
+  position:absolute !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100% !important;
+  z-index:1;
+}
+/* Hide D-ID's own buttons/controls/overlay UI */
+did-agent::part(controls),
+did-agent::part(header),
+did-agent::part(footer),
+did-agent::part(minimize),
+did-agent::part(close),
+did-agent::part(expand) {
+  display:none !important;
+}
 #av-speaking-ring{position:absolute;inset:0;border:4px solid rgba(201,168,76,.7);pointer-events:none;opacity:0;transition:opacity .3s;}
 #av-speaking-ring.on{opacity:1;animation:glowP .7s ease-in-out infinite alternate;}
 @keyframes glowP{from{border-color:rgba(201,168,76,.8);box-shadow:inset 0 0 30px rgba(201,168,76,.1)}to{border-color:rgba(201,168,76,.1);box-shadow:none}}
@@ -419,81 +438,35 @@ function initDIDAgent() {
   setStatus('Connecting to SARA...');
   setAvStatus('Connecting...');
 
-  // Wait for the did-agent web component to be ready
+  // did-agent is injected by the script into did-video-container
+  // Wait for it to appear then go to interview
   var waited = 0;
   var poll = setInterval(function() {
     waited += 300;
     var agent = document.querySelector('did-agent');
     if (agent) {
       clearInterval(poll);
-      console.log('did-agent element found, setting up...');
-      setupDIDAgent(agent);
-    } else if (waited >= 8000) {
+      console.log('did-agent ready');
+
+      // Listen for state changes to show speaking ring
+      agent.addEventListener('statechange', function(e) {
+        var state = e.detail && (e.detail.state || e.detail.status);
+        saraSpeaking = (state === 'talking' || state === 'TALKING');
+        document.getElementById('av-speaking-ring').classList.toggle('on', saraSpeaking);
+        setAvStatus(saraSpeaking ? 'Speaking...' : '');
+      });
+
+      saraReady = true;
+      agentManager = agent;
+      setAvStatus('');
+      goToInterview();
+
+    } else if (waited >= 10000) {
       clearInterval(poll);
-      console.warn('did-agent element never appeared - fallback');
+      console.warn('did-agent timeout - fallback');
       startFallback();
     }
   }, 300);
-}
-
-function setupDIDAgent(agent) {
-  // Hide the default D-ID widget UI - we have our own
-  agent.style.cssText = 'position:fixed;bottom:-9999px;right:-9999px;width:1px;height:1px;opacity:0;pointer-events:none;';
-
-  // Listen for the agent's video stream
-  agent.addEventListener('videoready', function(e) {
-    console.log('D-ID videoready event', e);
-    var container = document.getElementById('did-video-container');
-    var idle = document.getElementById('av-idle-photo');
-    var vid = container.querySelector('video') || document.createElement('video');
-    vid.autoplay = true; vid.playsinline = true; vid.muted = false;
-    vid.style.cssText = 'width:100%;height:100%;object-fit:cover;object-position:top center;';
-    if (!vid.parentNode) container.appendChild(vid);
-    if (e.detail && e.detail.stream) vid.srcObject = e.detail.stream;
-    else if (e.detail && e.detail.srcObject) vid.srcObject = e.detail.srcObject;
-    vid.play().catch(function(e){ console.warn('play:', e.message); });
-    if (idle) idle.style.display = 'none';
-    container.style.cssText = 'position:absolute;inset:0;display:block;z-index:2;';
-    setAvStatus('Live ✓');
-  });
-
-  agent.addEventListener('connected', function() {
-    console.log('D-ID agent connected');
-    saraReady = true;
-    agentManager = agent; // use element as our handle
-    setAvStatus('Ready');
-    goToInterview();
-  });
-
-  agent.addEventListener('statechange', function(e) {
-    var state = e.detail && e.detail.state;
-    console.log('D-ID state:', state);
-    saraSpeaking = (state === 'talking' || state === 'TALKING');
-    document.getElementById('av-speaking-ring').classList.toggle('on', saraSpeaking);
-    setAvStatus(saraSpeaking ? 'Speaking...' : 'Listening');
-  });
-
-  agent.addEventListener('error', function(e) {
-    console.error('D-ID error:', e.detail);
-    startFallback();
-  });
-
-  // If connected event never fires within 8s, fall back
-  setTimeout(function() {
-    if (!saraReady) {
-      console.warn('D-ID agent never connected - fallback');
-      startFallback();
-    }
-  }, 8000);
-}
-
-// Override speak to use the did-agent element
-function speakWithDID(text) {
-  var agent = document.querySelector('did-agent');
-  if (agent && typeof agent.speak === 'function') {
-    return agent.speak(text);
-  }
-  return Promise.reject(new Error('no agent'));
 }
 
 // ═══════════════════════════
@@ -505,7 +478,7 @@ function goToInterview() {
   setTimeout(function() {
     intro.classList.remove('on');
     intro.style.opacity = '1';
-    document.getElementById('av-idle-photo').style.display = 'block';
+    document.getElementById('av-idle-photo').style.display = 'none';
     document.getElementById('s-interview').classList.add('on');
   }, 300);
 
@@ -577,13 +550,16 @@ function askQ(idx) {
   addTx('s', QS[idx]);
 
   // Send question to D-ID agent to speak
-  if (saraReady && document.querySelector('did-agent')) {
-    speakWithDID(QS[idx])
-      .then(function() { onSaraFinished(); })
-      .catch(function(e) {
-        console.warn('speak error:', e);
-        setTimeout(onSaraFinished, Math.min(4000, Math.max(2000, QS[idx].length * 40)));
-      });
+  var agent = document.querySelector('did-agent');
+  if (saraReady && agent) {
+    var fn = agent.speak || agent.chat || agent.send;
+    if (typeof fn === 'function') {
+      Promise.resolve(fn.call(agent, QS[idx]))
+        .then(function() { onSaraFinished(); })
+        .catch(function() { setTimeout(onSaraFinished, Math.min(4000, Math.max(2000, QS[idx].length * 40))); });
+    } else {
+      setTimeout(onSaraFinished, Math.min(4000, Math.max(2000, QS[idx].length * 40)));
+    }
   } else {
     setTimeout(onSaraFinished, Math.min(4000, Math.max(2000, QS[idx].length * 40)));
   }
