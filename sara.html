@@ -210,11 +210,11 @@ did-agent::part(start-button),did-agent button[class*="start"],did-agent button[
 .sc-btn-o{width:100%;background:transparent;color:#8a9ab5;border:1px solid var(--border);border-radius:5px;padding:11px;font-family:'Barlow Condensed',sans-serif;font-size:.82rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;}
 
 /* ════════════════════════════════════
-   MOBILE (<= 768px)
-   Stack: SARA video top, controls below
+   MOBILE (<= 768px) — FACETIME LAYOUT
+   SARA fullscreen, candidate = PiP bubble
    ════════════════════════════════════ */
 @media (max-width: 768px) {
-  /* Header: tighter on mobile */
+  /* Tighter header */
   #hdr{height:52px;padding:0 .85rem;}
   #hdr-sub{display:none;}
   #hdr-qnum{font-size:.75rem;padding:4px 10px;}
@@ -222,7 +222,7 @@ did-agent::part(start-button),did-agent button[class*="start"],did-agent button[
   #hdr-exit{padding:5px 10px;font-size:.72rem;}
   .screen{top:52px;}
 
-  /* Intro: more compact */
+  /* Intro: compact */
   #s-intro{padding:1.25rem 1rem;justify-content:flex-start;padding-top:1.5rem;}
   .intro-avatar{width:90px;height:90px;margin-bottom:1rem;}
   .big-title{font-size:2.2rem;}
@@ -233,63 +233,167 @@ did-agent::part(start-button),did-agent button[class*="start"],did-agent button[
   .chk{font-size:.88rem;}
   #begin-btn{padding:14px 32px;font-size:1rem;max-width:100%;}
 
-  /* Interview: STACK vertically */
-  #iv-layout{flex-direction:column;}
+  /* ── INTERVIEW: FACETIME LAYOUT ── */
+  #s-interview{overflow:hidden;}
 
-  /* Left column = full width, fixed height - tall enough to show SARA fully */
-  #iv-cameras{
+  /* Single full-screen container */
+  #iv-layout{
+    flex-direction:column;
+    position:relative;
     width:100%;
-    flex-shrink:0;
-    flex-direction:column; /* SARA on top, candidate cam below */
-    height:55vh;
-    border-right:none;
-    border-bottom:1px solid rgba(201,168,76,.2);
+    height:100%;
   }
 
-  /* SARA takes 70% of the camera column on mobile */
-  #iv-sara{flex:7;}
-  /* Candidate cam takes 30% */
-  #iv-cam{flex:3;border-top:1px solid rgba(201,168,76,.15);border-left:none;}
+  /* Camera column = full screen */
+  #iv-cameras{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    flex-direction:column;
+    border:none;
+    z-index:1;
+  }
 
-  /* On mobile, candidate cam shows as a small strip at the bottom */
+  /* SARA fills the entire camera area */
+  #iv-sara{
+    flex:1;
+    width:100%;
+    height:100%;
+    border-bottom:none;
+  }
+
+  /* Candidate cam = floating PiP bubble, top-right */
+  #iv-cam{
+    position:absolute !important;
+    top:4.5rem;
+    right:.85rem;
+    width:110px;
+    height:150px;
+    border-radius:16px;
+    overflow:hidden;
+    border:2px solid rgba(255,255,255,.4);
+    box-shadow:0 4px 20px rgba(0,0,0,.5);
+    z-index:10;
+    flex:none;
+    background:#000;
+  }
+  #iv-cam video{border-radius:14px;}
+  #iv-cam-ov{border-radius:14px;background:rgba(6,14,28,.7);}
   #iv-cam-ov span:first-child{font-size:1.2rem;}
-  #iv-cam-ov span:last-child{font-size:.65rem;}
+  #iv-cam-ov span:last-child{font-size:.6rem;}
+  #iv-cam-lbl{
+    font-size:.58rem;padding:.15rem .45rem;
+    bottom:.35rem;left:.35rem;
+    background:rgba(0,0,0,.6);border:none;
+  }
 
-  /* Hide "You" camera label on mobile to save space */
-  #iv-cam-lbl{font-size:.6rem;padding:.2rem .5rem;bottom:.4rem;left:.4rem;}
+  /* Transcript panel overlays bottom 40% as a translucent drawer */
+  #iv-right{
+    position:absolute;
+    bottom:0;left:0;right:0;
+    height:42%;
+    z-index:5;
+    background:rgba(10,22,40,.92);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+    border-top:1px solid rgba(201,168,76,.2);
+    border-radius:16px 16px 0 0;
+  }
 
-  /* SARA label smaller on mobile */
-  #iv-sara-lbl{padding:.3rem .8rem;}
-  #iv-sara-lbl .n{font-size:.9rem;}
-  #iv-sara-lbl .r{font-size:.58rem;}
-  #av-status{font-size:.6rem;padding:.25rem .7rem;bottom:.5rem;left:.5rem;}
+  /* Transcript header on dark background */
+  #iv-tx-hdr{
+    background:transparent;
+    border-bottom:1px solid rgba(255,255,255,.08);
+    padding:.6rem .85rem;
+  }
+  #iv-tx-hdr span{color:rgba(201,168,76,.8);}
 
-  /* Right panel = fills remaining space, scrollable */
-  #iv-right{flex:1;min-height:0;}
-  #iv-tx-hdr{padding:.6rem .85rem;}
-  #iv-tx-body{padding:.65rem .85rem;gap:.5rem;}
-  .tx-m{font-size:.88rem;}
+  /* Transcript messages on dark bg */
+  #iv-tx-body{
+    padding:.6rem .85rem;
+    gap:.45rem;
+  }
+  .tx-s{
+    background:rgba(201,168,76,.1);
+    border-color:rgba(201,168,76,.2);
+    border-left-color:var(--gold);
+  }
+  .tx-u{
+    background:rgba(39,174,96,.1);
+    border-color:rgba(39,174,96,.2);
+    border-right-color:var(--green);
+  }
+  .tx-m{font-size:.88rem;color:#e0e6f0;}
+  .tx-w{color:rgba(201,168,76,.7);}
+  .tx-u .tx-w{color:rgba(39,174,96,.8);}
 
-  /* Controls: more compact on mobile */
-  #iv-ctrl{padding:.65rem .85rem;gap:.45rem;}
-  #iv-mic-btn{width:42px;height:42px;font-size:1.1rem;}
-  #iv-mic-status{font-size:.82rem;}
-  #iv-mic-hint{font-size:.76rem;}
-  #iv-submit{font-size:.9rem;padding:10px;}
-  #iv-camtog,#iv-end{font-size:.72rem;padding:8px;}
-
-  /* Progress bars: hide score quality on mobile */
+  /* Progress bar */
+  #iv-prog{
+    background:transparent;
+    border-top:1px solid rgba(255,255,255,.06);
+    padding:.45rem .85rem;
+  }
+  .bar-row{color:rgba(255,255,255,.4);}
+  .bar-row b{color:var(--gold);}
+  .bar-track{background:rgba(255,255,255,.1);}
   #iv-score{display:none;}
-  #iv-prog{padding:.45rem .85rem;}
 
-  /* Scorecard mobile */
+  /* Controls */
+  #iv-ctrl{
+    background:transparent;
+    border-top:1px solid rgba(255,255,255,.06);
+    padding:.6rem .85rem;
+    gap:.4rem;
+  }
+  #iv-mic-btn{
+    width:44px;height:44px;font-size:1.15rem;
+    background:rgba(255,255,255,.1);
+    border-color:rgba(201,168,76,.4);
+    color:#fff;
+  }
+  #iv-mic-status{font-size:.82rem;color:#c8d0df;}
+  #iv-mic-hint{font-size:.74rem;color:rgba(255,255,255,.35);}
+  #iv-live{
+    background:rgba(39,174,96,.12);
+    border-color:rgba(39,174,96,.3);
+    color:#e0f0e8;
+    font-size:.88rem;
+  }
+  #iv-submit{font-size:.9rem;padding:10px;}
+  #iv-camtog{
+    background:rgba(255,255,255,.1);
+    border-color:rgba(255,255,255,.15);
+    color:#c8d0df;
+  }
+  #iv-end{
+    background:rgba(192,57,43,.15);
+    border-color:rgba(192,57,43,.3);
+  }
+
+  /* SARA label & status on mobile */
+  #iv-sara-lbl{
+    top:.75rem;
+    padding:.35rem .9rem;
+    background:rgba(6,14,28,.85);
+  }
+  #iv-sara-lbl .n{font-size:.95rem;}
+  #iv-sara-lbl .r{font-size:.6rem;}
+  #av-status{
+    bottom:44%;/* sits just above the drawer */
+    left:.75rem;
+    font-size:.62rem;
+    padding:.25rem .75rem;
+  }
+
+  /* Scorecard */
   #sc-box{padding:1.25rem;}
   .sc-title{font-size:1.5rem;}
 }
 
 /* Very small phones */
 @media (max-width: 390px) {
-  #iv-cameras{height:38vh;}
+  #iv-cam{width:90px;height:122px;top:4rem;right:.6rem;}
   #hdr-qnum{display:none;}
 }
 </style>
