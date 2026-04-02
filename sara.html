@@ -435,38 +435,32 @@ function setStatus(msg) {
 // D-ID AGENT SDK
 // ═══════════════════════════
 function initDIDAgent() {
-  setStatus('Connecting to SARA...');
-  setAvStatus('Connecting...');
+  // Go to interview immediately - D-ID loads in background into the panel
+  saraReady = false;
+  goToInterview();
 
-  // did-agent is injected by the script into did-video-container
-  // Wait for it to appear then go to interview
+  // Poll for did-agent element and wire up state changes
   var waited = 0;
   var poll = setInterval(function() {
-    waited += 300;
+    waited += 500;
     var agent = document.querySelector('did-agent');
     if (agent) {
       clearInterval(poll);
-      console.log('did-agent ready');
-
-      // Listen for state changes to show speaking ring
-      agent.addEventListener('statechange', function(e) {
-        var state = e.detail && (e.detail.state || e.detail.status);
-        saraSpeaking = (state === 'talking' || state === 'TALKING');
-        document.getElementById('av-speaking-ring').classList.toggle('on', saraSpeaking);
-        setAvStatus(saraSpeaking ? 'Speaking...' : '');
-      });
-
+      console.log('did-agent found after', waited, 'ms');
       saraReady = true;
       agentManager = agent;
-      setAvStatus('');
-      goToInterview();
+      setAvStatus('Live');
 
-    } else if (waited >= 10000) {
+      agent.addEventListener('statechange', function(e) {
+        var state = e.detail && (e.detail.state || e.detail.status || '');
+        saraSpeaking = /talk/i.test(state);
+        document.getElementById('av-speaking-ring').classList.toggle('on', saraSpeaking);
+      });
+    } else if (waited >= 15000) {
       clearInterval(poll);
-      console.warn('did-agent timeout - fallback');
-      startFallback();
+      console.warn('did-agent never found');
     }
-  }, 300);
+  }, 500);
 }
 
 // ═══════════════════════════
