@@ -96,7 +96,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;color:#1a234
 #did-video-container{position:absolute;inset:0;display:block;}
 #did-video-container video{width:100%;height:100%;object-fit:cover;object-position:top center;}
 
-/* D-ID agent fills container, all widget chrome hidden */
+/* D-ID agent fills container */
 did-agent {
   position:absolute !important;
   inset:0 !important;
@@ -104,7 +104,7 @@ did-agent {
   height:100% !important;
   z-index:1;
 }
-/* Hide D-ID's own buttons/controls/overlay UI */
+/* Hide D-ID widget chrome we don't need */
 did-agent::part(controls),
 did-agent::part(header),
 did-agent::part(footer),
@@ -113,11 +113,28 @@ did-agent::part(close),
 did-agent::part(expand) {
   display:none !important;
 }
+/* Style the Start conversation button to be large and visible */
+did-agent::part(start-button),
+did-agent [part="start-button"],
+did-agent button[class*="start"],
+did-agent button[class*="conversation"],
+did-agent button[class*="connect"] {
+  font-size:1.1rem !important;
+  padding:14px 36px !important;
+  border-radius:6px !important;
+  background:#c9a84c !important;
+  color:#0a1628 !important;
+  font-weight:700 !important;
+  letter-spacing:2px !important;
+  border:none !important;
+  cursor:pointer !important;
+  box-shadow:0 4px 20px rgba(201,168,76,.4) !important;
+}
 #av-speaking-ring{position:absolute;inset:0;border:4px solid rgba(201,168,76,.7);pointer-events:none;opacity:0;transition:opacity .3s;}
 #av-speaking-ring.on{opacity:1;animation:glowP .7s ease-in-out infinite alternate;}
 @keyframes glowP{from{border-color:rgba(201,168,76,.8);box-shadow:inset 0 0 30px rgba(201,168,76,.1)}to{border-color:rgba(201,168,76,.1);box-shadow:none}}
-#av-status{position:absolute;top:1rem;left:50%;transform:translateX(-50%);background:rgba(10,22,40,.88);border:1px solid rgba(201,168,76,.25);border-radius:20px;padding:.35rem 1.25rem;font-family:'Barlow Condensed',sans-serif;font-size:.82rem;letter-spacing:2px;color:#c9a84c;text-transform:uppercase;white-space:nowrap;z-index:5;}
-#iv-sara-lbl{position:absolute;bottom:1rem;left:50%;transform:translateX(-50%);background:rgba(10,22,40,.9);border:1px solid rgba(201,168,76,.25);border-radius:4px;padding:.5rem 1.5rem;white-space:nowrap;text-align:center;z-index:5;}
+#av-status{position:absolute;top:4rem;left:50%;transform:translateX(-50%);background:rgba(10,22,40,.88);border:1px solid rgba(201,168,76,.25);border-radius:20px;padding:.35rem 1.25rem;font-family:'Barlow Condensed',sans-serif;font-size:.82rem;letter-spacing:2px;color:#c9a84c;text-transform:uppercase;white-space:nowrap;z-index:5;}
+#iv-sara-lbl{position:absolute;top:1rem;left:50%;transform:translateX(-50%);background:rgba(10,22,40,.9);border:1px solid rgba(201,168,76,.25);border-radius:4px;padding:.5rem 1.5rem;white-space:nowrap;text-align:center;z-index:5;}
 #iv-sara-lbl .n{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:2px;color:#fff;}
 #iv-sara-lbl .r{font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:2px;color:#c9a84c;text-transform:uppercase;}
 
