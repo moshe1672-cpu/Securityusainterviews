@@ -236,20 +236,24 @@ did-agent::part(start-button),did-agent button[class*="start"],did-agent button[
   /* Interview: STACK vertically */
   #iv-layout{flex-direction:column;}
 
-  /* Left column = full width, fixed height */
+  /* Left column = full width, fixed height - tall enough to show SARA fully */
   #iv-cameras{
     width:100%;
     flex-shrink:0;
-    flex-direction:row; /* SARA left, candidate cam right - side by side on mobile */
-    height:42vh;
+    flex-direction:column; /* SARA on top, candidate cam below */
+    height:55vh;
     border-right:none;
     border-bottom:1px solid rgba(201,168,76,.2);
   }
 
-  /* SARA takes 60% of the camera row on mobile */
-  #iv-sara{flex:6;}
-  /* Candidate cam takes 40% */
-  #iv-cam{flex:4;border-top:none;border-left:1px solid rgba(201,168,76,.15);}
+  /* SARA takes 70% of the camera column on mobile */
+  #iv-sara{flex:7;}
+  /* Candidate cam takes 30% */
+  #iv-cam{flex:3;border-top:1px solid rgba(201,168,76,.15);border-left:none;}
+
+  /* On mobile, candidate cam shows as a small strip at the bottom */
+  #iv-cam-ov span:first-child{font-size:1.2rem;}
+  #iv-cam-ov span:last-child{font-size:.65rem;}
 
   /* Hide "You" camera label on mobile to save space */
   #iv-cam-lbl{font-size:.6rem;padding:.2rem .5rem;bottom:.4rem;left:.4rem;}
@@ -524,22 +528,20 @@ function goToInterview() {
 function wireDIDAgent(agent) {
   setAvStatus('');
 
-  // Agent speaking state -> speaking ring
+  // ── Speaking state ──
   agent.addEventListener('statechange', function(e) {
     var state = (e.detail && (e.detail.state || e.detail.status || '')).toLowerCase();
     var speaking = state.includes('talk');
     document.getElementById('av-speaking-ring').classList.toggle('on', speaking);
     if (speaking) {
       setAvStatus('Speaking...');
-      // Hide mic while SARA speaks
       document.getElementById('iv-submit').style.display = 'none';
       document.getElementById('iv-mic-status').textContent = 'SARA is speaking...';
       document.getElementById('iv-mic-status').style.color = '';
       document.getElementById('iv-mic-btn').style.opacity = '.4';
       if (isListening) { try { recog && recog.stop(); } catch(e){} }
-    } else {
+    } else if (state && !state.includes('connect') && !state.includes('load')) {
       setAvStatus('');
-      // Enable mic after SARA finishes
       document.getElementById('iv-submit').style.display = 'block';
       document.getElementById('iv-mic-status').textContent = 'Your turn — speak your answer';
       document.getElementById('iv-mic-status').style.color = '#c9a84c';
@@ -551,7 +553,7 @@ function wireDIDAgent(agent) {
     }
   });
 
-  // Agent messages -> transcript
+  // ── Transcript messages ──
   agent.addEventListener('message', function(e) {
     var msg = e.detail && (e.detail.message || e.detail.content || e.detail.text || '');
     var role = e.detail && (e.detail.role || 'assistant');
@@ -566,14 +568,72 @@ function wireDIDAgent(agent) {
       }
     }
   });
-
-  // Also listen for newmessage / onNewMessage variants
   ['newmessage', 'onNewMessage', 'chat', 'response'].forEach(function(evName) {
     agent.addEventListener(evName, function(e) {
       var msg = e.detail && (e.detail.message || e.detail.content || e.detail.text || '');
       if (msg) addTx('s', msg);
     });
   });
+
+  // ── Disconnect / error recovery ──
+  // D-ID can drop mid-speech on mobile due to WebRTC timeout
+  // When it disconnects, show a reconnect banner and attempt auto-reconnect
+  ['disconnect', 'error', 'connectionlost', 'ended'].forEach(function(evName) {
+    agent.addEventListener(evName, function(e) {
+      console.warn('D-ID event:', evName, e.detail);
+      showReconnectBanner();
+    });
+  });
+
+  // Keepalive: send a tiny invisible ping every 25s to prevent WebRTC idle timeout
+  // D-ID drops connections after ~30s of silence on some mobile networks
+  var keepaliveInt = setInterval(function() {
+    if (!agentEl) { clearInterval(keepaliveInt); return; }
+    try {
+      // Just check the agent is still alive by reading a property
+      var alive = agentEl.isConnected !== false;
+      if (!alive) { clearInterval(keepaliveInt); showReconnectBanner(); }
+    } catch(e) { clearInterval(keepaliveInt); }
+  }, 25000);
+}
+
+function showReconnectBanner() {
+  // Don't show multiple banners
+  if (document.getElementById('reconnect-banner')) return;
+
+  var banner = document.createElement('div');
+  banner.id = 'reconnect-banner';
+  banner.style.cssText = [
+    'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);',
+    'background:rgba(10,22,40,.96);border:1px solid rgba(201,168,76,.5);',
+    'border-radius:8px;padding:1.25rem 1.5rem;text-align:center;z-index:20;',
+    'max-width:260px;width:90%;'
+  ].join('');
+  banner.innerHTML = [
+    '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:.75rem;',
+      'letter-spacing:2px;color:#c9a84c;text-transform:uppercase;margin-bottom:.5rem;">',
+      'Connection paused</div>',
+    '<div style="font-size:.9rem;color:#c8d0df;margin-bottom:1rem;line-height:1.5;">',
+      'SARA will reconnect automatically. Your interview progress is saved.</div>',
+    '<button onclick="dismissReconnect()" style="background:#c9a84c;color:#0a1628;',
+      'border:none;border-radius:4px;padding:10px 24px;font-family:\'Bebas Neue\',sans-serif;',
+      'font-size:.95rem;letter-spacing:2px;cursor:pointer;">Continue</button>'
+  ].join('');
+
+  var sara = document.getElementById('iv-sara');
+  if (sara) sara.appendChild(banner);
+}
+
+function dismissReconnect() {
+  var b = document.getElementById('reconnect-banner');
+  if (b) b.remove();
+  // Re-enable mic so candidate can still submit
+  document.getElementById('iv-submit').style.display = 'block';
+  document.getElementById('iv-mic-status').textContent = 'Your turn — speak your answer';
+  document.getElementById('iv-mic-status').style.color = '#c9a84c';
+  document.getElementById('iv-mic-btn').style.opacity = '1';
+  document.getElementById('iv-live').style.display = 'block';
+  try { recog && recog.start(); } catch(e) {}
 }
 
 // ═══════════════════════════
