@@ -263,6 +263,18 @@ did-agent::part(start-button),did-agent button[class*="start"],did-agent button[
     border-bottom:none;
   }
 
+  /* D-ID agent + start button must sit ABOVE the bottom drawer (z-index:5) */
+  #iv-sara did-agent{z-index:15 !important;}
+  #did-video-container{z-index:2;}
+
+  /* Push D-ID start button up so it clears the drawer */
+  did-agent::part(start-button),
+  did-agent button[class*="start"],
+  did-agent button[class*="conversation"],
+  did-agent button[class*="connect"]{
+    margin-bottom:46% !important;
+  }
+
   /* Candidate cam = floating PiP bubble, top-right */
   #iv-cam{
     position:absolute !important;
@@ -456,6 +468,10 @@ did-agent::part(start-button),did-agent button[class*="start"],did-agent button[
         <div id="av-speaking-ring"></div>
         <div id="av-status">Connecting...</div>
         <div id="iv-sara-lbl"><div class="n">SARA</div><div class="r">Security USA® AI</div></div>
+        <!-- Mobile start button overlay - sits above the drawer -->
+        <div id="mobile-start-overlay" style="display:none;position:absolute;bottom:48%;left:50%;transform:translateX(-50%);z-index:20;text-align:center;">
+          <button id="mobile-start-btn" onclick="clickDIDStart()" style="background:#c9a84c;color:#0a1628;border:none;border-radius:8px;padding:14px 32px;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;cursor:pointer;box-shadow:0 4px 20px rgba(201,168,76,.5);white-space:nowrap;">🎤 Start Conversation</button>
+        </div>
       </div>
 
       <!-- BOTTOM: Candidate webcam -->
@@ -619,16 +635,59 @@ function goToInterview() {
     } else if (waited >= 12000) {
       clearInterval(poll);
       setAvStatus('No connection');
-      // Show mic anyway so user can interact
       document.getElementById('iv-submit').style.display = 'block';
       document.getElementById('iv-mic-status').textContent = 'Type your answer below';
     }
+    // Check if we need to show mobile start overlay
+    checkShowMobileStart();
   }, 400);
+  // Also check periodically after wiring
+  setTimeout(function() {
+    var checkInt = setInterval(function() {
+      checkShowMobileStart();
+      // Stop checking once interview started (agent speaking)
+      if (agentEl) clearInterval(checkInt);
+    }, 800);
+    setTimeout(function() { clearInterval(checkInt); }, 30000);
+  }, 1000);
 }
 
 // ═══════════════════════════
 // WIRE D-ID AGENT
 // ═══════════════════════════
+function clickDIDStart() {
+  // Try to find and click DID's own start button
+  var agent = document.querySelector('did-agent');
+  if (!agent) return;
+  var shadow = agent.shadowRoot;
+  if (shadow) {
+    var btn = shadow.querySelector('button');
+    if (btn) { btn.click(); }
+  }
+  // Also try direct methods
+  if (typeof agent.start === 'function') agent.start();
+  if (typeof agent.connect === 'function') agent.connect();
+  // Hide our overlay
+  var ov = document.getElementById('mobile-start-overlay');
+  if (ov) ov.style.display = 'none';
+}
+
+// Show mobile start overlay when on mobile and agent is waiting
+function checkShowMobileStart() {
+  if (window.innerWidth > 768) return;
+  var agent = document.querySelector('did-agent');
+  if (!agent) return;
+  // Check if DID's start button is visible in its shadow
+  var shadow = agent.shadowRoot;
+  var didBtnVisible = false;
+  if (shadow) {
+    var btn = shadow.querySelector('button');
+    if (btn && btn.offsetParent !== null) didBtnVisible = true;
+  }
+  var ov = document.getElementById('mobile-start-overlay');
+  if (ov) ov.style.display = didBtnVisible ? 'block' : 'none';
+}
+
 function wireDIDAgent(agent) {
   setAvStatus('');
 
