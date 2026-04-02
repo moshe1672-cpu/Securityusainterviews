@@ -289,7 +289,10 @@ did-agent::part(start-button),did-agent button[class*="start"],did-agent button[
     z-index:10;
     flex:none;
     background:#000;
+    opacity:0;
+    transition:opacity .4s ease;
   }
+  body.agent-ready #iv-cam{opacity:1;}
   #iv-cam video{border-radius:14px;}
   #iv-cam-ov{border-radius:14px;background:rgba(6,14,28,.7);}
   #iv-cam-ov span:first-child{font-size:1.2rem;}
@@ -301,6 +304,7 @@ did-agent::part(start-button),did-agent button[class*="start"],did-agent button[
   }
 
   /* Transcript panel overlays bottom 40% as a translucent drawer */
+  /* Hidden until SARA connects so start button is visible */
   #iv-right{
     position:absolute;
     bottom:0;left:0;right:0;
@@ -311,6 +315,12 @@ did-agent::part(start-button),did-agent button[class*="start"],did-agent button[
     -webkit-backdrop-filter:blur(12px);
     border-top:1px solid rgba(201,168,76,.2);
     border-radius:16px 16px 0 0;
+    transform:translateY(100%);
+    transition:transform .4s ease;
+  }
+  /* Slide up once agent is connected */
+  body.agent-ready #iv-right{
+    transform:translateY(0);
   }
 
   /* Transcript header on dark background */
@@ -690,6 +700,10 @@ function checkShowMobileStart() {
 
 function wireDIDAgent(agent) {
   setAvStatus('');
+  // On mobile: show drawer once agent is wired
+  setTimeout(function() {
+    document.body.classList.add('agent-ready');
+  }, 1500); // short delay so start button is visible first
 
   // ── Speaking state ──
   agent.addEventListener('statechange', function(e) {
