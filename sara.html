@@ -355,38 +355,21 @@ did-agent::part(expand) {
 var AGENT_ID   = 'v2_agt_M7ejpYI6';
 var CLIENT_KEY = 'ck_M4Mc7iCR6GVnh4h8EW97U';
 
-var QS = [
-  "Hello! I'm SARA, your AI screening interviewer for Security USA. To start, please tell me your full name and give me a brief introduction of yourself.",
-  "How many years of security experience do you have, and what types of posts have you worked — residential, commercial, hospitals, or events?",
-  "Do you currently hold a valid New York State Security Guard License? If yes, please share your license number and expiration date.",
-  "What additional certifications do you hold? For example CPR, Fire Safety Director, Fire Guard certificates, or an armed guard permit.",
-  "Tell me about your availability. Which days and shifts can you work — day 7am to 3pm, evening 3pm to 11pm, or overnight?",
-  "Are you comfortable with on-call assignments on short notice? Can you work weekends and holidays when required?",
-  "Security USA operates in New York, New Jersey, and Florida. Are you able to work in all three locations or are you limited to a specific area?",
-  "Please describe a challenging situation you faced on duty and walk me through exactly how you handled it.",
-  "What are the most important qualities of an outstanding security guard, and how do you personally demonstrate them in your work?",
-  "Finally, why do you want to work for Security USA specifically, and where do you see your security career in the next few years?"
-];
-
 // ═══════════════════════════
 // STATE
 // ═══════════════════════════
-var agentManager = null;
 var mediaStream  = null;
 var recog        = null;
 var isListening  = false;
 var camOn        = true;
-var curQ         = 0;
-var answers      = [];
-var scores       = [];
 var liveBuf      = '';
 var timerSec     = 0;
 var timerInt     = null;
-var saraReady    = false;
-var saraSpeaking = false;
+var questionCount = 0;
+var agentEl      = null;
 
 // ═══════════════════════════
-// BEGIN — called on button click
+// BEGIN
 // ═══════════════════════════
 function beginInterview() {
   var btn = document.getElementById('begin-btn');
@@ -395,7 +378,6 @@ function beginInterview() {
   btn.style.pointerEvents = 'none';
   setStatus('Requesting camera & microphone...');
 
-  // Get camera + mic
   var camP = navigator.mediaDevices
     ? navigator.mediaDevices.getUserMedia({ video: true, audio: true })
         .then(function(stream) {
@@ -404,15 +386,12 @@ function beginInterview() {
           document.getElementById('iv-cam-ov').style.display = 'none';
           setPerm(true);
         })
-        .catch(function(e) {
-          console.warn('Camera/mic denied:', e);
-          setPerm(false);
-        })
+        .catch(function() { setPerm(false); })
     : Promise.resolve();
 
   camP.then(function() {
     setStatus('Connecting to SARA...');
-    initDIDAgent();
+    goToInterview();
   });
 }
 
@@ -421,8 +400,7 @@ function setPerm(ok) {
   var txt  = document.getElementById('perm-txt');
   icon.textContent = '✓';
   icon.style.borderColor = ok ? '#27ae60' : '#c9a84c';
-  icon.style.background  = ok ? 'rgba(39,174,96,.12)' : 'rgba(201,168,76,.06)';
-  icon.style.color       = ok ? '#27ae60' : '#c9a84c';
+  icon.style.color = ok ? '#27ae60' : '#c9a84c';
   txt.textContent = ok ? 'Camera & microphone ready' : 'Proceeding without camera';
 }
 
@@ -431,36 +409,9 @@ function setStatus(msg) {
   if (el) el.textContent = msg;
 }
 
-// ═══════════════════════════
-// D-ID AGENT SDK
-// ═══════════════════════════
-function initDIDAgent() {
-  // Go to interview immediately - D-ID loads in background into the panel
-  saraReady = false;
-  goToInterview();
-
-  // Poll for did-agent element and wire up state changes
-  var waited = 0;
-  var poll = setInterval(function() {
-    waited += 500;
-    var agent = document.querySelector('did-agent');
-    if (agent) {
-      clearInterval(poll);
-      console.log('did-agent found after', waited, 'ms');
-      saraReady = true;
-      agentManager = agent;
-      setAvStatus('Live');
-
-      agent.addEventListener('statechange', function(e) {
-        var state = e.detail && (e.detail.state || e.detail.status || '');
-        saraSpeaking = /talk/i.test(state);
-        document.getElementById('av-speaking-ring').classList.toggle('on', saraSpeaking);
-      });
-    } else if (waited >= 15000) {
-      clearInterval(poll);
-      console.warn('did-agent never found');
-    }
-  }, 500);
+function setAvStatus(txt) {
+  var el = document.getElementById('av-status');
+  if (el) el.textContent = txt;
 }
 
 // ═══════════════════════════
@@ -472,7 +423,6 @@ function goToInterview() {
   setTimeout(function() {
     intro.classList.remove('on');
     intro.style.opacity = '1';
-    document.getElementById('av-idle-photo').style.display = 'none';
     document.getElementById('s-interview').classList.add('on');
   }, 300);
 
@@ -480,14 +430,88 @@ function goToInterview() {
   timerInt = setInterval(function() {
     timerSec++;
     var m = Math.floor(timerSec / 60), s = timerSec % 60;
-    document.getElementById('hdr-timer').textContent = (m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+    document.getElementById('hdr-timer').textContent =
+      (m<10?'0':'')+m+':'+(s<10?'0':'')+s;
   }, 1000);
 
-  // Speech recognition
+  // Speech recognition for candidate
   setupRecog();
 
-  // Ask first question after short delay
-  setTimeout(function() { askQ(0); }, 1000);
+  // Wire up D-ID agent events
+  var waited = 0;
+  var poll = setInterval(function() {
+    waited += 400;
+    agentEl = document.querySelector('did-agent');
+    if (agentEl) {
+      clearInterval(poll);
+      console.log('did-agent ready');
+      wireDIDAgent(agentEl);
+    } else if (waited >= 12000) {
+      clearInterval(poll);
+      setAvStatus('No connection');
+      // Show mic anyway so user can interact
+      document.getElementById('iv-submit').style.display = 'block';
+      document.getElementById('iv-mic-status').textContent = 'Type your answer below';
+    }
+  }, 400);
+}
+
+// ═══════════════════════════
+// WIRE D-ID AGENT
+// ═══════════════════════════
+function wireDIDAgent(agent) {
+  setAvStatus('');
+
+  // Agent speaking state -> speaking ring
+  agent.addEventListener('statechange', function(e) {
+    var state = (e.detail && (e.detail.state || e.detail.status || '')).toLowerCase();
+    var speaking = state.includes('talk');
+    document.getElementById('av-speaking-ring').classList.toggle('on', speaking);
+    if (speaking) {
+      setAvStatus('Speaking...');
+      // Hide mic while SARA speaks
+      document.getElementById('iv-submit').style.display = 'none';
+      document.getElementById('iv-mic-status').textContent = 'SARA is speaking...';
+      document.getElementById('iv-mic-status').style.color = '';
+      document.getElementById('iv-mic-btn').style.opacity = '.4';
+      if (isListening) { try { recog && recog.stop(); } catch(e){} }
+    } else {
+      setAvStatus('');
+      // Enable mic after SARA finishes
+      document.getElementById('iv-submit').style.display = 'block';
+      document.getElementById('iv-mic-status').textContent = 'Your turn — speak your answer';
+      document.getElementById('iv-mic-status').style.color = '#c9a84c';
+      document.getElementById('iv-mic-btn').style.opacity = '1';
+      liveBuf = '';
+      document.getElementById('iv-live').textContent = '';
+      document.getElementById('iv-live').style.display = 'block';
+      try { recog && recog.start(); } catch(e) {}
+    }
+  });
+
+  // Agent messages -> transcript
+  agent.addEventListener('message', function(e) {
+    var msg = e.detail && (e.detail.message || e.detail.content || e.detail.text || '');
+    var role = e.detail && (e.detail.role || 'assistant');
+    if (msg) {
+      addTx(role === 'user' ? 'u' : 's', msg);
+      if (role !== 'user') {
+        questionCount++;
+        var pct = Math.min(100, Math.round(questionCount / 10 * 100));
+        document.getElementById('iv-prog-fill').style.width = pct + '%';
+        document.getElementById('iv-pct').textContent = pct + '%';
+        document.getElementById('q-num').textContent = Math.min(questionCount, 10);
+      }
+    }
+  });
+
+  // Also listen for newmessage / onNewMessage variants
+  ['newmessage', 'onNewMessage', 'chat', 'response'].forEach(function(evName) {
+    agent.addEventListener(evName, function(e) {
+      var msg = e.detail && (e.detail.message || e.detail.content || e.detail.text || '');
+      if (msg) addTx('s', msg);
+    });
+  });
 }
 
 // ═══════════════════════════
@@ -504,14 +528,11 @@ function setupRecog() {
   recog.onstart = function() {
     isListening = true;
     document.getElementById('iv-mic-btn').classList.add('on');
-    document.getElementById('iv-mic-status').textContent = 'Listening — speak now';
-    document.getElementById('iv-mic-status').style.color = '#27ae60';
     document.getElementById('iv-live').style.display = 'block';
   };
   recog.onend = function() {
     isListening = false;
     document.getElementById('iv-mic-btn').classList.remove('on');
-    document.getElementById('iv-mic-status').style.color = '';
   };
   recog.onresult = function(e) {
     var interim = '', final = '';
@@ -526,106 +547,52 @@ function setupRecog() {
 }
 
 // ═══════════════════════════
-// ASK QUESTION
-// ═══════════════════════════
-function askQ(idx) {
-  if (idx >= QS.length) { finish(); return; }
-  curQ = idx;
-  var pct = Math.round(idx / QS.length * 100);
-
-  document.getElementById('q-num').textContent = idx + 1;
-  document.getElementById('iv-prog-fill').style.width = pct + '%';
-  document.getElementById('iv-pct').textContent = pct + '%';
-  document.getElementById('iv-mic-status').textContent = 'SARA is speaking...';
-  document.getElementById('iv-mic-status').style.color = '';
-  document.getElementById('iv-mic-btn').style.opacity = '.4';
-  document.getElementById('iv-submit').style.display = 'none';
-
-  addTx('s', QS[idx]);
-
-  // Send question to D-ID agent to speak
-  var agent = document.querySelector('did-agent');
-  if (saraReady && agent) {
-    var fn = agent.speak || agent.chat || agent.send;
-    if (typeof fn === 'function') {
-      Promise.resolve(fn.call(agent, QS[idx]))
-        .then(function() { onSaraFinished(); })
-        .catch(function() { setTimeout(onSaraFinished, Math.min(4000, Math.max(2000, QS[idx].length * 40))); });
-    } else {
-      setTimeout(onSaraFinished, Math.min(4000, Math.max(2000, QS[idx].length * 40)));
-    }
-  } else {
-    setTimeout(onSaraFinished, Math.min(4000, Math.max(2000, QS[idx].length * 40)));
-  }
-}
-
-function onSaraFinished() {
-  document.getElementById('iv-mic-status').textContent = 'Your turn — speak your answer';
-  document.getElementById('iv-mic-status').style.color = '#c9a84c';
-  document.getElementById('iv-mic-btn').style.opacity = '1';
-  document.getElementById('iv-submit').style.display = 'block';
-  liveBuf = '';
-  document.getElementById('iv-live').textContent = '';
-  document.getElementById('iv-live').style.display = 'block';
-  if (recog) { try { recog.start(); } catch(e) {} }
-}
-
-// ═══════════════════════════
-// SUBMIT ANSWER
+// SUBMIT ANSWER -> send to D-ID agent
 // ═══════════════════════════
 function submitAnswer() {
   if (recog && isListening) { try { recog.stop(); } catch(e) {} }
+
   var live = document.getElementById('iv-live');
-  var ans = (liveBuf + (live.textContent || '')).trim() || 'No response recorded';
+  var ans = (liveBuf + (live.textContent || '')).trim();
+  if (!ans) return;
+
   liveBuf = '';
   live.textContent = '';
   live.style.display = 'none';
   document.getElementById('iv-submit').style.display = 'none';
-  document.getElementById('iv-mic-status').textContent = 'Processing...';
+  document.getElementById('iv-mic-status').textContent = 'Sending...';
   document.getElementById('iv-mic-btn').style.opacity = '.4';
 
   addTx('u', ans);
-  answers.push({ q: QS[curQ], a: ans });
 
-  // Score the answer
-  var kw = ['security','guard','license','patrol','supervisor','report','professional','emergency','experience','call','procedure'];
-  var sc = 2;
-  if (ans.length > 60)  sc += 2;
-  if (ans.length > 150) sc += 1;
-  kw.forEach(function(k) { if (ans.toLowerCase().indexOf(k) >= 0) sc += 0.4; });
-  sc = Math.min(10, Math.round(sc * 10) / 10);
-  scores.push(sc);
-  var avg = scores.reduce(function(a,b){return a+b;},0) / scores.length;
-  document.getElementById('iv-score-val').textContent = Math.round(avg*10)/10 + '/10';
-  document.getElementById('iv-score-fill').style.width = (avg/10*100) + '%';
+  // Send to D-ID agent
+  if (agentEl) {
+    var sendFn = agentEl.chat || agentEl.speak || agentEl.send || agentEl.respond;
+    if (typeof sendFn === 'function') {
+      sendFn.call(agentEl, ans);
+    } else {
+      // Try dispatching an input event
+      agentEl.dispatchEvent(new CustomEvent('input', { detail: { message: ans } }));
+    }
+  }
+}
 
-  var next = curQ + 1;
-  if (next >= QS.length) { finish(); return; }
+// ═══════════════════════════
+// TRANSCRIPT
+// ═══════════════════════════
+function addTx(who, text) {
+  var body = document.getElementById('iv-tx-body');
+  // Avoid duplicate entries
+  var last = body.lastElementChild;
+  if (last && last.querySelector('.tx-m') &&
+      last.querySelector('.tx-m').textContent === text) return;
 
-  // Get brief transition from Claude then ask next question
-  document.getElementById('iv-mic-status').textContent = 'SARA is thinking...';
-
-  fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 40,
-      system: 'You are SARA, a professional AI interviewer. Acknowledge this answer in ONE sentence, max 8 words. Be warm.',
-      messages: [{ role: 'user', content: 'Answer: "' + ans.substring(0, 120) + '"' }]
-    })
-  }).then(function(r) { return r.json(); })
-    .then(function(d) {
-      var reply = d.content && d.content[0] ? d.content[0].text : '';
-      if (reply) {
-        addTx('s', reply);
-        if (saraReady && document.querySelector('did-agent')) {
-          return speakWithDID(reply);
-        }
-      }
-    })
-    .catch(function() {})
-    .then(function() { askQ(next); });
+  var d = document.createElement('div');
+  d.className = who === 's' ? 'tx-s' : 'tx-u';
+  d.innerHTML = '<div class="tx-w">' + (who === 's' ? 'SARA' : 'You') +
+    '</div><div class="tx-m">' + text + '</div>';
+  body.appendChild(d);
+  body.scrollTop = body.scrollHeight;
 }
 
 // ═══════════════════════════
@@ -650,69 +617,40 @@ function camToggle() {
   document.getElementById('iv-camtog').textContent = camOn ? 'Cam On' : 'Cam Off';
 }
 
-function addTx(who, text) {
-  var body = document.getElementById('iv-tx-body');
-  var d = document.createElement('div');
-  d.className = who === 's' ? 'tx-s' : 'tx-u';
-  d.innerHTML = '<div class="tx-w">' + (who === 's' ? 'SARA' : 'You') + '</div><div class="tx-m">' + text + '</div>';
-  body.appendChild(d);
-  body.scrollTop = body.scrollHeight;
-}
-
-// ═══════════════════════════
-// FINISH
-// ═══════════════════════════
 function finish() {
   clearInterval(timerInt);
   if (recog) { try { recog.stop(); } catch(e) {} }
   if (mediaStream) mediaStream.getTracks().forEach(function(t) { t.stop(); });
-  if (agentManager) { try { agentManager.disconnect(); } catch(e) {} }
-
-  var avg = scores.length ? scores.reduce(function(a,b){return a+b;},0)/scores.length : 6;
-  var ov = Math.round(avg * 10) / 10;
-  document.getElementById('sc-num').textContent = ov;
-
-  var rec = document.getElementById('sc-rec');
-  if (ov >= 7)      { rec.textContent = 'Recommend Hire';    rec.style.color = '#27ae60'; rec.style.borderColor = '#27ae60'; }
-  else if (ov >= 5) { rec.textContent = 'Under Review';      rec.style.color = '#c9a84c'; rec.style.borderColor = '#c9a84c'; }
-  else              { rec.textContent = 'Not Recommended';   rec.style.color = '#c0392b'; rec.style.borderColor = '#c0392b'; }
-
-  var cats = [
-    {n:'Communication', s:avg+(Math.random()-.3)*2},
-    {n:'Experience',    s:avg+(Math.random()-.4)*2},
-    {n:'Professionalism',s:avg+(Math.random()-.2)*2},
-    {n:'Availability',  s:avg+(Math.random()-.5)*2},
-    {n:'Licensing',     s:avg+(Math.random()-.3)*2}
-  ];
-  document.getElementById('sc-cats').innerHTML = cats.map(function(c) {
-    var sv = Math.max(1, Math.min(10, Math.round(c.s * 10)/10));
-    return '<div class="sc-cat"><div class="sc-cl">'+c.n+'</div><div class="sc-cb"><div class="sc-cf" style="width:'+(sv/10*100)+'%"></div></div><div class="sc-cv">'+sv+'</div></div>';
-  }).join('');
-
-  document.getElementById('sc-nt').textContent = ov >= 7
-    ? 'Candidate demonstrated strong communication and relevant security experience. Recommended for onboarding.'
-    : ov >= 5
-    ? 'Candidate showed adequate knowledge. Licensing and availability should be verified before proceeding.'
-    : 'Candidate responses did not sufficiently demonstrate required experience for this position.';
 
   document.getElementById('s-interview').classList.remove('on');
   document.getElementById('s-score').classList.add('on');
+
+  document.getElementById('sc-num').textContent = '—';
+  document.getElementById('sc-rec').textContent = 'Under Review';
+  document.getElementById('sc-nt').textContent =
+    'Interview completed. Security USA HR team will review and be in touch within 3-5 business days.';
 }
 
 // ═══════════════════════════
-// BOOT — wire up buttons
+// BOOT
 // ═══════════════════════════
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('begin-btn').addEventListener('click', beginInterview);
   document.getElementById('iv-mic-btn').addEventListener('click', micToggle);
   document.getElementById('iv-camtog').addEventListener('click', camToggle);
   document.getElementById('iv-submit').addEventListener('click', submitAnswer);
-  document.getElementById('iv-end').addEventListener('click', function() { if (confirm('End interview?')) finish(); });
-  document.getElementById('hdr-exit').addEventListener('click', function() { if (confirm('Exit?')) window.location.href = 'index.html'; });
-  document.getElementById('sc-sched').addEventListener('click', function() { window.location.href = 'index.html'; });
-  document.getElementById('sc-back').addEventListener('click',  function() { window.location.href = 'index.html'; });
-
-// D-ID photo fetch removed - using static image
+  document.getElementById('iv-end').addEventListener('click', function() {
+    if (confirm('End interview?')) finish();
+  });
+  document.getElementById('hdr-exit').addEventListener('click', function() {
+    if (confirm('Exit?')) window.location.href = 'index.html';
+  });
+  document.getElementById('sc-sched').addEventListener('click', function() {
+    window.location.href = 'index.html';
+  });
+  document.getElementById('sc-back').addEventListener('click', function() {
+    window.location.href = 'index.html';
+  });
 });
 </script>
 </body>
