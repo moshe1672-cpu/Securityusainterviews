@@ -327,7 +327,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a1628;color:#1a234
 // CONFIG
 // ═══════════════════════════
 var AGENT_ID   = 'v2_agt_M7ejpYI6';
-var CLIENT_KEY = 'Y2tfTTRNYzdpQ1I2R1ZuaDRoOEVXOTdV';
+var CLIENT_KEY = 'ck_M4Mc7iCR6GVnh4h8EW97U';
 
 var QS = [
   "Hello! I'm SARA, your AI screening interviewer for Security USA. To start, please tell me your full name and give me a brief introduction of yourself.",
@@ -409,36 +409,31 @@ function setStatus(msg) {
 // D-ID AGENT SDK
 // ═══════════════════════════
 function initDIDAgent() {
-  // Log ALL window properties that have createAgentManager
-  console.log('=== D-ID SDK Debug ===');
-  console.log('window.DID:', typeof window.DID);
-  console.log('window.createAgentManager:', typeof window.createAgentManager);
-  
-  // The D-ID UMD bundle name varies by version - try all known names
+  // Find createAgentManager - UMD bundle
   var createFn = null;
-  var names = Object.keys(window);
-  for (var i = 0; i < names.length; i++) {
-    var k = names[i];
+  var keys = Object.keys(window);
+  for (var i = 0; i < keys.length; i++) {
+    var k = keys[i];
     try {
-      if (window[k] && typeof window[k] === 'object' && typeof window[k].createAgentManager === 'function') {
+      if (window[k] && typeof window[k].createAgentManager === 'function') {
         createFn = window[k].createAgentManager.bind(window[k]);
-        console.log('Found createAgentManager at window.' + k);
+        console.log('D-ID SDK found at window.' + k);
         break;
       }
     } catch(e) {}
   }
   if (!createFn && typeof window.createAgentManager === 'function') {
     createFn = window.createAgentManager;
-    console.log('Found createAgentManager directly on window');
   }
-
   if (!createFn) {
-    console.error('D-ID SDK not found. Scripts on page:',
-      Array.from(document.scripts).map(function(s){ return s.src || 'inline'; }).join(', '));
-    setAvStatus('No SDK');
+    console.error('D-ID SDK not found');
     startFallback();
     return;
   }
+  _connectDIDAgent(createFn);
+}
+
+function _connectDIDAgent(createFn) {
 
   console.log('Connecting to agent:', AGENT_ID, 'with key:', CLIENT_KEY.substring(0,10) + '...');
   setAvStatus('Connecting...');
