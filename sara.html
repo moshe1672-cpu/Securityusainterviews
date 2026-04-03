@@ -6,16 +6,7 @@
 <title>SARA — AI Interview | Security USA®</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
-<!-- D-ID Agents SDK -->
-<script type="module"
-  src="https://agent.d-id.com/v2/index.js"
-  data-name="did-agent"
-  data-mode="full"
-  data-client-key="ck_M4Mc7iCR6GVnh4h8EW97U"
-  data-agent-id="v2_agt_M7ejpYI6"
-  data-monitor="true"
-  data-target-id="did-video-container">
-</script>
+<!-- D-ID script loaded dynamically when interview starts -->
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
@@ -62,8 +53,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--navy);color:va
   padding:1.5rem 1.25rem;text-align:center;
   overflow-y:auto;background:var(--surface);
   transition:opacity .3s ease;
-  position:relative;
-  z-index:50;
 }
 .intro-avatar{
   width:110px;height:110px;border-radius:50%;overflow:hidden;
@@ -115,8 +104,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--navy);color:va
 
 /* D-ID fills container */
 did-agent{position:absolute !important;inset:0 !important;width:100% !important;height:100% !important;z-index:1;}
-/* Prevent did-agent from intercepting intro screen clicks */
-#s-intro ~ * did-agent, body:not(.interview-active) did-agent{pointer-events:none !important;}
 did-agent::part(controls),did-agent::part(header),did-agent::part(footer),
 did-agent::part(minimize),did-agent::part(close),did-agent::part(expand){display:none !important;}
 did-agent::part(start-button),did-agent button[class*="start"],did-agent button[class*="conversation"],did-agent button[class*="connect"]{
@@ -627,6 +614,18 @@ function goToInterview() {
     intro.style.opacity = '1';
     document.getElementById('s-interview').classList.add('on');
     document.body.classList.add('interview-active');
+
+    // NOW load D-ID script - after intro is fully hidden
+    var didScript = document.createElement('script');
+    didScript.type = 'module';
+    didScript.src = 'https://agent.d-id.com/v2/index.js';
+    didScript.setAttribute('data-name', 'did-agent');
+    didScript.setAttribute('data-mode', 'full');
+    didScript.setAttribute('data-client-key', 'ck_M4Mc7iCR6GVnh4h8EW97U');
+    didScript.setAttribute('data-agent-id', 'v2_agt_M7ejpYI6');
+    didScript.setAttribute('data-monitor', 'true');
+    didScript.setAttribute('data-target-id', 'did-video-container');
+    document.head.appendChild(didScript);
   }, 300);
 
   // Timer
