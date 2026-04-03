@@ -803,7 +803,29 @@ function wireDIDAgent(agent) {
   // On mobile: show drawer once agent is wired
   setTimeout(function() {
     document.body.classList.add('agent-ready');
-  }, 1500); // short delay so start button is visible first
+  }, 1500);
+
+  // Inject today's date into the conversation as soon as agent is ready
+  // This tells SARA the current date without needing API write access
+  setTimeout(function() {
+    var today = new Date();
+    var dateStr = today.toLocaleDateString('en-US', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    });
+    var dateMsg = 'System note: Today is ' + dateStr + '. Use this date if asked.';
+    // Send via agent chat function if available
+    var sendFn = agent.chat || agent.speak || agent.send;
+    if (typeof sendFn === 'function') {
+      try { sendFn.call(agent, dateMsg); } catch(e) {}
+    }
+    // Also dispatch as a hidden input event
+    try {
+      agent.dispatchEvent(new CustomEvent('input', {
+        detail: { message: dateMsg, hidden: true }
+      }));
+    } catch(e) {}
+    console.log('Date injected into conversation:', dateStr);
+  }, 3000); // after agent is fully connected
 
   // ── Speaking state ──
   agent.addEventListener('statechange', function(e) {
