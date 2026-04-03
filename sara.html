@@ -456,22 +456,22 @@ did-agent::part(start-button),did-agent button[class*="start"],did-agent button[
   </div>
   <p style="font-family:'Barlow Condensed',sans-serif;font-size:.78rem;letter-spacing:2px;color:#8a6f2e;text-transform:uppercase;margin-bottom:.65rem;font-weight:700;">Please confirm all items before starting:</p>
   <div class="checks" id="checklist">
-    <label class="chk chk-box" onclick="toggleCheck(this)">
-      <span class="chk-i chk-tick" id="chk1">✗</span>
+    <div class="chk chk-box" id="chk1" onclick="toggleCheck('chk1')">
+      <span class="chk-i">✓</span>
       <span>I am in a quiet, well-lit location</span>
-    </label>
-    <label class="chk chk-box" onclick="toggleCheck(this)">
-      <span class="chk-i chk-tick" id="chk2">✗</span>
+    </div>
+    <div class="chk chk-box" id="chk2" onclick="toggleCheck('chk2')">
+      <span class="chk-i">✓</span>
       <span>I will speak clearly and at a normal pace</span>
-    </label>
-    <label class="chk chk-box" onclick="toggleCheck(this)">
-      <span class="chk-i chk-tick" id="chk3">✗</span>
+    </div>
+    <div class="chk chk-box" id="chk3" onclick="toggleCheck('chk3')">
+      <span class="chk-i">✓</span>
       <span>I have my security license number ready</span>
-    </label>
-    <label class="chk chk-box" onclick="toggleCheck(this)">
-      <span class="chk-i chk-tick" id="chk4">✗</span>
+    </div>
+    <div class="chk chk-box" id="chk4" onclick="toggleCheck('chk4')">
+      <span class="chk-i">✓</span>
       <span>I understand this interview will be recorded</span>
-    </label>
+    </div>
   </div>
   <button id="begin-btn" disabled>Begin Interview →</button>
   <div class="note-sm" id="begin-hint" style="color:#c0392b;font-weight:500;">Please check all 4 boxes above to continue</div>
@@ -584,20 +584,24 @@ var transcriptLog = []; // stores {role, text} for scoring
 // ═══════════════════════════
 // BEGIN
 // ═══════════════════════════
-function toggleCheck(el) {
+function toggleCheck(id) {
+  var el = document.getElementById(id);
+  if (!el) return;
   el.classList.toggle('checked');
-  var allChecked = document.querySelectorAll('.chk-box.checked').length === 4;
+  var checked = document.querySelectorAll('.chk-box.checked').length;
+  var allChecked = checked === 4;
   var btn  = document.getElementById('begin-btn');
   var hint = document.getElementById('begin-hint');
   btn.disabled = !allChecked;
   if (allChecked) {
-    hint.textContent = 'All set — you can begin your interview!';
+    hint.textContent = '✓ All set — tap Begin Interview to start!';
     hint.style.color = '#27ae60';
-    btn.style.opacity = '1';
+    hint.style.fontWeight = '600';
   } else {
-    var remaining = 4 - document.querySelectorAll('.chk-box.checked').length;
-    hint.textContent = remaining + ' item' + (remaining > 1 ? 's' : '') + ' remaining — please check all boxes to continue';
+    var remaining = 4 - checked;
+    hint.textContent = remaining + ' item' + (remaining > 1 ? 's' : '') + ' remaining — check all boxes to continue';
     hint.style.color = '#c0392b';
+    hint.style.fontWeight = '500';
   }
 }
 
