@@ -966,6 +966,15 @@ function submitAnswer() {
   var ans = (liveBuf + (live.textContent || '')).trim();
   if (!ans) return;
 
+  // Secret codeword to skip to end for testing
+  if (ans.toLowerCase().trim() === 'endtest') {
+    liveBuf = '';
+    live.textContent = '';
+    live.style.display = 'none';
+    showInterviewCompleteOverlay();
+    return;
+  }
+
   liveBuf = '';
   live.textContent = '';
   live.style.display = 'none';
