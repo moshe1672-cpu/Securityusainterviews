@@ -863,7 +863,7 @@ function wireDIDAgent(agent) {
     }
   });
 
-  // ── Transcript messages ──
+  // ── Mute mic immediately when ANY agent message starts (belt + suspenders) ──
   agent.addEventListener('message', function(e) {
     var msg = e.detail && (e.detail.message || e.detail.content || e.detail.text || '');
     var role = e.detail && (e.detail.role || 'assistant');
@@ -871,17 +871,20 @@ function wireDIDAgent(agent) {
       // Store in transcript array for scoring
       transcriptLog.push({ role: role === 'user' ? 'candidate' : 'sara', text: msg });
       addTx(role === 'user' ? 'u' : 's', msg);
+      // Mute mic whenever SARA sends a message (she's about to speak)
       if (role !== 'user') {
+        if (mediaStream) mediaStream.getAudioTracks().forEach(function(t){ t.enabled = false; });
+        if (isListening) { try { recog && recog.stop(); } catch(e){} }
         questionCount++;
         var pct = Math.min(100, Math.round(questionCount / 10 * 100));
         document.getElementById('iv-prog-fill').style.width = pct + '%';
         document.getElementById('iv-pct').textContent = pct + '%';
         document.getElementById('q-num').textContent = Math.min(questionCount, 10);
-        // Detect outro - show complete overlay after SARA wraps up
+        // Detect outro
         var lower = msg.toLowerCase();
         if (lower.includes('hr team') || lower.includes('business days') ||
             lower.includes('good luck') || lower.includes('concludes your') ||
-            lower.includes('completes your') || lower.includes('thank you') && questionCount >= 10) {
+            lower.includes('completes your') || (lower.includes('thank you') && questionCount >= 10)) {
           setTimeout(showInterviewCompleteOverlay, 2500);
         }
       }
