@@ -703,6 +703,11 @@ function goToInterview() {
     document.getElementById('s-interview').classList.add('on');
     document.body.classList.add('interview-active');
 
+    // Inject today's date into agent prompt before loading
+    var today = new Date();
+    var dateStr = today.toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+    updateAgentDate(dateStr);
+
     // NOW load D-ID script - after intro is fully hidden
     var didScript = document.createElement('script');
     didScript.type = 'module';
@@ -1045,6 +1050,24 @@ function camToggle() {
   mediaStream.getVideoTracks().forEach(function(t) { t.enabled = camOn; });
   document.getElementById('iv-cam-ov').style.display = camOn ? 'none' : 'flex';
   document.getElementById('iv-camtog').textContent = camOn ? 'Cam On' : 'Cam Off';
+}
+
+function updateAgentDate(dateStr) {
+  // PATCH the D-ID agent to include today's real date in its system prompt
+  fetch('/api/did-proxy?path=' + encodeURIComponent('/agents/v2_agt_M7ejpYI6'), {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      llm: {
+        prompt_customization: {
+          personality: 'Friendly and Professional',
+          prompt_knowledge: 'Today\'s date is ' + dateStr + '. Always use this exact date when asked what day, date, or time it is. Never guess or use a different date.'
+        }
+      }
+    })
+  })
+  .then(function(r) { console.log('Agent date updated:', dateStr, 'Status:', r.status); })
+  .catch(function(e) { console.warn('Agent date update failed:', e.message); });
 }
 
 function showInterviewCompleteOverlay() {
