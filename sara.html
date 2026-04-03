@@ -457,7 +457,7 @@ did-agent::part(start-button),did-agent button[class*="start"],did-agent button[
       I understand this interview will be recorded
     </label>
   </div>
-  <button id="begin-btn" onclick="if(!this.disabled)beginInterview()" style="background:#c8b97a;color:#0a1628;border:none;border-radius:6px;padding:15px 48px;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:3px;cursor:not-allowed;transition:all .2s;margin-bottom:.65rem;box-shadow:none;width:100%;max-width:320px;opacity:.55;" id-disabled="true">Begin Interview →</button>
+  <button id="begin-btn" onclick="beginInterview()">Begin Interview →</button>>
   <div id="begin-hint" style="margin-top:.5rem;font-size:.88rem;color:#c0392b;font-weight:500;">Check all 4 boxes above to continue</div>
   <div id="status-msg"></div>
 </div>
@@ -575,23 +575,12 @@ function updateChecklist() {
             document.getElementById('chk4').checked;
   var btn  = document.getElementById('begin-btn');
   var hint = document.getElementById('begin-hint');
-  // Use style instead of disabled attribute to avoid any CSS conflicts
   if (all) {
-    btn.removeAttribute('id-disabled');
-    btn.style.background = '#c9a84c';
-    btn.style.opacity = '1';
-    btn.style.cursor = 'pointer';
-    btn.style.boxShadow = '0 4px 24px rgba(201,168,76,.35)';
-    btn.disabled = false;
+    btn.style.cssText = 'background:#c9a84c;color:#0a1628;border:none;border-radius:6px;padding:15px 48px;font-family:Bebas Neue,sans-serif;font-size:1.1rem;letter-spacing:3px;cursor:pointer;width:100%;max-width:320px;margin-bottom:.65rem;box-shadow:0 4px 24px rgba(201,168,76,.35);opacity:1;';
     hint.textContent = '✓ All set — tap Begin Interview to start!';
     hint.style.color = '#27ae60';
   } else {
-    btn.setAttribute('id-disabled', 'true');
-    btn.style.background = '#c8b97a';
-    btn.style.opacity = '.55';
-    btn.style.cursor = 'not-allowed';
-    btn.style.boxShadow = 'none';
-    btn.disabled = true;
+    btn.style.cssText = 'background:#c8b97a;color:#0a1628;border:none;border-radius:6px;padding:15px 48px;font-family:Bebas Neue,sans-serif;font-size:1.1rem;letter-spacing:3px;cursor:not-allowed;width:100%;max-width:320px;margin-bottom:.65rem;opacity:.5;';
     var n = [1,2,3,4].filter(function(i){return !document.getElementById('chk'+i).checked;}).length;
     hint.textContent = n + ' item' + (n>1?'s':'') + ' remaining';
     hint.style.color = '#c0392b';
@@ -599,6 +588,14 @@ function updateChecklist() {
 }
 
 function beginInterview() {
+  // Guard: ensure all boxes checked
+  if (!document.getElementById('chk1').checked ||
+      !document.getElementById('chk2').checked ||
+      !document.getElementById('chk3').checked ||
+      !document.getElementById('chk4').checked) {
+    updateChecklist();
+    return;
+  }
   var btn = document.getElementById('begin-btn');
   btn.textContent = 'Starting...';
   btn.style.opacity = '.7';
