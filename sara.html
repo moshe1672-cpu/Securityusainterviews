@@ -794,9 +794,17 @@ function wireDIDAgent(agent) {
       document.getElementById('iv-mic-status').textContent = 'SARA is speaking...';
       document.getElementById('iv-mic-status').style.color = '';
       document.getElementById('iv-mic-btn').style.opacity = '.4';
+      // Stop speech recognition and mute mic so SARA doesn't hear herself
       if (isListening) { try { recog && recog.stop(); } catch(e){} }
+      if (mediaStream) {
+        mediaStream.getAudioTracks().forEach(function(t) { t.enabled = false; });
+      }
     } else if (state && !state.includes('connect') && !state.includes('load')) {
       setAvStatus('');
+      // Unmute mic now that SARA is done speaking
+      if (mediaStream) {
+        mediaStream.getAudioTracks().forEach(function(t) { t.enabled = true; });
+      }
       document.getElementById('iv-submit').style.display = 'block';
       document.getElementById('iv-mic-status').textContent = 'Your turn — speak your answer';
       document.getElementById('iv-mic-status').style.color = '#c9a84c';
