@@ -291,10 +291,10 @@ did-agent::part(start-button),did-agent button[class*="start"],did-agent button[
     margin-bottom:46% !important;
   }
 
-  /* Candidate cam = floating PiP bubble, bottom-right (above drawer) */
+  /* Candidate cam = floating PiP bubble, lower-right */
   #iv-cam{
     position:absolute !important;
-    bottom:44%;
+    bottom:42%;
     right:.85rem;
     width:100px;
     height:136px;
@@ -324,19 +324,35 @@ did-agent::part(start-button),did-agent button[class*="start"],did-agent button[
   #iv-right{
     position:absolute;
     bottom:0;left:0;right:0;
-    height:42%;
+    height:40%;
     z-index:5;
-    background:rgba(10,22,40,.92);
-    backdrop-filter:blur(12px);
-    -webkit-backdrop-filter:blur(12px);
-    border-top:1px solid rgba(201,168,76,.2);
-    border-radius:16px 16px 0 0;
+    background:rgba(10,22,40,.95);
+    backdrop-filter:blur(16px);
+    -webkit-backdrop-filter:blur(16px);
+    border-top:1px solid rgba(201,168,76,.25);
+    border-radius:20px 20px 0 0;
     transform:translateY(100%);
     transition:transform .4s ease;
   }
   /* Slide up once agent is connected */
   body.agent-ready #iv-right{
     transform:translateY(0);
+  }
+
+  /* SARA fills ALL remaining space - no gap */
+  #iv-sara{
+    position:absolute;
+    inset:0;
+    flex:none;
+  }
+
+  /* did-agent fills sara panel completely */
+  #iv-sara did-agent,
+  #iv-sara #did-video-container{
+    position:absolute;
+    inset:0;
+    width:100% !important;
+    height:100% !important;
   }
 
   /* Transcript header on dark background */
