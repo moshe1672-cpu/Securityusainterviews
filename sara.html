@@ -78,8 +78,13 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--navy);color:va
 .stat-l{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:2px;color:var(--text3);text-transform:uppercase;}
 .checks{text-align:left;display:inline-flex;flex-direction:column;gap:.45rem;margin-bottom:1.5rem;}
 .chk{display:flex;align-items:center;gap:.65rem;font-size:.95rem;color:var(--text2);}
-.chk-i{width:20px;height:20px;border-radius:50%;border:1px solid var(--green);background:rgba(39,174,96,.12);color:var(--green);display:flex;align-items:center;justify-content:center;font-size:.65rem;flex-shrink:0;}
+.chk-box{cursor:pointer;padding:.5rem .65rem;border-radius:8px;border:1.5px solid var(--border);background:#fff;transition:all .2s;user-select:none;-webkit-user-select:none;}
+.chk-box:hover{border-color:rgba(201,168,76,.4);background:#fffdf5;}
+.chk-box.checked{border-color:var(--green);background:rgba(39,174,96,.06);}
+.chk-i{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);background:#fff;color:transparent;display:flex;align-items:center;justify-content:center;font-size:.72rem;flex-shrink:0;transition:all .2s;font-weight:700;}
+.chk-box.checked .chk-i{border-color:var(--green);background:var(--green);color:#fff;}
 .chk-i.q{border-color:rgba(201,168,76,.4);background:rgba(201,168,76,.06);color:var(--gold);}
+#begin-btn:disabled{background:#c8b97a;cursor:not-allowed;opacity:.55;transform:none !important;box-shadow:none;}
 #begin-btn{
   background:var(--gold);color:var(--navy);border:none;border-radius:6px;
   padding:15px 48px;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;
@@ -449,14 +454,27 @@ did-agent::part(start-button),did-agent button[class*="start"],did-agent button[
     <div><div class="stat-n">~15</div><div class="stat-l">Minutes</div></div>
     <div><div class="stat-n">100%</div><div class="stat-l">Secure</div></div>
   </div>
-  <div class="checks">
-    <div class="chk"><span class="chk-i">✓</span>Find a quiet, well-lit location</div>
-    <div class="chk"><span class="chk-i">✓</span>Speak clearly and at a normal pace</div>
-    <div class="chk"><span class="chk-i">✓</span>Have your security license number ready</div>
-    <div class="chk"><span class="chk-i q" id="perm-icon">?</span><span id="perm-txt">Camera &amp; microphone access required</span></div>
+  <p style="font-family:'Barlow Condensed',sans-serif;font-size:.78rem;letter-spacing:2px;color:#8a6f2e;text-transform:uppercase;margin-bottom:.65rem;font-weight:700;">Please confirm all items before starting:</p>
+  <div class="checks" id="checklist">
+    <label class="chk chk-box" onclick="toggleCheck(this)">
+      <span class="chk-i chk-tick" id="chk1">✗</span>
+      <span>I am in a quiet, well-lit location</span>
+    </label>
+    <label class="chk chk-box" onclick="toggleCheck(this)">
+      <span class="chk-i chk-tick" id="chk2">✗</span>
+      <span>I will speak clearly and at a normal pace</span>
+    </label>
+    <label class="chk chk-box" onclick="toggleCheck(this)">
+      <span class="chk-i chk-tick" id="chk3">✗</span>
+      <span>I have my security license number ready</span>
+    </label>
+    <label class="chk chk-box" onclick="toggleCheck(this)">
+      <span class="chk-i chk-tick" id="chk4">✗</span>
+      <span>I understand this interview will be recorded</span>
+    </label>
   </div>
-  <button id="begin-btn">Begin Interview →</button>
-  <div class="note-sm">Click the button to allow camera &amp; microphone, then your interview will begin.</div>
+  <button id="begin-btn" disabled>Begin Interview →</button>
+  <div class="note-sm" id="begin-hint" style="color:#c0392b;font-weight:500;">Please check all 4 boxes above to continue</div>
   <div id="status-msg"></div>
 </div>
 
@@ -566,6 +584,23 @@ var transcriptLog = []; // stores {role, text} for scoring
 // ═══════════════════════════
 // BEGIN
 // ═══════════════════════════
+function toggleCheck(el) {
+  el.classList.toggle('checked');
+  var allChecked = document.querySelectorAll('.chk-box.checked').length === 4;
+  var btn  = document.getElementById('begin-btn');
+  var hint = document.getElementById('begin-hint');
+  btn.disabled = !allChecked;
+  if (allChecked) {
+    hint.textContent = 'All set — you can begin your interview!';
+    hint.style.color = '#27ae60';
+    btn.style.opacity = '1';
+  } else {
+    var remaining = 4 - document.querySelectorAll('.chk-box.checked').length;
+    hint.textContent = remaining + ' item' + (remaining > 1 ? 's' : '') + ' remaining — please check all boxes to continue';
+    hint.style.color = '#c0392b';
+  }
+}
+
 function beginInterview() {
   var btn = document.getElementById('begin-btn');
   btn.textContent = 'Starting...';
