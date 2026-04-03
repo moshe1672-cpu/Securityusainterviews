@@ -445,15 +445,27 @@ did-agent::part(start-button),did-agent button[class*="start"],did-agent button[
     <div><div class="stat-n">~15</div><div class="stat-l">Minutes</div></div>
     <div><div class="stat-n">100%</div><div class="stat-l">Secure</div></div>
   </div>
-  <p style="font-family:'Barlow Condensed',sans-serif;font-size:.78rem;letter-spacing:2px;color:#8a6f2e;text-transform:uppercase;margin-bottom:.65rem;font-weight:700;">Please confirm all items before starting:</p>
-  <div class="checks" id="checklist">
-    <div class="chk chk-box" id="chk1"><span class="chk-i">✓</span><span>I am in a quiet, well-lit location</span></div>
-    <div class="chk chk-box" id="chk2"><span class="chk-i">✓</span><span>I will speak clearly and at a normal pace</span></div>
-    <div class="chk chk-box" id="chk3"><span class="chk-i">✓</span><span>I have my security license number ready</span></div>
-    <div class="chk chk-box" id="chk4"><span class="chk-i">✓</span><span>I understand this interview will be recorded</span></div>
+  <p style="font-family:'Barlow Condensed',sans-serif;font-size:.78rem;letter-spacing:2px;color:#8a6f2e;text-transform:uppercase;margin-bottom:.75rem;font-weight:700;">Please confirm all items before starting:</p>
+  <div id="checklist" style="display:flex;flex-direction:column;gap:.6rem;margin-bottom:1.5rem;text-align:left;width:100%;max-width:360px;">
+    <label style="display:flex;align-items:center;gap:12px;padding:12px 14px;border:2px solid #dde2ed;border-radius:8px;background:#fff;cursor:pointer;font-size:.95rem;color:#374060;">
+      <input type="checkbox" id="chk1" onchange="updateChecklist()" style="width:20px;height:20px;cursor:pointer;accent-color:#27ae60;flex-shrink:0;">
+      I am in a quiet, well-lit location
+    </label>
+    <label style="display:flex;align-items:center;gap:12px;padding:12px 14px;border:2px solid #dde2ed;border-radius:8px;background:#fff;cursor:pointer;font-size:.95rem;color:#374060;">
+      <input type="checkbox" id="chk2" onchange="updateChecklist()" style="width:20px;height:20px;cursor:pointer;accent-color:#27ae60;flex-shrink:0;">
+      I will speak clearly and at a normal pace
+    </label>
+    <label style="display:flex;align-items:center;gap:12px;padding:12px 14px;border:2px solid #dde2ed;border-radius:8px;background:#fff;cursor:pointer;font-size:.95rem;color:#374060;">
+      <input type="checkbox" id="chk3" onchange="updateChecklist()" style="width:20px;height:20px;cursor:pointer;accent-color:#27ae60;flex-shrink:0;">
+      I have my security license number ready
+    </label>
+    <label style="display:flex;align-items:center;gap:12px;padding:12px 14px;border:2px solid #dde2ed;border-radius:8px;background:#fff;cursor:pointer;font-size:.95rem;color:#374060;">
+      <input type="checkbox" id="chk4" onchange="updateChecklist()" style="width:20px;height:20px;cursor:pointer;accent-color:#27ae60;flex-shrink:0;">
+      I understand this interview will be recorded
+    </label>
   </div>
   <button id="begin-btn" disabled>Begin Interview →</button>
-  <div class="note-sm" id="begin-hint" style="color:#c0392b;font-weight:500;">Check all 4 boxes above to continue</div>
+  <div id="begin-hint" style="margin-top:.5rem;font-size:.88rem;color:#c0392b;font-weight:500;">Check all 4 boxes above to continue</div>
   <div id="status-msg"></div>
 </div>
 
@@ -563,6 +575,24 @@ var transcriptLog = []; // stores {role, text} for scoring
 // ═══════════════════════════
 // BEGIN
 // ═══════════════════════════
+function updateChecklist() {
+  var all = document.getElementById('chk1').checked &&
+            document.getElementById('chk2').checked &&
+            document.getElementById('chk3').checked &&
+            document.getElementById('chk4').checked;
+  var btn  = document.getElementById('begin-btn');
+  var hint = document.getElementById('begin-hint');
+  btn.disabled = !all;
+  if (all) {
+    hint.textContent = '✓ All set — tap Begin Interview to start!';
+    hint.style.color = '#27ae60';
+  } else {
+    var n = [1,2,3,4].filter(function(i){return !document.getElementById('chk'+i).checked;}).length;
+    hint.textContent = n + ' item' + (n>1?'s':'') + ' remaining';
+    hint.style.color = '#c0392b';
+  }
+}
+
 function beginInterview() {
   var btn = document.getElementById('begin-btn');
   btn.textContent = 'Starting...';
@@ -1050,33 +1080,6 @@ function showScorecard(scores) {
 // BOOT
 // ═══════════════════════════
 document.addEventListener('DOMContentLoaded', function() {
-
-  // ── CHECKLIST ──
-  var boxes = document.querySelectorAll('.chk-box');
-  boxes.forEach(function(box) {
-    function handleToggle(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      box.classList.toggle('checked');
-      var checked = document.querySelectorAll('.chk-box.checked').length;
-      var btn  = document.getElementById('begin-btn');
-      var hint = document.getElementById('begin-hint');
-      if (checked === 4) {
-        btn.disabled = false;
-        hint.textContent = '✓ All set — tap Begin Interview to start!';
-        hint.style.color = '#27ae60';
-        hint.style.fontWeight = '600';
-      } else {
-        btn.disabled = true;
-        var rem = 4 - checked;
-        hint.textContent = rem + ' item' + (rem > 1 ? 's' : '') + ' remaining';
-        hint.style.color = '#c0392b';
-        hint.style.fontWeight = '500';
-      }
-    }
-    box.addEventListener('click', handleToggle);
-    box.addEventListener('touchend', handleToggle);
-  });
 
   document.getElementById('begin-btn').addEventListener('click', beginInterview);
   document.getElementById('iv-mic-btn').addEventListener('click', micToggle);
