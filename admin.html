@@ -592,27 +592,85 @@ function renderApps(apps) {
 // ── RENDER INTERVIEWS ──
 function renderInterviews(interviews) {
   const tbody = document.getElementById('interviews-tbody');
-  if (!interviews.length) {
-    tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="icon">🎤</div><p>No interview results yet</p></div></td></tr>';
+  if (!tbody) return;
+  if (!interviews || !interviews.length) {
+    tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><div class="icon">🎤</div><p>No interview results yet</p></div></td></tr>';
     return;
   }
   tbody.innerHTML = interviews.map(iv => {
-    const name = (iv.candidates?.first_name || '') + ' ' + (iv.candidates?.last_name || '');
-    const scores = iv.scores || {};
-    const overall = scores.overall || '—';
-    const rec    = iv.recommendation || '—';
-    const comm   = scores.categories?.find(c => c.name === 'Communication')?.score || '—';
-    const exp    = scores.categories?.find(c => c.name === 'Experience')?.score || '—';
-    return `<tr>
-      <td><div class="candidate-name">${name.trim()}</div><div class="candidate-email">${iv.candidates?.email || ''}</div></td>
-      <td style="font-size:.85rem;color:var(--text3);">${formatDate(iv.completed_at)}</td>
-      <td style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:${scoreColor(overall)};">${overall}/10</td>
-      <td><span class="badge badge-${rec === 'hire' ? 'hire' : rec === 'review' ? 'review' : 'pass'}">${recLabel(rec)}</span></td>
-      <td style="font-size:.88rem;">${comm}</td>
-      <td style="font-size:.88rem;">${exp}</td>
-      <td><button class="action-btn">View</button></td>
+    const name    = ((iv.candidates?.first_name || '') + ' ' + (iv.candidates?.last_name || '')).trim() || '—';
+    const email   = iv.candidates?.email || '';
+    const overall = iv.score_overall != null ? Number(iv.score_overall).toFixed(1) : '—';
+    const rec     = iv.recommendation || 'Under Review';
+    const comm    = iv.score_communication != null ? Number(iv.score_communication).toFixed(1) : '—';
+    const exp     = iv.score_experience != null ? Number(iv.score_experience).toFixed(1) : '—';
+    const lic     = iv.score_licensing != null ? Number(iv.score_licensing).toFixed(1) : '—';
+    const avail   = iv.score_availability != null ? Number(iv.score_availability).toFixed(1) : '—';
+    const prof    = iv.score_professionalism != null ? Number(iv.score_professionalism).toFixed(1) : '—';
+    const notes   = iv.ai_notes || '';
+    const status  = iv.interview_status || 'pending';
+    const recBadge = rec === 'Recommend Hire' ? 'hire' : rec === 'Not Recommended' ? 'pass' : 'review';
+    const rowId   = 'iv-detail-' + iv.id;
+
+    return `<tr onclick="toggleDetail('${rowId}')" style="cursor:pointer;">
+      <td>
+        <div class="candidate-name">${name}</div>
+        <div class="candidate-email">${email}</div>
+      </td>
+      <td style="font-size:.82rem;color:var(--text3);">${formatDate(iv.completed_at)}</td>
+      <td style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:${scoreColor(overall)};font-weight:700;">${overall !== '—' ? overall + '/10' : '—'}</td>
+      <td><span class="badge badge-${recBadge}">${rec}</span></td>
+      <td style="font-size:.88rem;color:var(--text2);">${comm}</td>
+      <td style="font-size:.88rem;color:var(--text2);">${exp}</td>
+      <td style="font-size:.88rem;color:var(--text2);">${lic}</td>
+      <td style="font-size:.88rem;color:var(--text2);">${avail}</td>
+    </tr>
+    <tr id="${rowId}" style="display:none;background:#f8f9fc;">
+      <td colspan="8" style="padding:0;">
+        <div style="padding:1.25rem 1.5rem;border-top:1px solid #dde2ed;border-bottom:2px solid #c9a84c;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+            ${scoreBar('Communication', comm)}
+            ${scoreBar('Experience', exp)}
+            ${scoreBar('Licensing', lic)}
+            ${scoreBar('Availability', avail)}
+            ${scoreBar('Professionalism', prof)}
+            ${overall !== '—' ? scoreBar('Overall', overall, true) : ''}
+          </div>
+          ${notes ? `<div style="background:#fff8e8;border:1px solid rgba(201,168,76,.3);border-left:4px solid #c9a84c;border-radius:6px;padding:1rem;">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:2px;color:#8a6f2e;text-transform:uppercase;margin-bottom:.5rem;font-weight:700;">SARA's Analysis</div>
+            <div style="font-size:.95rem;color:#374060;line-height:1.65;">${notes}</div>
+          </div>` : ''}
+        </div>
+      </td>
     </tr>`;
   }).join('');
+}
+
+function scoreBar(label, val, isOverall) {
+  const num = parseFloat(val);
+  const pct = isNaN(num) ? 0 : (num / 10 * 100);
+  const col = isNaN(num) ? '#dde2ed' : num >= 7 ? '#27ae60' : num >= 5 ? '#c9a84c' : '#c0392b';
+  return `<div>
+    <div style="display:flex;justify-content:space-between;font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:1.5px;text-transform:uppercase;color:#6b7a99;margin-bottom:.3rem;">
+      <span>${label}</span><b style="color:${col};">${isNaN(num) ? '—' : num.toFixed(1)}</b>
+    </div>
+    <div style="height:${isOverall ? '8px' : '5px'};background:#dde2ed;border-radius:3px;overflow:hidden;">
+      <div style="height:100%;width:${pct}%;background:${col};border-radius:3px;transition:width .5s;"></div>
+    </div>
+  </div>`;
+}
+
+function toggleDetail(id) {
+  const el = document.getElementById(id);
+  if (el) el.style.display = el.style.display === 'none' ? 'table-row' : 'none';
+}
+
+function scoreColor(v) {
+  const n = parseFloat(v);
+  if (isNaN(n)) return 'var(--text3)';
+  if (n >= 7) return '#27ae60';
+  if (n >= 5) return '#c9a84c';
+  return '#c0392b';
 }
 
 function renderMockInterviews(apps) {

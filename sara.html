@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SARA — AI Interview | Security USA®</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
 <!-- D-ID Agents SDK -->
 <script type="module"
@@ -560,6 +561,7 @@ var timerSec     = 0;
 var timerInt     = null;
 var questionCount = 0;
 var agentEl      = null;
+var transcriptLog = []; // stores {role, text} for scoring
 
 // ═══════════════════════════
 // BEGIN
@@ -732,6 +734,8 @@ function wireDIDAgent(agent) {
     var msg = e.detail && (e.detail.message || e.detail.content || e.detail.text || '');
     var role = e.detail && (e.detail.role || 'assistant');
     if (msg) {
+      // Store in transcript array for scoring
+      transcriptLog.push({ role: role === 'user' ? 'candidate' : 'sara', text: msg });
       addTx(role === 'user' ? 'u' : 's', msg);
       if (role !== 'user') {
         questionCount++;
@@ -921,10 +925,118 @@ function finish() {
   document.getElementById('s-interview').classList.remove('on');
   document.getElementById('s-score').classList.add('on');
 
-  document.getElementById('sc-num').textContent = '—';
-  document.getElementById('sc-rec').textContent = 'Under Review';
+  document.getElementById('sc-num').textContent = '…';
+  document.getElementById('sc-rec').textContent = 'Scoring...';
+  document.getElementById('sc-nt').textContent = 'SARA is reviewing your responses. This takes a few seconds.';
+
+  // Score and save
+  scoreAndSave();
+}
+
+async function scoreAndSave() {
+  try {
+    // Build transcript text for Claude
+    var txText = transcriptLog.map(function(m) {
+      return (m.role === 'sara' ? 'SARA: ' : 'CANDIDATE: ') + m.text;
+    }).join('
+
+');
+
+    if (!txText || txText.length < 50) {
+      // No meaningful transcript
+      showScorecard({ overall: null, note: 'Interview transcript was not captured. HR will review manually.' });
+      return;
+    }
+
+    // Call Claude to score the interview
+    var res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 600,
+        system: 'You are an expert HR analyst for Security USA Inc., a professional security guard company. Score this security guard job interview transcript. Respond ONLY with valid JSON, no other text.',
+        messages: [{
+          role: 'user',
+          content: 'Score this interview transcript on a scale of 1-10 for each category. Return ONLY this JSON:
+{
+  "communication": <1-10>,
+  "experience": <1-10>,
+  "licensing": <1-10>,
+  "availability": <1-10>,
+  "professionalism": <1-10>,
+  "overall": <1-10>,
+  "recommendation": "Recommend Hire" OR "Under Review" OR "Not Recommended",
+  "notes": "<2-3 sentence HR summary>"
+}
+
+TRANSCRIPT:
+' + txText.substring(0, 4000)
+        }]
+      })
+    });
+
+    var data = await res.json();
+    var text = data.content && data.content[0] ? data.content[0].text : '';
+    var scores = JSON.parse(text.replace(/```json|```/g, '').trim());
+
+    // Save to Supabase
+    await saveToSupabase(scores, txText);
+
+    showScorecard(scores);
+
+  } catch(err) {
+    console.error('Score/save error:', err);
+    showScorecard({ overall: null, note: 'Your interview has been recorded. HR will be in touch within 3-5 business days.' });
+  }
+}
+
+async function saveToSupabase(scores, txText) {
+  try {
+    if (!window.supabase) return;
+    var sb = window.supabase.createClient(
+      'https://stvagyjcjoxnbslafmyf.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0dmFneWpjam94bmJzbGFmbXlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NTcxNTIsImV4cCI6MjA4OTQzMzE1Mn0.da_l4ogYdc_XL7DqmK_RmmR6cC_X6Lq102ddnN7QYY4'
+    );
+
+    var { data: { user } } = await sb.auth.getUser();
+    if (!user) return;
+
+    await sb.from('interview_results').upsert({
+      candidate_id:          user.id,
+      transcript:            transcriptLog,
+      score_communication:   scores.communication,
+      score_experience:      scores.experience,
+      score_licensing:       scores.licensing,
+      score_availability:    scores.availability,
+      score_professionalism: scores.professionalism,
+      score_overall:         scores.overall,
+      recommendation:        scores.recommendation,
+      ai_notes:              scores.notes,
+      interview_status:      'completed',
+      completed_at:          new Date().toISOString()
+    }, { onConflict: 'candidate_id' });
+
+    console.log('Interview results saved to Supabase');
+  } catch(e) {
+    console.warn('Supabase save error:', e.message);
+  }
+}
+
+function showScorecard(scores) {
+  var overall = scores.overall || scores.score_overall;
+  document.getElementById('sc-num').textContent = overall ? Math.round(overall * 10) / 10 : '—';
+
+  var rec = document.getElementById('sc-rec');
+  var recommendation = scores.recommendation || 'Under Review';
+  rec.textContent = recommendation;
+  if (recommendation === 'Recommend Hire') { rec.style.color = '#27ae60'; rec.style.borderColor = '#27ae60'; }
+  else if (recommendation === 'Not Recommended') { rec.style.color = '#c0392b'; rec.style.borderColor = '#c0392b'; }
+  else { rec.style.color = '#c9a84c'; rec.style.borderColor = '#c9a84c'; }
+
   document.getElementById('sc-nt').textContent =
-    'Interview completed. Security USA HR team will review and be in touch within 3-5 business days.';
+    'Your interview has been submitted to Security USA® HR for review. ' +
+    'Our team will be in touch within 3–5 business days. Thank you!';
 }
 
 // ═══════════════════════════
