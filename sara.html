@@ -456,19 +456,19 @@ did-agent::part(start-button),did-agent button[class*="start"],did-agent button[
   </div>
   <p style="font-family:'Barlow Condensed',sans-serif;font-size:.78rem;letter-spacing:2px;color:#8a6f2e;text-transform:uppercase;margin-bottom:.65rem;font-weight:700;">Please confirm all items before starting:</p>
   <div class="checks" id="checklist">
-    <div class="chk chk-box" id="chk1" onclick="toggleCheck('chk1')">
+    <div class="chk chk-box" id="chk1" onclick="toggleCheck('chk1')" ontouchend="toggleCheck('chk1');event.preventDefault();">
       <span class="chk-i">✓</span>
       <span>I am in a quiet, well-lit location</span>
     </div>
-    <div class="chk chk-box" id="chk2" onclick="toggleCheck('chk2')">
+    <div class="chk chk-box" id="chk2" onclick="toggleCheck('chk2')" ontouchend="toggleCheck('chk2');event.preventDefault();">
       <span class="chk-i">✓</span>
       <span>I will speak clearly and at a normal pace</span>
     </div>
-    <div class="chk chk-box" id="chk3" onclick="toggleCheck('chk3')">
+    <div class="chk chk-box" id="chk3" onclick="toggleCheck('chk3')" ontouchend="toggleCheck('chk3');event.preventDefault();">
       <span class="chk-i">✓</span>
       <span>I have my security license number ready</span>
     </div>
-    <div class="chk chk-box" id="chk4" onclick="toggleCheck('chk4')">
+    <div class="chk chk-box" id="chk4" onclick="toggleCheck('chk4')" ontouchend="toggleCheck('chk4');event.preventDefault();">
       <span class="chk-i">✓</span>
       <span>I understand this interview will be recorded</span>
     </div>
@@ -630,12 +630,9 @@ function beginInterview() {
 }
 
 function setPerm(ok) {
-  var icon = document.getElementById('perm-icon');
-  var txt  = document.getElementById('perm-txt');
-  icon.textContent = '✓';
-  icon.style.borderColor = ok ? '#27ae60' : '#c9a84c';
-  icon.style.color = ok ? '#27ae60' : '#c9a84c';
-  txt.textContent = ok ? 'Camera & microphone ready' : 'Proceeding without camera';
+  // Camera permission status - just log it
+  console.log('Camera permission:', ok ? 'granted' : 'denied');
+  setStatus(ok ? 'Camera & microphone ready' : 'Proceeding without camera');
 }
 
 function setStatus(msg) {
