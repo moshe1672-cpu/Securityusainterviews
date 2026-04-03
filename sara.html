@@ -971,7 +971,18 @@ function submitAnswer() {
     liveBuf = '';
     live.textContent = '';
     live.style.display = 'none';
-    showInterviewCompleteOverlay();
+    document.getElementById('iv-live').style.display = 'none';
+    document.getElementById('iv-submit').style.display = 'none';
+    // Force show the overlay directly
+    var ov = document.getElementById('interview-complete-overlay');
+    if (ov) {
+      ov.style.cssText = 'display:block !important;position:fixed !important;top:0;left:0;right:0;bottom:0;z-index:99999;pointer-events:all;';
+      ov.style.opacity = '0';
+      ov.style.transition = 'opacity .5s';
+      setTimeout(function(){ ov.style.opacity = '1'; }, 50);
+    } else {
+      alert('Overlay element not found - check HTML');
+    }
     return;
   }
 
@@ -1038,14 +1049,11 @@ function camToggle() {
 
 function showInterviewCompleteOverlay() {
   var overlay = document.getElementById('interview-complete-overlay');
-  if (overlay) {
-    overlay.style.display = 'block';
-    overlay.style.pointerEvents = 'all';
-    // Animate in
-    overlay.style.opacity = '0';
-    overlay.style.transition = 'opacity .5s ease';
-    setTimeout(function() { overlay.style.opacity = '1'; }, 50);
-  }
+  if (!overlay) { console.error('Overlay not found!'); return; }
+  // Force overlay visible - override any CSS that might hide it
+  overlay.style.cssText = 'display:block !important;position:fixed !important;top:0;left:0;right:0;bottom:0;z-index:99999 !important;pointer-events:all;opacity:0;transition:opacity .5s ease;';
+  setTimeout(function() { overlay.style.opacity = '1'; }, 50);
+  console.log('Interview complete overlay shown');
 }
 
 function finishAndReturn() {
