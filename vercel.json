@@ -1,8 +1,5 @@
 {
-  "functions": {
-    "api/did-proxy.js": {
-      "memory": 128,
-      "maxDuration": 10
-    }
-  }
+  "rewrites": [
+    { "source": "/onboarding", "destination": "/onboarding.html" }
+  ]
 }
