@@ -497,7 +497,15 @@ async function adminLogout() {
 async function loadAllData() {
   try {
     // Load candidates
-    const { data: candidates } = await sb.from('candidates').select('*').order('created_at', { ascending: false });
+    const { data: candidates } = await sb
+      .from('candidates')
+      .select(`
+        *,
+        applications(id, status, submitted_at),
+        eeo_responses(id),
+        interview_results(id, interview_status, score_overall, recommendation, completed_at)
+      `)
+      .order('created_at', { ascending: false });
     allCandidates = candidates || [];
 
     // Load applications
@@ -690,20 +698,71 @@ function renderMockInterviews(apps) {
 }
 
 // ── RENDER CANDIDATES ──
+function getStep(c) {
+  // Step 1: Profile created (candidate exists)
+  // Step 2: Application submitted
+  // Step 3: EEO submitted
+  // Step 4: AI Interview started/in progress
+  // Step 5: Interview completed
+  const apps = c.applications || [];
+  const eeos = c.eeo_responses || [];
+  const ivs  = c.interview_results || [];
+  if (ivs.length && ivs[0].interview_status === 'completed') return 5;
+  if (ivs.length) return 4;
+  if (eeos.length) return 3;
+  if (apps.length) return 2;
+  return 1;
+}
+
+function stepLabel(step) {
+  const labels = {
+    1: 'Profile Created',
+    2: 'Application Submitted',
+    3: 'EEO Submitted',
+    4: 'Interview In Progress',
+    5: 'Interview Complete'
+  };
+  return labels[step] || 'Profile Created';
+}
+
+function stepColor(step) {
+  if (step >= 5) return '#27ae60';
+  if (step >= 3) return '#c9a84c';
+  return '#6b7a99';
+}
+
 function renderCandidates(candidates) {
   const tbody = document.getElementById('candidates-tbody');
-  if (!candidates.length) {
-    tbody.innerHTML = '<tr><td colspan="6"><div class="loading">No candidates yet</div></td></tr>';
+  if (!candidates || !candidates.length) {
+    tbody.innerHTML = '<tr><td colspan="7"><div class="loading">No candidates yet</div></td></tr>';
     return;
   }
   tbody.innerHTML = candidates.map(c => {
-    const name = (c.first_name || '') + ' ' + (c.last_name || '');
+    const name  = ((c.first_name || '') + ' ' + (c.last_name || '')).trim() || 'Unknown';
+    const step  = getStep(c);
+    const ivs   = c.interview_results || [];
+    const score = ivs.length && ivs[0].score_overall ? Number(ivs[0].score_overall).toFixed(1) : '—';
+    const rec   = ivs.length ? (ivs[0].recommendation || '—') : '—';
+    const recColor = rec === 'Recommend Hire' ? '#27ae60' : rec === 'Not Recommended' ? '#c0392b' : '#c9a84c';
+
+    // Progress bar showing steps 1-5
+    const bars = [1,2,3,4,5].map(s =>
+      `<div style="flex:1;height:6px;border-radius:3px;background:${s <= step ? stepColor(step) : '#dde2ed'};margin:0 1px;"></div>`
+    ).join('');
+
     return `<tr>
-      <td><div class="candidate-name">${name.trim() || 'Unknown'}</div></tr>
-      <td style="font-size:.88rem;">${c.email || '—'}</td>
-      <td style="font-size:.88rem;">${c.phone || '—'}</td>
-      <td style="font-size:.88rem;">${c.city ? c.city + ', ' + c.state : '—'}</td>
-      <td style="font-size:.85rem;color:var(--text3);">${formatDate(c.created_at)}</td>
+      <td>
+        <div class="candidate-name">${name}</div>
+        <div class="candidate-email">${c.email || ''}</div>
+      </td>
+      <td style="font-size:.82rem;color:var(--text3);">${c.ref_number || '—'}</td>
+      <td>
+        <div style="font-size:.8rem;color:${stepColor(step)};font-weight:600;margin-bottom:4px;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;">${stepLabel(step)}</div>
+        <div style="display:flex;gap:2px;width:100px;">${bars}</div>
+      </td>
+      <td style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:${score !== '—' ? (Number(score)>=7?'#27ae60':Number(score)>=5?'#c9a84c':'#c0392b') : 'var(--text3)'};">${score !== '—' ? score+'/10' : '—'}</td>
+      <td style="font-size:.82rem;color:${recColor};font-weight:600;">${rec}</td>
+      <td style="font-size:.82rem;color:var(--text3);">${formatDate(c.created_at)}</td>
       <td><button class="action-btn">View</button></td>
     </tr>`;
   }).join('');
