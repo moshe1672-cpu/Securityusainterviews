@@ -709,37 +709,6 @@ function goToInterview() {
     var dateStr = today.toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
     updateAgentDate(dateStr);
 
-    // Override getUserMedia to gate audio via Web Audio API gain node
-    // This lets us truly silence the mic when SARA is speaking
-    if (!window._micGainInstalled) {
-      window._micGainInstalled = true;
-      var _origGUM = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
-      navigator.mediaDevices.getUserMedia = async function(constraints) {
-        var stream = await _origGUM(constraints);
-        if (constraints && constraints.audio && stream.getAudioTracks().length > 0) {
-          try {
-            var ctx = new (window.AudioContext || window.webkitAudioContext)();
-            var src  = ctx.createMediaStreamSource(stream);
-            var gain = ctx.createGain();
-            var dest = ctx.createMediaStreamDestination();
-            gain.gain.value = 1;
-            src.connect(gain);
-            gain.connect(dest);
-            window._micGain = gain;
-            var gated = new MediaStream([
-              ...stream.getVideoTracks(),
-              ...dest.stream.getAudioTracks()
-            ]);
-            console.log('Mic gain node installed');
-            return gated;
-          } catch(e) {
-            console.warn('Gain node setup failed:', e.message);
-          }
-        }
-        return stream;
-      };
-    }
-
     // NOW load D-ID script - after intro is fully hidden
     var didScript = document.createElement('script');
     didScript.type = 'module';
@@ -874,8 +843,7 @@ function wireDIDAgent(agent) {
       if (mediaStream) {
         mediaStream.getAudioTracks().forEach(function(t) { t.enabled = false; });
       }
-      // Also silence via gain node if D-ID captured its own stream
-      if (window._micGain) { window._micGain.gain.value = 0; }
+
     } else if (state && !state.includes('connect') && !state.includes('load')) {
       setAvStatus('');
       // Small delay before unmuting mic - prevents VAD from triggering too fast
@@ -884,8 +852,7 @@ function wireDIDAgent(agent) {
         if (mediaStream) {
           mediaStream.getAudioTracks().forEach(function(t) { t.enabled = true; });
         }
-        // Unmute gain node
-        if (window._micGain) { window._micGain.gain.value = 1; }
+
         document.getElementById('iv-submit').style.display = 'block';
         document.getElementById('iv-mic-status').textContent = 'Your turn — speak your answer';
         document.getElementById('iv-mic-status').style.color = '#c9a84c';
@@ -909,7 +876,6 @@ function wireDIDAgent(agent) {
       // Mute mic whenever SARA sends a message (she's about to speak)
       if (role !== 'user') {
         if (mediaStream) mediaStream.getAudioTracks().forEach(function(t){ t.enabled = false; });
-        if (window._micGain) { window._micGain.gain.value = 0; }
         if (isListening) { try { recog && recog.stop(); } catch(e){} }
         questionCount++;
         var pct = Math.min(100, Math.round(questionCount / 10 * 100));
