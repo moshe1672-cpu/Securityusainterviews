@@ -925,16 +925,25 @@ function wireDIDAgent(agent) {
         document.getElementById('iv-prog-fill').style.width = pct + '%';
         document.getElementById('iv-pct').textContent = pct + '%';
         document.getElementById('q-num').textContent = Math.min(questionCount, 10);
-        // Detect outro - expanded keyword list
+        // Detect outro
         var lower = msg.toLowerCase();
-        var isOutro = lower.includes('hr team') || lower.includes('business days') ||
-            lower.includes('good luck') || lower.includes('concludes your') ||
-            lower.includes('completes your') || lower.includes('best of luck') ||
-            lower.includes('wish you') || lower.includes('in touch') ||
-            lower.includes('recruitment') || lower.includes('review your') ||
+        var isOutro =
+            lower.includes('3-5 business days') ||
+            lower.includes('3 to 5 business days') ||
+            lower.includes('five business days') ||
+            lower.includes('business days') ||
+            lower.includes('hr team') ||
+            lower.includes('good luck') ||
+            lower.includes('best of luck') ||
+            lower.includes('concludes your') ||
+            lower.includes('completes your') ||
+            lower.includes('wish you') ||
+            lower.includes('be in touch') ||
+            lower.includes('be in contact') ||
             (lower.includes('thank you') && questionCount >= 9) ||
-            questionCount >= 11; // fallback: show after 11th message from SARA
+            questionCount >= 11;
         if (isOutro) {
+          console.log('Outro detected! Showing overlay. Trigger msg:', msg.substring(0,80));
           setTimeout(showInterviewCompleteOverlay, 3000);
         }
       }
