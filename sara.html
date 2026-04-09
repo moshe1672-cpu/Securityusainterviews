@@ -805,6 +805,30 @@ function wireDIDAgent(agent) {
     document.body.classList.add('agent-ready');
   }, 1500);
 
+  // Pass candidate_id to D-ID via agent metadata so webhook can identify the candidate
+  try {
+    var sb = window.supabase ? window.supabase.createClient(
+      'https://stvagyjcjoxnbslafmyf.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0dmFneWpjam94bmJzbGFmbXlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NTcxNTIsImV4cCI6MjA4OTQzMzE1Mn0.da_l4ogYdc_XL7DqmK_RmmR6cC_X6Lq102ddnN7QYY4'
+    ) : null;
+    if (sb) {
+      sb.auth.getUser().then(function(res) {
+        var user = res.data && res.data.user;
+        if (user) {
+          window._candidateId = user.id;
+          // Try to set metadata on the agent
+          if (typeof agent.setMetadata === 'function') {
+            agent.setMetadata({ candidate_id: user.id });
+          }
+          if (agent.metadata !== undefined) {
+            agent.metadata = { candidate_id: user.id };
+          }
+          console.log('Candidate ID set:', user.id);
+        }
+      });
+    }
+  } catch(e) { console.warn('Could not set candidate ID:', e.message); }
+
   // Inject today's date into the conversation as soon as agent is ready
   // This tells SARA the current date without needing API write access
   setTimeout(function() {
