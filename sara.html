@@ -320,17 +320,19 @@ did-agent::part(start-button),did-agent button[class*="start"],did-agent button[
     background:rgba(0,0,0,.6);border:none;
   }
 
-  /* Transcript panel overlays bottom 40% as a translucent drawer - always visible */
+  /* Transcript panel - starts collapsed on mobile, toggled by button */
   #iv-right{
     position:absolute;
     bottom:0;left:0;right:0;
-    height:40%;
+    height:42px;
     z-index:5;
     background:rgba(10,22,40,.95);
     backdrop-filter:blur(16px);
     -webkit-backdrop-filter:blur(16px);
     border-top:1px solid rgba(201,168,76,.25);
     border-radius:20px 20px 0 0;
+    transition:height .3s ease;
+    overflow:hidden;
   }
 
   /* SARA fills ALL remaining space - no gap */
@@ -356,6 +358,8 @@ did-agent::part(start-button),did-agent button[class*="start"],did-agent button[
     padding:.6rem .85rem;
   }
   #iv-tx-hdr span{color:rgba(201,168,76,.8);}
+  /* Show toggle button on mobile only */
+  #drawer-toggle{display:block !important;}
 
   /* Transcript messages on dark bg */
   #iv-tx-body{
@@ -547,7 +551,10 @@ did-agent::part(start-button),did-agent button[class*="start"],did-agent button[
     <div id="iv-right">
       <div id="iv-tx-hdr">
         <span>Live Transcript</span>
-        <span style="color:#8a9ab5;font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:1px;">Auto-saved</span>
+        <div style="display:flex;align-items:center;gap:.75rem;">
+          <span style="color:#8a9ab5;font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:1px;">Auto-saved</span>
+          <button id="drawer-toggle" onclick="toggleDrawer()" style="display:none;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.3);color:#c9a84c;border-radius:20px;padding:3px 12px;font-family:'Barlow Condensed',sans-serif;font-size:.75rem;letter-spacing:1px;cursor:pointer;">SHOW ▲</button>
+        </div>
       </div>
       <div id="iv-tx-body"></div>
       <div id="iv-prog">
@@ -620,6 +627,23 @@ var transcriptLog = []; // stores {role, text} for scoring
 // ═══════════════════════════
 // BEGIN
 // ═══════════════════════════
+function toggleDrawer() {
+  var drawer = document.getElementById('iv-right');
+  var btn    = document.getElementById('drawer-toggle');
+  if (!drawer || !btn) return;
+  // Default state is collapsed (42px), so absence of attribute = collapsed
+  var collapsed = drawer.getAttribute('data-collapsed') !== 'false';
+  if (collapsed) {
+    drawer.style.height = '40%';
+    drawer.setAttribute('data-collapsed', 'false');
+    btn.textContent = 'HIDE ▼';
+  } else {
+    drawer.style.height = '42px';
+    drawer.setAttribute('data-collapsed', 'true');
+    btn.textContent = 'SHOW ▲';
+  }
+}
+
 function updateChecklist() {
   var all = document.getElementById('chk1').checked &&
             document.getElementById('chk2').checked &&
