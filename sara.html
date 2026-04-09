@@ -713,14 +713,11 @@ function goToInterview() {
     var didScript = document.createElement('script');
     didScript.type = 'module';
     didScript.src = 'https://agent.d-id.com/v2/index.js';
-    didScript.setAttribute('data-mode', 'fabio');
+    didScript.setAttribute('data-mode', 'full');
     didScript.setAttribute('data-client-key', 'ck_M4Mc7iCR6GVnh4h8EW97U');
     didScript.setAttribute('data-agent-id', 'v2_agt_M7ejpYI6');
     didScript.setAttribute('data-name', 'did-agent');
     didScript.setAttribute('data-monitor', 'true');
-    didScript.setAttribute('data-orientation', 'horizontal');
-    didScript.setAttribute('data-position', 'right');
-    didScript.setAttribute('data-open-mode', 'expanded');
     didScript.setAttribute('data-target-id', 'did-video-container');
     document.head.appendChild(didScript);
   }, 300);
