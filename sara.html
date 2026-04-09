@@ -925,12 +925,17 @@ function wireDIDAgent(agent) {
         document.getElementById('iv-prog-fill').style.width = pct + '%';
         document.getElementById('iv-pct').textContent = pct + '%';
         document.getElementById('q-num').textContent = Math.min(questionCount, 10);
-        // Detect outro
+        // Detect outro - expanded keyword list
         var lower = msg.toLowerCase();
-        if (lower.includes('hr team') || lower.includes('business days') ||
+        var isOutro = lower.includes('hr team') || lower.includes('business days') ||
             lower.includes('good luck') || lower.includes('concludes your') ||
-            lower.includes('completes your') || (lower.includes('thank you') && questionCount >= 10)) {
-          setTimeout(showInterviewCompleteOverlay, 2500);
+            lower.includes('completes your') || lower.includes('best of luck') ||
+            lower.includes('wish you') || lower.includes('in touch') ||
+            lower.includes('recruitment') || lower.includes('review your') ||
+            (lower.includes('thank you') && questionCount >= 9) ||
+            questionCount >= 11; // fallback: show after 11th message from SARA
+        if (isOutro) {
+          setTimeout(showInterviewCompleteOverlay, 3000);
         }
       }
     }
@@ -1270,7 +1275,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('iv-camtog').addEventListener('click', camToggle);
   document.getElementById('iv-submit').addEventListener('click', submitAnswer);
   document.getElementById('iv-end').addEventListener('click', function() {
-    if (confirm('End interview?')) finish();
+    if (confirm('End interview and submit?')) showInterviewCompleteOverlay();
   });
   document.getElementById('hdr-exit').addEventListener('click', function() {
     if (confirm('Exit?')) window.location.href = 'index.html';
