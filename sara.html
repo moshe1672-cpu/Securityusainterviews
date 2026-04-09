@@ -196,7 +196,7 @@ did-agent::part(start-button),did-agent button[class*="start"],did-agent button[
 #iv-mic-status{font-family:'Barlow Condensed',sans-serif;font-size:.9rem;letter-spacing:1.5px;color:var(--text);text-transform:uppercase;font-weight:600;}
 #iv-mic-hint{font-size:.82rem;color:#8a9ab5;margin-top:2px;}
 #iv-live{background:#f0faf4;border:1px solid var(--green);border-radius:4px;padding:.45rem .8rem;font-size:.9rem;color:var(--text);font-style:italic;min-height:34px;display:none;line-height:1.5;}
-#iv-btn-row{display:flex;gap:.5rem;}
+#iv-btn-row2{display:flex;gap:.5rem;margin-top:.4rem;}
 #iv-submit{flex:2;background:var(--gold);color:var(--navy);border:none;border-radius:5px;padding:11px;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;cursor:pointer;display:none;font-weight:700;transition:all .2s;}
 #iv-submit:hover,#iv-submit:active{background:var(--gold-l);}
 #iv-camtog,#iv-end{flex:1;border-radius:5px;padding:9px;font-family:'Barlow Condensed',sans-serif;font-size:.78rem;letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-weight:600;transition:all .2s;}
@@ -566,8 +566,10 @@ did-agent::part(start-button),did-agent button[class*="start"],did-agent button[
             <div id="iv-mic-hint">Mic activates after each question</div>
           </div>
         </div>
-        <div id="iv-live"></div>
         <div id="iv-btn-row">
+          <textarea id="iv-live" placeholder="Type your answer here or speak..." rows="2" style="width:100%;padding:.6rem .8rem;font-size:.95rem;font-family:'Barlow',sans-serif;border:1px solid var(--border);border-radius:6px;resize:none;line-height:1.5;color:var(--text);background:#fff;display:block;"></textarea>
+        </div>
+        <div id="iv-btn-row2">
           <button id="iv-submit">Submit Answer →</button>
           <button id="iv-camtog">Cam On</button>
           <button id="iv-end">End</button>
@@ -875,8 +877,8 @@ function wireDIDAgent(agent) {
         document.getElementById('iv-mic-status').style.color = '#c9a84c';
         document.getElementById('iv-mic-btn').style.opacity = '1';
         liveBuf = '';
-        document.getElementById('iv-live').textContent = '';
-        document.getElementById('iv-live').style.display = 'block';
+        document.getElementById('iv-live').value = ''; document.getElementById('iv-live').textContent = '';
+        // textarea always visible
         try { recog && recog.start(); } catch(e) {}
       }, 800); // 800ms buffer after SARA stops before candidate mic opens
     }
@@ -973,7 +975,7 @@ function dismissReconnect() {
   document.getElementById('iv-mic-status').textContent = 'Your turn — speak your answer';
   document.getElementById('iv-mic-status').style.color = '#c9a84c';
   document.getElementById('iv-mic-btn').style.opacity = '1';
-  document.getElementById('iv-live').style.display = 'block';
+  // textarea always visible
   try { recog && recog.start(); } catch(e) {}
 }
 
@@ -991,7 +993,7 @@ function setupRecog() {
   recog.onstart = function() {
     isListening = true;
     document.getElementById('iv-mic-btn').classList.add('on');
-    document.getElementById('iv-live').style.display = 'block';
+    // textarea always visible
   };
   recog.onend = function() {
     isListening = false;
@@ -1004,7 +1006,7 @@ function setupRecog() {
       else interim += e.results[i][0].transcript;
     }
     if (final) liveBuf += final;
-    document.getElementById('iv-live').textContent = liveBuf + interim;
+    var lv = document.getElementById('iv-live'); lv.value = liveBuf + interim; lv.textContent = liveBuf + interim;
   };
   recog.onerror = function(e) { console.warn('recog:', e.error); isListening = false; };
 }
@@ -1016,7 +1018,7 @@ function submitAnswer() {
   if (recog && isListening) { try { recog.stop(); } catch(e) {} }
 
   var live = document.getElementById('iv-live');
-  var ans = (liveBuf + (live.textContent || '')).trim();
+  var ans = (live.value || live.textContent || liveBuf || '').trim();
   if (!ans) return;
 
   // Secret codeword to skip to end for testing
@@ -1024,7 +1026,7 @@ function submitAnswer() {
     liveBuf = '';
     live.textContent = '';
     live.style.display = 'none';
-    document.getElementById('iv-live').style.display = 'none';
+    document.getElementById('iv-live').value = '';
     document.getElementById('iv-submit').style.display = 'none';
     // Force show the overlay directly
     var ov = document.getElementById('interview-complete-overlay');
@@ -1040,8 +1042,8 @@ function submitAnswer() {
   }
 
   liveBuf = '';
+  live.value = '';
   live.textContent = '';
-  live.style.display = 'none';
   document.getElementById('iv-submit').style.display = 'none';
   document.getElementById('iv-mic-status').textContent = 'Sending...';
   document.getElementById('iv-mic-btn').style.opacity = '.4';
@@ -1086,8 +1088,8 @@ function micToggle() {
   if (isListening) { try { recog.stop(); } catch(e) {} }
   else {
     liveBuf = '';
-    document.getElementById('iv-live').textContent = '';
-    document.getElementById('iv-live').style.display = 'block';
+    document.getElementById('iv-live').value = ''; document.getElementById('iv-live').textContent = '';
+    // textarea always visible
     try { recog.start(); } catch(e) {}
   }
 }
