@@ -320,8 +320,7 @@ did-agent::part(start-button),did-agent button[class*="start"],did-agent button[
     background:rgba(0,0,0,.6);border:none;
   }
 
-  /* Transcript panel overlays bottom 40% as a translucent drawer */
-  /* Hidden until SARA connects so start button is visible */
+  /* Transcript panel overlays bottom 40% as a translucent drawer - always visible */
   #iv-right{
     position:absolute;
     bottom:0;left:0;right:0;
@@ -332,12 +331,6 @@ did-agent::part(start-button),did-agent button[class*="start"],did-agent button[
     -webkit-backdrop-filter:blur(16px);
     border-top:1px solid rgba(201,168,76,.25);
     border-radius:20px 20px 0 0;
-    transform:translateY(100%);
-    transition:transform .4s ease;
-  }
-  /* Slide up once agent is connected */
-  body.agent-ready #iv-right{
-    transform:translateY(0);
   }
 
   /* SARA fills ALL remaining space - no gap */
@@ -457,7 +450,7 @@ did-agent::part(start-button),did-agent button[class*="start"],did-agent button[
     <div><div id="hdr-name">SARA</div><div id="hdr-sub">Security USA® AI Interview</div></div>
   </div>
   <div id="hdr-right">
-    <div id="hdr-qnum">Question <b id="q-num">—</b> of 10</div>
+    <div id="hdr-qnum">10 Questions</div>
     <div id="hdr-timer">00:00</div>
     <button id="hdr-exit">Exit</button>
   </div>
