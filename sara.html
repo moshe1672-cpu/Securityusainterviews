@@ -622,7 +622,9 @@ var timerSec     = 0;
 var timerInt     = null;
 var questionCount = 0;
 var agentEl      = null;
-var transcriptLog = []; // stores {role, text} for scoring
+var transcriptLog = [];
+var silenceTimer  = null;
+var silenceCount  = 0; // how many times silence detected in a row // stores {role, text} for scoring
 
 // ═══════════════════════════
 // BEGIN
@@ -817,6 +819,44 @@ function checkShowMobileStart() {
   if (ov) ov.style.display = didBtnVisible ? 'block' : 'none';
 }
 
+function startSilenceTimer() {
+  clearSilenceTimer();
+  // Track transcript length at the moment timer starts
+  // Only fire if no NEW candidate message has appeared since then
+  var txLengthAtStart = transcriptLog.filter(function(m){ return m.role === 'candidate'; }).length;
+  silenceTimer = setTimeout(function() {
+    if (!agentEl) return;
+    // Check if candidate has spoken since timer started
+    var currentTxLength = transcriptLog.filter(function(m){ return m.role === 'candidate'; }).length;
+    if (currentTxLength > txLengthAtStart) {
+      // Candidate responded — no action needed
+      silenceCount = 0;
+      return;
+    }
+    // No candidate response detected — trigger Andrew
+    silenceCount++;
+    var msg = silenceCount === 1
+      ? "Take your time — whenever you're ready. Please speak loudly and clearly into the microphone."
+      : "No worries, let's keep moving.";
+    var sendFn = agentEl.chat || agentEl.speak || agentEl.send || agentEl.respond;
+    if (typeof sendFn === 'function') {
+      try { sendFn.call(agentEl, msg); } catch(e) {}
+    } else {
+      agentEl.dispatchEvent(new CustomEvent('input', { detail: { message: msg } }));
+    }
+    if (silenceCount < 2) {
+      // One more 15s chance
+      startSilenceTimer();
+    } else {
+      silenceCount = 0;
+    }
+  }, 15000);
+}
+
+function clearSilenceTimer() {
+  if (silenceTimer) { clearTimeout(silenceTimer); silenceTimer = null; }
+}
+
 function wireDIDAgent(agent) {
   setAvStatus('');
   // On mobile: show drawer once agent is wired
@@ -879,6 +919,8 @@ function wireDIDAgent(agent) {
 
         document.getElementById('iv-submit').style.display = 'block';
         document.getElementById('iv-mic-status').textContent = 'Your turn — speak your answer';
+        silenceCount = 0;
+        startSilenceTimer(); // start 15s silence countdown
         document.getElementById('iv-mic-status').style.color = '#c9a84c';
         document.getElementById('iv-mic-btn').style.opacity = '1';
         liveBuf = '';
@@ -899,6 +941,7 @@ function wireDIDAgent(agent) {
       addTx(role === 'user' ? 'u' : 's', msg);
       // Mute mic whenever ANDREW sends a message (she's about to speak)
       if (role !== 'user') {
+        clearSilenceTimer(); // Andrew speaking - clear any active timer
         if (mediaStream) mediaStream.getAudioTracks().forEach(function(t){ t.enabled = false; });
         if (isListening) { try { recog && recog.stop(); } catch(e){} }
         questionCount++;
@@ -1034,6 +1077,8 @@ function setupRecog() {
 // SUBMIT ANSWER -> send to D-ID agent
 // ═══════════════════════════
 function submitAnswer() {
+  clearSilenceTimer();
+  silenceCount = 0;
   if (recog && isListening) { try { recog.stop(); } catch(e) {} }
 
   var live = document.getElementById('iv-live');
@@ -1153,6 +1198,7 @@ function finishAndReturn() {
 }
 
 function finish() {
+  clearSilenceTimer();
   clearInterval(timerInt);
   if (recog) { try { recog.stop(); } catch(e) {} }
   if (mediaStream) mediaStream.getTracks().forEach(function(t) { t.stop(); });
