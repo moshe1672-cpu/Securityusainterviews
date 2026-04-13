@@ -821,34 +821,31 @@ function checkShowMobileStart() {
 
 function startSilenceTimer() {
   clearSilenceTimer();
-  // Track transcript length at the moment timer starts
-  // Only fire if no NEW candidate message has appeared since then
-  var txLengthAtStart = transcriptLog.filter(function(m){ return m.role === 'candidate'; }).length;
   silenceTimer = setTimeout(function() {
     if (!agentEl) return;
-    // Check if candidate has spoken since timer started
-    var currentTxLength = transcriptLog.filter(function(m){ return m.role === 'candidate'; }).length;
-    if (currentTxLength > txLengthAtStart) {
-      // Candidate responded — no action needed
-      silenceCount = 0;
-      return;
-    }
-    // No candidate response detected — trigger Andrew
     silenceCount++;
     var msg = silenceCount === 1
       ? "Take your time — whenever you're ready. Please speak loudly and clearly into the microphone."
       : "No worries, let's keep moving.";
+    // Submit the prompt as if the candidate typed it — this forces Andrew to respond
+    var live = document.getElementById('iv-live');
+    if (live) live.value = msg;
+    // Directly send to agent
     var sendFn = agentEl.chat || agentEl.speak || agentEl.send || agentEl.respond;
     if (typeof sendFn === 'function') {
-      try { sendFn.call(agentEl, msg); } catch(e) {}
+      try {
+        sendFn.call(agentEl, msg);
+        console.log('Silence prompt sent:', msg);
+      } catch(e) { console.warn('sendFn failed:', e); }
     } else {
       agentEl.dispatchEvent(new CustomEvent('input', { detail: { message: msg } }));
     }
+    if (live) live.value = '';
     if (silenceCount < 2) {
-      // One more 15s chance
-      startSilenceTimer();
+      startSilenceTimer(); // one more 15s
     } else {
       silenceCount = 0;
+      clearSilenceTimer();
     }
   }, 15000);
 }
@@ -859,6 +856,9 @@ function clearSilenceTimer() {
 
 function wireDIDAgent(agent) {
   setAvStatus('');
+  // Log available methods on the agent for debugging
+  console.log('D-ID agent methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(agent)).join(', '));
+  console.log('D-ID agent keys:', Object.keys(agent).join(', '));
   // On mobile: show drawer once agent is wired
   setTimeout(function() {
     document.body.classList.add('agent-ready');
