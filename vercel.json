@@ -1,5 +1,12 @@
 {
-  "rewrites": [
-    { "source": "/onboarding", "destination": "/onboarding.html" }
-  ]
+  "functions": {
+    "api/did-proxy.js": {
+      "memory": 128,
+      "maxDuration": 10
+    },
+    "api/tavus-proxy.js": {
+      "memory": 128,
+      "maxDuration": 15
+    }
+  }
 }
