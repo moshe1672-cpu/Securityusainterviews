@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Security USA® | Certifications Admin</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0a1628;--navy-mid:#112240;--navy-light:#1a3460;
+  --gold:#c9a84c;--gold-light:#e8c46a;--gold-dim:#8a6f2e;
+  --bg:#f4f6fa;--surface:#ffffff;--surface2:#f0f2f8;--surface3:#e8ecf4;
+  --text:#1a2340;--text2:#374060;--text3:#6b7a99;
+  --border-l:#dde2ed;--red:#c0392b;--success:#27ae60;--warn:#e67e22;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;
+  font-size:16px;display:flex;flex-direction:column;min-height:100vh;
+}
+
+.site-header{
+  background:var(--navy);border-bottom:1px solid rgba(201,168,76,.25);
+  padding:0 2rem;display:flex;align-items:center;justify-content:space-between;
+  height:68px;flex-shrink:0;position:sticky;top:0;z-index:200;
+  box-shadow:0 2px 12px rgba(0,0,0,.25);
+}
+.logo-area{display:flex;align-items:center;gap:12px;}
+.brand-name{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;color:#fff;line-height:1;}
+.brand-tag{font-family:'Barlow Condensed',sans-serif;font-size:.58rem;letter-spacing:3px;color:var(--gold);text-transform:uppercase;}
+.header-right{display:flex;align-items:center;gap:12px;}
+.header-nav-btn{background:transparent;border:1px solid rgba(201,168,76,.3);color:#c8d0df;padding:5px 14px;border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.header-nav-btn:hover{color:#fff;border-color:var(--gold);}
+
+.page-title-bar{
+  background:linear-gradient(90deg,var(--navy-mid) 0%,var(--navy-light) 100%);
+  border-bottom:3px solid var(--gold);padding:1.75rem 2rem;flex-shrink:0;
+}
+.page-title-bar-inner{max-width:1300px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;}
+.page-title-bar h1{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;letter-spacing:3px;color:#fff;}
+.page-title-bar p{font-size:.85rem;color:var(--gold);font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;margin-top:3px;}
+
+.main-scroll{flex:1;overflow-y:auto;width:100%;}
+.main{max-width:1300px;margin:1.5rem auto;padding:0 1.5rem 4rem;width:100%;}
+
+.site-footer{background:var(--navy);border-top:1px solid rgba(201,168,76,.2);padding:1.25rem 2rem;text-align:center;font-size:.7rem;color:#8a9ab5;font-family:'Barlow Condensed',sans-serif;line-height:1.8;flex-shrink:0;}
+.site-footer strong{color:var(--gold);}
+.site-footer a{color:#8a9ab5;text-decoration:none;}
+
+input[type=text],input[type=password],select{
+  background:#fff;border:1px solid var(--border-l);border-radius:4px;
+  color:var(--text);font-family:'Barlow',sans-serif;font-size:.95rem;padding:9px 12px;
+  outline:none;transition:border-color .2s,box-shadow .2s;
+}
+input:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.12);}
+
+.btn{font-family:'Barlow Condensed',sans-serif;font-size:.78rem;letter-spacing:2px;text-transform:uppercase;padding:8px 16px;border-radius:4px;cursor:pointer;transition:all .2s;font-weight:700;border:none;display:inline-flex;align-items:center;gap:6px;}
+.btn-gold{background:var(--gold);color:var(--navy);}
+.btn-gold:hover{background:var(--gold-light);}
+.btn-outline{background:#fff;color:var(--text2);border:1px solid var(--border-l);}
+.btn-outline:hover{color:var(--text);border-color:var(--navy);}
+.btn-full{width:100%;background:var(--gold);color:var(--navy);border:none;border-radius:4px;padding:14px;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:3px;cursor:pointer;font-weight:700;}
+.btn-full:hover{background:var(--gold-light);}
+
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:1.1rem;}
+.field>label{font-family:'Barlow Condensed',sans-serif;font-size:.78rem;letter-spacing:2px;text-transform:uppercase;color:var(--navy-mid);font-weight:700;}
+
+.section-block{background:var(--surface);border:1px solid var(--border-l);border-radius:6px;margin-bottom:1.5rem;box-shadow:0 1px 6px rgba(0,0,0,.06);}
+.section-head{background:var(--navy);border-bottom:1px solid rgba(201,168,76,.25);padding:.85rem 1.25rem;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;color:var(--gold);}
+.section-body{padding:1.25rem;}
+
+.error-msg{display:none;background:#fef2f2;border:1px solid #fca5a5;border-left:4px solid var(--red);border-radius:6px;padding:.85rem 1rem;font-size:.95rem;color:var(--red);margin-bottom:1rem;font-weight:500;}
+
+/* TABS */
+.tab-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.25rem;}
+.tab-btn{
+  padding:9px 16px;background:#fff;border:1px solid var(--border-l);border-radius:4px;
+  font-family:'Barlow Condensed',sans-serif;font-size:.75rem;letter-spacing:2px;text-transform:uppercase;
+  color:var(--text2);cursor:pointer;transition:all .15s;font-weight:700;display:inline-flex;align-items:center;gap:6px;
+}
+.tab-btn:hover{border-color:var(--navy);}
+.tab-btn.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.tab-btn.active.failed{background:var(--red);border-color:var(--red);}
+.tab-btn.active.passed{background:var(--success);border-color:var(--success);}
+.tab-pulse{width:7px;height:7px;border-radius:50%;background:var(--red);animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* TOOLBAR */
+.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:.75rem 1rem;background:var(--surface2);border-bottom:1px solid var(--border-l);}
+.toolbar input[type=text],.toolbar select{padding:7px 11px;font-size:.88rem;}
+.toolbar .search-wrap{position:relative;flex:1;min-width:180px;max-width:320px;}
+.toolbar .search-wrap input{width:100%;padding-left:30px;}
+.toolbar .search-wrap::before{content:'🔍';position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:.85rem;opacity:.5;}
+.toolbar .count{font-family:'Barlow Condensed',sans-serif;font-size:.78rem;color:var(--text3);letter-spacing:1px;margin-left:auto;}
+
+/* TABLE */
+.table-wrap{overflow-x:auto;background:#fff;}
+table{width:100%;border-collapse:collapse;font-size:.88rem;}
+th{
+  background:var(--surface2);border-bottom:2px solid var(--border-l);
+  text-align:left;padding:10px 12px;
+  font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--text2);font-weight:700;
+}
+.failed-tab th{background:var(--red);color:#fff;}
+td{padding:10px 12px;border-bottom:1px solid var(--border-l);color:var(--text);}
+tr:hover td{background:var(--surface2);}
+.failed-tab tr:hover td{background:rgba(192,57,43,.04);}
+.mono{font-family:'Barlow Condensed',sans-serif;font-size:.85rem;}
+.tag{display:inline-block;padding:3px 10px;border-radius:20px;font-family:'Barlow Condensed',sans-serif;font-size:.62rem;letter-spacing:2px;text-transform:uppercase;font-weight:700;}
+.tag-pass{background:rgba(39,174,96,.12);color:var(--success);border:1px solid rgba(39,174,96,.3);}
+.tag-fail{background:rgba(192,57,43,.1);color:var(--red);border:1px solid rgba(192,57,43,.3);}
+.tag-active{background:rgba(39,174,96,.12);color:var(--success);border:1px solid rgba(39,174,96,.3);}
+.tag-inactive{background:#eee;color:var(--text3);border:1px solid var(--border-l);}
+
+.pagination{display:flex;align-items:center;gap:6px;padding:.6rem 1rem;background:var(--surface2);border-top:1px solid var(--border-l);font-family:'Barlow Condensed',sans-serif;font-size:.8rem;color:var(--text2);letter-spacing:.5px;}
+.pagination button{background:#fff;border:1px solid var(--border-l);padding:5px 10px;border-radius:3px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:.8rem;}
+.pagination button:hover:not(:disabled){border-color:var(--navy);}
+.pagination button:disabled{opacity:.4;cursor:not-allowed;}
+
+.empty-state{text-align:center;padding:3rem 1rem;color:var(--text3);}
+.empty-state-icon{font-size:2.5rem;opacity:.3;margin-bottom:.75rem;}
+
+/* TEST CARDS */
+.test-card{
+  padding:1rem 1.25rem;border-bottom:1px solid var(--border-l);
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;
+}
+.test-card:last-child{border-bottom:none;}
+.test-card:hover{background:var(--surface2);}
+.test-card-info{flex:1;min-width:200px;}
+.test-card-num{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:2px;color:var(--gold-dim);}
+.test-card-title{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:1px;color:var(--text);margin:2px 0;}
+.test-card-meta{display:flex;gap:1rem;font-family:'Barlow Condensed',sans-serif;font-size:.72rem;color:var(--text3);letter-spacing:1px;flex-wrap:wrap;}
+
+.banner-warn{
+  background:rgba(192,57,43,.06);border-left:4px solid var(--red);border-radius:4px;
+  padding:1rem 1.25rem;margin-bottom:1.25rem;
+}
+.banner-warn-title{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:1.5px;color:var(--red);}
+.banner-warn-desc{font-size:.88rem;color:var(--text2);line-height:1.6;margin-top:3px;}
+
+@media(max-width:640px){
+  .page-title-bar{padding:1.25rem 1rem;}
+  .main{padding:0 1rem 3rem;}
+  .toolbar{flex-direction:column;align-items:stretch;}
+  .toolbar .search-wrap{max-width:100%;}
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo-area">
+    <svg width="38" height="38" viewBox="0 0 40 48" fill="none">
+      <path d="M20 2L3 9V22C3 32 10.5 41 20 45C29.5 41 37 32 37 22V9L20 2Z" fill="#0a1628" stroke="#c9a84c" stroke-width="1.8"/>
+      <path d="M20 7L8 13V22C8 29.5 13.5 37 20 40C26.5 37 32 29.5 32 22V13L20 7Z" fill="rgba(201,168,76,0.08)" stroke="rgba(201,168,76,0.3)" stroke-width="1"/>
+      <text x="20" y="28" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="12" fill="#c9a84c">USA</text>
+    </svg>
+    <div>
+      <div class="brand-name">Security USA®</div>
+      <div class="brand-tag">Certifications Admin</div>
+    </div>
+  </div>
+  <div class="header-right" id="headerRight" style="display:none;">
+    <button class="header-nav-btn" onclick="signOut()">Sign Out</button>
+  </div>
+</header>
+
+<div class="page-title-bar">
+  <div class="page-title-bar-inner">
+    <div>
+      <h1 id="pageTitle">Certifications Admin Console</h1>
+      <p id="pageSub">Sign in with admin password</p>
+    </div>
+    <button class="btn btn-outline" id="refreshBtn" style="display:none;" onclick="loadAll()">↻ Refresh</button>
+  </div>
+</div>
+
+<div class="main-scroll">
+  <div class="main">
+
+    <!-- LOGIN -->
+    <div id="view-login">
+      <div class="section-block" style="max-width:480px;margin:0 auto;">
+        <div class="section-head">🔒 Admin Sign-In</div>
+        <div class="section-body">
+          <p style="color:var(--text2);font-size:.95rem;margin-bottom:1.25rem;">Enter the admin password to access the certifications dashboard.</p>
+          <div id="loginErr" class="error-msg"></div>
+          <div class="field">
+            <label>Password</label>
+            <input type="password" id="loginPw" placeholder="••••••••" autocomplete="current-password">
+          </div>
+          <button class="btn-full" onclick="signIn()">Sign In →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="view-dash" style="display:none;">
+      <div class="tab-row" id="tabRow"></div>
+      <div id="tabContent"></div>
+    </div>
+
+  </div>
+</div>
+
+<footer class="site-footer">
+  <strong>Security USA, Inc.</strong> &nbsp;·&nbsp; License# 11000033301 &nbsp;·&nbsp; Admin Console
+</footer>
+
+<script>
+// ═════════════════════════════════════════════════
+// CONFIG — change ADMIN_PASSWORD before deploying!
+// ═════════════════════════════════════════════════
+const ADMIN_PASSWORD = 'admin2026';   // ← CHANGE THIS
+
+const SUPABASE_URL = 'https://stvagyjcjoxnbslafmyf.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0dmFneWpjam94bmJzbGFmbXlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NTcxNTIsImV4cCI6MjA4OTQzMzE1Mn0.da_l4ogYdc_XL7DqmK_RmmR6cC_X6Lq102ddnN7QYY4';
+
+let sb = null;
+function getSB() {
+  if (sb) return sb;
+  if (!window.supabase) return null;
+  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+  return sb;
+}
+
+const STORAGE_KEY = 'susa_cert_admin';
+let tests = [];
+let attempts = []; // joined with officer info
+let failed = [];
+let currentTab = 'tests';
+
+// ═════════════════════════════════════════════════
+// AUTH (password gate; not real auth — see note)
+// ═════════════════════════════════════════════════
+function signIn() {
+  const pw = document.getElementById('loginPw').value;
+  const errEl = document.getElementById('loginErr');
+  if (pw !== ADMIN_PASSWORD) {
+    errEl.textContent = '⚠ Incorrect password.';
+    errEl.style.display = 'block';
+    return;
+  }
+  sessionStorage.setItem(STORAGE_KEY, '1');
+  showDashboard();
+}
+
+function signOut() {
+  sessionStorage.removeItem(STORAGE_KEY);
+  document.getElementById('view-dash').style.display = 'none';
+  document.getElementById('view-login').style.display = 'block';
+  document.getElementById('headerRight').style.display = 'none';
+  document.getElementById('refreshBtn').style.display = 'none';
+  document.getElementById('pageTitle').textContent = 'Certifications Admin Console';
+  document.getElementById('pageSub').textContent = 'Sign in with admin password';
+  document.getElementById('loginPw').value = '';
+}
+
+async function showDashboard() {
+  document.getElementById('view-login').style.display = 'none';
+  document.getElementById('view-dash').style.display = 'block';
+  document.getElementById('headerRight').style.display = 'flex';
+  document.getElementById('refreshBtn').style.display = 'inline-flex';
+  document.getElementById('pageTitle').textContent = 'Manage Platform';
+  document.getElementById('pageSub').textContent = 'Tests, attempts, and officers requiring follow-up';
+  await loadAll();
+}
+
+// ═════════════════════════════════════════════════
+// LOAD DATA
+// ═════════════════════════════════════════════════
+async function loadAll() {
+  const client = getSB();
+  if (!client) return;
+
+  document.getElementById('tabRow').innerHTML = '<div style="color:var(--text3);font-family:Barlow Condensed,sans-serif;letter-spacing:1px;font-size:.8rem;">Loading...</div>';
+  document.getElementById('tabContent').innerHTML = '';
+
+  try {
+    const [testsRes, attemptsRes, officersRes, failedRes] = await Promise.all([
+      client.from('tests').select('*').order('test_number', { ascending: true }),
+      client.from('attempts').select('*').not('completed_at','is',null).order('completed_at',{ascending:false}).limit(2000),
+      client.from('officers').select('id, officer_id, full_name'),
+      client.from('failed_list_active').select('*').order('last_attempt',{ ascending:false })
+    ]);
+
+    if (testsRes.error) throw testsRes.error;
+    if (attemptsRes.error) throw attemptsRes.error;
+    if (officersRes.error) throw officersRes.error;
+    if (failedRes.error) throw failedRes.error;
+
+    tests = testsRes.data || [];
+    const officers = officersRes.data || [];
+    const officerMap = {};
+    officers.forEach(o => { officerMap[o.id] = o; });
+    const testMap = {};
+    tests.forEach(t => { testMap[t.id] = t; });
+
+    attempts = (attemptsRes.data || []).map(a => ({
+      ...a,
+      officer_name: officerMap[a.officer_id]?.full_name || '(unknown)',
+      officer_id_text: officerMap[a.officer_id]?.officer_id || '—',
+      test_title: testMap[a.test_id]?.title || '(unknown test)'
+    }));
+    failed = failedRes.data || [];
+
+    renderTabs();
+    renderTabContent();
+  } catch (e) {
+    console.error(e);
+    document.getElementById('tabContent').innerHTML = '<div class="empty-state">Failed to load data: ' + escapeHtml(e.message) + '</div>';
+  }
+}
+
+function renderTabs() {
+  const passedCount = attempts.filter(a => a.passed).length;
+  document.getElementById('tabRow').innerHTML = `
+    <button class="tab-btn ${currentTab==='tests'?'active':''}" onclick="setTab('tests')">📋 Tests (${tests.length})</button>
+    <button class="tab-btn ${currentTab==='all'?'active':''}" onclick="setTab('all')">All Attempts (${attempts.length})</button>
+    <button class="tab-btn ${currentTab==='passed'?'active passed':''}" onclick="setTab('passed')">✓ Passed (${passedCount})</button>
+    <button class="tab-btn ${currentTab==='failed'?'active failed':''}" onclick="setTab('failed')">⚠ Failed List (${failed.length}) ${failed.length > 0 && currentTab !== 'failed' ? '<span class="tab-pulse"></span>' : ''}</button>
+  `;
+}
+
+function setTab(t) { currentTab = t; renderTabs(); renderTabContent(); }
+
+// ═════════════════════════════════════════════════
+// TAB CONTENT
+// ═════════════════════════════════════════════════
+function renderTabContent() {
+  const c = document.getElementById('tabContent');
+  if (currentTab === 'tests') {
+    c.innerHTML = renderTestsTab();
+  } else if (currentTab === 'all') {
+    c.innerHTML = renderAttemptsTab(attempts, 'all');
+    bindAttemptsControls('all');
+  } else if (currentTab === 'passed') {
+    c.innerHTML = renderAttemptsTab(attempts.filter(a => a.passed), 'passed');
+    bindAttemptsControls('passed');
+  } else if (currentTab === 'failed') {
+    c.innerHTML = renderFailedTab();
+    bindFailedControls();
+  }
+}
+
+function renderTestsTab() {
+  if (tests.length === 0) {
+    return `<div class="section-block"><div class="section-head">All Tests</div><div class="empty-state"><div class="empty-state-icon">📋</div><div>No tests yet. Run the import script in <code>scripts/import-pdfs.py</code> or insert via Supabase Table Editor.</div></div></div>`;
+  }
+  return `<div class="section-block">
+    <div class="section-head">All Tests (${tests.length})</div>
+    ${tests.map(t => `
+      <div class="test-card">
+        <div class="test-card-info">
+          ${t.test_number ? '<div class="test-card-num">Test #' + escapeHtml(t.test_number) + '</div>' : ''}
+          <div class="test-card-title">${escapeHtml(t.title)}</div>
+          ${t.description ? '<div style="color:var(--text2);font-size:.88rem;margin-bottom:6px;">' + escapeHtml(t.description) + '</div>' : ''}
+          <div class="test-card-meta">
+            <span>⏱ ${t.time_limit_minutes} MIN</span>
+            <span>✓ PASS ${t.passing_score}%</span>
+            <span>${attempts.filter(a => a.test_id === t.id).length} ATTEMPTS</span>
+          </div>
+        </div>
+        <div>${t.is_active ? '<span class="tag tag-active">Active</span>' : '<span class="tag tag-inactive">Inactive</span>'}</div>
+      </div>
+    `).join('')}
+  </div>`;
+}
+
+// ═════════════════════════════════════════════════
+// ATTEMPTS TAB (All / Passed)
+// ═════════════════════════════════════════════════
+let attemptsState = { all: { search:'', filter:'all', page:1, perPage:25 }, passed: { search:'', filter:'all', page:1, perPage:25 } };
+
+function renderAttemptsTab(rows, mode) {
+  const st = attemptsState[mode];
+  let filtered = rows;
+  if (mode === 'all' && st.filter !== 'all') {
+    filtered = filtered.filter(a => st.filter === 'passed' ? a.passed : !a.passed);
+  }
+  if (st.search) {
+    const q = st.search.toLowerCase();
+    filtered = filtered.filter(a =>
+      (a.officer_name||'').toLowerCase().includes(q) ||
+      (a.officer_id_text||'').toLowerCase().includes(q) ||
+      (a.test_title||'').toLowerCase().includes(q)
+    );
+  }
+  const totalPages = Math.max(1, Math.ceil(filtered.length / st.perPage));
+  st.page = Math.min(st.page, totalPages);
+  const pageItems = filtered.slice((st.page - 1) * st.perPage, st.page * st.perPage);
+
+  return `
+    <div class="section-block">
+      <div class="section-head">${mode === 'all' ? 'All Attempts' : 'Passed Attempts'}</div>
+      <div class="toolbar">
+        ${mode === 'all' ? `
+          <select id="att-filter">
+            <option value="all" ${st.filter==='all'?'selected':''}>All results</option>
+            <option value="passed" ${st.filter==='passed'?'selected':''}>Passed only</option>
+            <option value="failed" ${st.filter==='failed'?'selected':''}>Failed only</option>
+          </select>
+        ` : '<div style="font-size:.85rem;color:var(--text2);font-family:Barlow Condensed,sans-serif;letter-spacing:1px;">Showing passes only</div>'}
+        <div class="search-wrap"><input type="text" id="att-search" placeholder="Officer, ID, or test..." value="${escapeHtml(st.search)}"></div>
+        <select id="att-perpage">
+          <option value="10" ${st.perPage===10?'selected':''}>10 / page</option>
+          <option value="25" ${st.perPage===25?'selected':''}>25 / page</option>
+          <option value="50" ${st.perPage===50?'selected':''}>50 / page</option>
+          <option value="100" ${st.perPage===100?'selected':''}>100 / page</option>
+        </select>
+        <button class="btn btn-gold" onclick="downloadCSV('${mode}')" ${filtered.length===0?'disabled':''}>⬇ CSV</button>
+        <div class="count">${filtered.length} result${filtered.length===1?'':'s'}</div>
+      </div>
+      <div class="table-wrap">
+        ${pageItems.length === 0 ? '<div class="empty-state">No matching attempts.</div>' : `
+          <table>
+            <thead><tr>
+              <th>Test</th><th>Officer</th><th>Officer ID</th><th>Status</th><th>Score</th><th>Finished</th>
+            </tr></thead>
+            <tbody>
+              ${pageItems.map(a => `
+                <tr>
+                  <td>${escapeHtml(a.test_title)}</td>
+                  <td>${escapeHtml(a.officer_name)}</td>
+                  <td class="mono">${escapeHtml(a.officer_id_text)}</td>
+                  <td><span class="tag ${a.passed?'tag-pass':'tag-fail'}">${a.passed?'Passed':'Failed'}</span></td>
+                  <td class="mono">${a.percent}% <span style="color:var(--text3);font-size:.75rem;">(${a.earned_points}/${a.total_points})</span></td>
+                  <td class="mono" style="font-size:.78rem;color:var(--text2);">${new Date(a.completed_at).toLocaleString()}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `}
+      </div>
+      ${totalPages > 1 ? `
+        <div class="pagination">
+          <button onclick="changePage('${mode}', -1)" ${st.page===1?'disabled':''}>← Prev</button>
+          <span>Page ${st.page} of ${totalPages}</span>
+          <button onclick="changePage('${mode}', 1)" ${st.page>=totalPages?'disabled':''}>Next →</button>
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+
+function bindAttemptsControls(mode) {
+  const st = attemptsState[mode];
+  const filter = document.getElementById('att-filter');
+  const search = document.getElementById('att-search');
+  const perpage = document.getElementById('att-perpage');
+  if (filter) filter.addEventListener('change', e => { st.filter = e.target.value; st.page = 1; renderTabContent(); });
+  if (search) search.addEventListener('input', e => { st.search = e.target.value; st.page = 1; renderTabContent(); search.focus(); });
+  if (perpage) perpage.addEventListener('change', e => { st.perPage = parseInt(e.target.value); st.page = 1; renderTabContent(); });
+}
+
+function changePage(mode, delta) {
+  if (mode === 'failed') { failedState.page += delta; renderTabContent(); }
+  else { attemptsState[mode].page += delta; renderTabContent(); }
+}
+
+// ═════════════════════════════════════════════════
+// FAILED TAB
+// ═════════════════════════════════════════════════
+let failedState = { search:'', page:1, perPage:25 };
+
+function renderFailedTab() {
+  let filtered = failed;
+  if (failedState.search) {
+    const q = failedState.search.toLowerCase();
+    filtered = filtered.filter(f =>
+      (f.officer_name||'').toLowerCase().includes(q) ||
+      (f.officer_id||'').toLowerCase().includes(q) ||
+      (f.test_title||'').toLowerCase().includes(q)
+    );
+  }
+  const totalPages = Math.max(1, Math.ceil(filtered.length / failedState.perPage));
+  failedState.page = Math.min(failedState.page, totalPages);
+  const pageItems = filtered.slice((failedState.page - 1) * failedState.perPage, failedState.page * failedState.perPage);
+
+  return `
+    ${failed.length > 0 ? `<div class="banner-warn">
+      <div class="banner-warn-title">⚠ Officers Requiring Follow-up</div>
+      <div class="banner-warn-desc">Officers whose <strong>most recent attempt</strong> on a test did not meet the passing score. Once an officer retakes and passes, they are removed from this list automatically.</div>
+    </div>` : ''}
+    <div class="section-block failed-tab">
+      <div class="section-head">Failed List (${failed.length})</div>
+      <div class="toolbar">
+        <div class="search-wrap"><input type="text" id="fail-search" placeholder="Officer, ID, or test..." value="${escapeHtml(failedState.search)}"></div>
+        <select id="fail-perpage">
+          <option value="10" ${failedState.perPage===10?'selected':''}>10 / page</option>
+          <option value="25" ${failedState.perPage===25?'selected':''}>25 / page</option>
+          <option value="50" ${failedState.perPage===50?'selected':''}>50 / page</option>
+        </select>
+        <button class="btn btn-gold" onclick="downloadCSV('failed')" ${filtered.length===0?'disabled':''}>⬇ CSV</button>
+        <div class="count">${filtered.length} result${filtered.length===1?'':'s'}</div>
+      </div>
+      <div class="table-wrap">
+        ${pageItems.length === 0 ? `<div class="empty-state">
+          <div class="empty-state-icon">${failed.length===0?'✓':'🔍'}</div>
+          <div style="font-family:Bebas Neue,sans-serif;font-size:1.2rem;letter-spacing:2px;color:var(--text);margin-bottom:4px;">${failed.length===0?'All clear':'No matches'}</div>
+          <div style="font-size:.88rem;">${failed.length===0?'No officers currently have outstanding failed tests.':'Try a different search.'}</div>
+        </div>` : `
+          <table>
+            <thead><tr>
+              <th>Test</th><th>Officer</th><th>Officer ID</th><th>Last Score</th><th>Attempts</th><th>Last Attempt</th>
+            </tr></thead>
+            <tbody>
+              ${pageItems.map(f => `
+                <tr>
+                  <td>${escapeHtml(f.test_title)}</td>
+                  <td><strong>${escapeHtml(f.officer_name)}</strong></td>
+                  <td class="mono">${escapeHtml(f.officer_id)}</td>
+                  <td class="mono"><strong style="color:var(--red);">${f.last_score}%</strong> <span style="color:var(--text3);">/ ${f.passing_score}%</span></td>
+                  <td class="mono"><span>${f.attempt_count} total</span> <span style="color:var(--red);margin-left:6px;">(${f.fail_count} failed)</span></td>
+                  <td class="mono" style="font-size:.78rem;color:var(--text2);">${new Date(f.last_attempt).toLocaleString()}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `}
+      </div>
+      ${totalPages > 1 ? `
+        <div class="pagination">
+          <button onclick="changePage('failed', -1)" ${failedState.page===1?'disabled':''}>← Prev</button>
+          <span>Page ${failedState.page} of ${totalPages}</span>
+          <button onclick="changePage('failed', 1)" ${failedState.page>=totalPages?'disabled':''}>Next →</button>
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+
+function bindFailedControls() {
+  const search = document.getElementById('fail-search');
+  const perpage = document.getElementById('fail-perpage');
+  if (search) search.addEventListener('input', e => { failedState.search = e.target.value; failedState.page = 1; renderTabContent(); document.getElementById('fail-search').focus(); });
+  if (perpage) perpage.addEventListener('change', e => { failedState.perPage = parseInt(e.target.value); failedState.page = 1; renderTabContent(); });
+}
+
+// ═════════════════════════════════════════════════
+// CSV
+// ═════════════════════════════════════════════════
+function downloadCSV(mode) {
+  const esc = v => {
+    const s = String(v == null ? '' : v);
+    return /[,"\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
+  };
+
+  let rows;
+  let filename;
+  if (mode === 'failed') {
+    let list = failed;
+    if (failedState.search) {
+      const q = failedState.search.toLowerCase();
+      list = list.filter(f => (f.officer_name||'').toLowerCase().includes(q) || (f.officer_id||'').toLowerCase().includes(q) || (f.test_title||'').toLowerCase().includes(q));
+    }
+    rows = [['Test','Officer Name','Officer ID','Last Score %','Passing %','Total Attempts','Failed Attempts','Last Attempt']];
+    list.forEach(f => rows.push([esc(f.test_title), esc(f.officer_name), esc(f.officer_id), f.last_score, f.passing_score, f.attempt_count, f.fail_count, new Date(f.last_attempt).toLocaleString()]));
+    filename = 'failed-list_' + dateStr() + '.csv';
+  } else {
+    const st = attemptsState[mode];
+    let list = mode === 'passed' ? attempts.filter(a => a.passed) : attempts;
+    if (mode === 'all' && st.filter !== 'all') list = list.filter(a => st.filter==='passed' ? a.passed : !a.passed);
+    if (st.search) {
+      const q = st.search.toLowerCase();
+      list = list.filter(a => (a.officer_name||'').toLowerCase().includes(q) || (a.officer_id_text||'').toLowerCase().includes(q) || (a.test_title||'').toLowerCase().includes(q));
+    }
+    rows = [['Test','Officer Name','Officer ID','Status','Score %','Earned','Total','Finished']];
+    list.forEach(a => rows.push([esc(a.test_title), esc(a.officer_name), esc(a.officer_id_text), a.passed?'Passed':'Failed', a.percent, a.earned_points, a.total_points, new Date(a.completed_at).toLocaleString()]));
+    filename = (mode === 'passed' ? 'passed-attempts_' : 'all-attempts_') + dateStr() + '.csv';
+  }
+
+  const csv = rows.map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], { type:'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function dateStr() { return new Date().toISOString().split('T')[0]; }
+function escapeHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// ═════════════════════════════════════════════════
+// INIT
+// ═════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  if (sessionStorage.getItem(STORAGE_KEY) === '1') {
+    showDashboard();
+  }
+  document.getElementById('loginPw').addEventListener('keydown', e => {
+    if (e.key === 'Enter') signIn();
+  });
+});
+</script>
+</body>
+</html>

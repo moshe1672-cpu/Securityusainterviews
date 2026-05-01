@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Security USA® | Officer Certifications</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0a1628;--navy-mid:#112240;--navy-light:#1a3460;
+  --gold:#c9a84c;--gold-light:#e8c46a;--gold-dim:#8a6f2e;
+  --bg:#f4f6fa;--surface:#ffffff;--surface2:#f0f2f8;--surface3:#e8ecf4;
+  --text:#1a2340;--text2:#374060;--text3:#6b7a99;
+  --border-l:#dde2ed;--red:#c0392b;--success:#27ae60;--warn:#e67e22;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;
+  font-size:16px;display:flex;flex-direction:column;min-height:100vh;
+}
+
+.site-header{
+  background:var(--navy);border-bottom:1px solid rgba(201,168,76,.25);
+  padding:0 2rem;display:flex;align-items:center;justify-content:space-between;
+  height:68px;flex-shrink:0;position:sticky;top:0;z-index:200;
+  box-shadow:0 2px 12px rgba(0,0,0,.25);
+}
+.logo-area{display:flex;align-items:center;gap:12px;}
+.brand-name{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;color:#fff;line-height:1;}
+.brand-tag{font-family:'Barlow Condensed',sans-serif;font-size:.58rem;letter-spacing:3px;color:var(--gold);text-transform:uppercase;}
+.header-right{display:flex;align-items:center;gap:12px;}
+.header-officer{font-family:'Barlow Condensed',sans-serif;font-size:.8rem;letter-spacing:1px;color:#c8d0df;}
+.header-officer strong{color:var(--gold);}
+.header-nav-btn{background:transparent;border:1px solid rgba(201,168,76,.3);color:#c8d0df;padding:5px 14px;border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.header-nav-btn:hover{color:#fff;border-color:var(--gold);}
+
+.page-title-bar{
+  background:linear-gradient(90deg,var(--navy-mid) 0%,var(--navy-light) 100%);
+  border-bottom:3px solid var(--gold);padding:1.75rem 2rem;flex-shrink:0;
+}
+.page-title-bar-inner{max-width:1100px;margin:0 auto;}
+.page-title-bar h1{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;letter-spacing:3px;color:#fff;}
+.page-title-bar p{font-size:.85rem;color:var(--gold);font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;margin-top:3px;}
+
+.main-scroll{flex:1;overflow-y:auto;width:100%;}
+.main{max-width:900px;margin:2rem auto;padding:0 1.5rem 4rem;width:100%;}
+
+.site-footer{background:var(--navy);border-top:1px solid rgba(201,168,76,.2);padding:1.25rem 2rem;text-align:center;font-size:.7rem;color:#8a9ab5;font-family:'Barlow Condensed',sans-serif;line-height:1.8;flex-shrink:0;}
+.site-footer strong{color:var(--gold);}
+.site-footer a{color:#8a9ab5;text-decoration:none;}
+.site-footer a:hover{color:var(--gold);}
+
+input[type=text],textarea,select{
+  background:#fff;border:1px solid var(--border-l);border-radius:4px;
+  color:var(--text);font-family:'Barlow',sans-serif;font-size:1rem;padding:11px 14px;
+  outline:none;width:100%;transition:border-color .2s,box-shadow .2s;
+}
+input:focus,textarea:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.12);}
+textarea{resize:vertical;min-height:90px;line-height:1.6;}
+
+.section-block{
+  background:var(--surface);border:1px solid var(--border-l);border-radius:6px;
+  margin-bottom:1.5rem;box-shadow:0 1px 6px rgba(0,0,0,.06);
+}
+.section-head{background:var(--navy);border-bottom:1px solid rgba(201,168,76,.25);padding:.85rem 1.25rem;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;color:var(--gold);}
+.section-body{padding:1.5rem;}
+
+.btn{font-family:'Barlow Condensed',sans-serif;font-size:.85rem;letter-spacing:2px;text-transform:uppercase;padding:11px 24px;border-radius:4px;cursor:pointer;transition:all .2s;font-weight:700;border:none;display:inline-flex;align-items:center;gap:8px;}
+.btn-gold{background:var(--gold);color:var(--navy);font-weight:700;}
+.btn-gold:hover{background:var(--gold-light);transform:translateY(-1px);box-shadow:0 4px 16px rgba(201,168,76,.35);}
+.btn-outline{background:#fff;color:var(--text2);border:1px solid var(--border-l);}
+.btn-outline:hover{color:var(--text);border-color:var(--navy);}
+.btn-full{width:100%;background:var(--gold);color:var(--navy);border:none;border-radius:4px;padding:14px;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:3px;cursor:pointer;transition:all .2s;font-weight:700;}
+.btn-full:hover{background:var(--gold-light);transform:translateY(-1px);box-shadow:0 5px 20px rgba(201,168,76,.3);}
+.btn-full:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none;}
+
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:1.1rem;}
+.field>label{font-family:'Barlow Condensed',sans-serif;font-size:.78rem;letter-spacing:2px;text-transform:uppercase;color:var(--navy-mid);font-weight:700;}
+.field>label .req{color:var(--red);margin-left:2px;}
+
+.error-msg{display:none;background:#fef2f2;border:1px solid #fca5a5;border-left:4px solid var(--red);border-radius:6px;padding:.85rem 1rem;font-size:.95rem;color:var(--red);margin-bottom:1rem;font-weight:500;}
+
+/* TEST LIST */
+.test-list-card{
+  background:#fff;border:1px solid var(--border-l);border-radius:6px;
+  padding:1.5rem;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;
+  gap:1rem;box-shadow:0 1px 5px rgba(0,0,0,.05);transition:all .2s;
+}
+.test-list-card:hover{border-color:var(--gold);box-shadow:0 2px 10px rgba(201,168,76,.15);}
+.test-info{flex:1;min-width:0;}
+.test-num{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:2px;color:var(--gold-dim);margin-bottom:3px;}
+.test-title{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:1px;color:var(--text);margin-bottom:6px;}
+.test-meta{display:flex;gap:1.25rem;font-family:'Barlow Condensed',sans-serif;font-size:.75rem;color:var(--text3);letter-spacing:1px;flex-wrap:wrap;}
+.test-meta span{display:flex;align-items:center;gap:4px;}
+.test-status{padding:5px 12px;border-radius:20px;font-family:'Barlow Condensed',sans-serif;font-size:.65rem;letter-spacing:2px;text-transform:uppercase;font-weight:700;}
+.status-passed{background:rgba(39,174,96,.12);color:var(--success);border:1px solid rgba(39,174,96,.3);}
+.status-failed{background:rgba(192,57,43,.1);color:var(--red);border:1px solid rgba(192,57,43,.3);}
+.status-new{background:rgba(201,168,76,.1);color:var(--gold-dim);border:1px solid rgba(201,168,76,.3);}
+
+/* TEST TAKING UI */
+.test-status-bar{
+  background:var(--navy);color:#fff;padding:1rem 1.5rem;border-radius:6px 6px 0 0;
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;
+}
+.test-status-bar-left{flex:1;min-width:200px;}
+.test-status-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:.65rem;letter-spacing:3px;color:var(--gold);text-transform:uppercase;}
+.test-status-title{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:2px;color:#fff;margin-top:2px;}
+.test-status-stats{display:flex;gap:1rem;align-items:center;}
+.test-stat{text-align:right;}
+.test-stat-label{font-family:'Barlow Condensed',sans-serif;font-size:.6rem;letter-spacing:1.5px;color:#8a9ab5;text-transform:uppercase;}
+.test-stat-val{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;color:#fff;font-weight:700;}
+.timer-box{background:rgba(255,255,255,.08);border:1px solid rgba(201,168,76,.2);padding:6px 14px;border-radius:4px;}
+.timer-box.warn{background:rgba(192,57,43,.2);border-color:var(--red);}
+.timer-box.warn .test-stat-val{color:var(--red);}
+
+.q-nav{
+  background:var(--surface2);border:1px solid var(--border-l);border-top:none;border-bottom:none;
+  padding:.85rem 1rem;display:flex;gap:6px;flex-wrap:wrap;
+}
+.q-nav-btn{
+  width:34px;height:34px;font-family:'Barlow Condensed',sans-serif;font-size:.78rem;font-weight:700;
+  border:1px solid var(--border-l);background:#fff;color:var(--text2);border-radius:3px;cursor:pointer;
+  transition:all .15s;
+}
+.q-nav-btn:hover:not(.current){border-color:var(--navy);}
+.q-nav-btn.answered{background:var(--navy-light);color:#fff;border-color:var(--navy-light);}
+.q-nav-btn.current{background:var(--gold);color:var(--navy);border-color:var(--gold);}
+
+.q-card{
+  background:#fff;border:1px solid var(--border-l);border-top:none;border-radius:0 0 6px 6px;
+  padding:2rem;
+}
+.q-meta{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:2.5px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:.5rem;}
+.q-prompt{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.5px;color:var(--text);margin-bottom:1.5rem;line-height:1.3;}
+
+/* MC option */
+.opt{
+  display:flex;align-items:flex-start;gap:14px;padding:14px 16px;
+  border:1px solid var(--border-l);border-radius:4px;margin-bottom:8px;cursor:pointer;
+  transition:all .15s;background:#fff;
+}
+.opt:hover{border-color:var(--gold-dim);background:#fffbf2;}
+.opt.selected{border-color:var(--navy);background:rgba(26,52,96,.04);box-shadow:inset 3px 0 0 var(--navy);}
+.opt input{margin-top:3px;width:16px;height:16px;accent-color:var(--gold);cursor:pointer;flex-shrink:0;}
+.opt-letter{font-family:'Barlow Condensed',sans-serif;font-size:.75rem;font-weight:700;color:var(--text3);margin-top:1px;letter-spacing:1px;}
+.opt-text{flex:1;color:var(--text);line-height:1.5;}
+
+/* TF buttons */
+.tf-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.tf-btn{
+  padding:1.5rem;border:1px solid var(--border-l);border-radius:4px;background:#fff;cursor:pointer;
+  font-family:'Barlow Condensed',sans-serif;font-size:1rem;letter-spacing:3px;color:var(--text2);
+  transition:all .15s;text-transform:uppercase;font-weight:700;
+}
+.tf-btn:hover{border-color:var(--gold-dim);}
+.tf-btn.selected{background:var(--navy);color:#fff;border-color:var(--navy);}
+
+/* Matching */
+.match-row{
+  display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--border-l);
+  border-radius:4px;margin-bottom:8px;background:var(--surface2);
+}
+.match-num{font-family:'Barlow Condensed',sans-serif;font-size:.8rem;color:var(--text3);font-weight:700;min-width:24px;}
+.match-text{flex:1;font-size:.95rem;color:var(--text);line-height:1.4;}
+.match-select{min-width:80px;}
+.match-rights{
+  background:var(--surface2);border:1px solid var(--border-l);border-radius:4px;padding:1rem;margin-top:1rem;
+}
+.match-rights-title{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:2px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:.5rem;font-weight:700;}
+.match-right-item{display:flex;gap:8px;font-size:.92rem;color:var(--text2);padding:3px 0;line-height:1.5;}
+.match-right-letter{font-family:'Barlow Condensed',sans-serif;font-weight:700;color:var(--gold-dim);min-width:20px;}
+
+.q-nav-bottom{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-top:1.75rem;padding-top:1.5rem;border-top:1px solid var(--border-l);
+}
+.q-nav-bottom .btn-outline{padding:9px 18px;font-size:.78rem;}
+
+/* RESULTS */
+.results-banner{padding:2.5rem;text-align:center;color:#fff;border-radius:6px 6px 0 0;}
+.results-banner.pass{background:linear-gradient(135deg,#27ae60 0%,#1e8449 100%);}
+.results-banner.fail{background:linear-gradient(135deg,#c0392b 0%,#922b21 100%);}
+.results-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:4px;text-transform:uppercase;opacity:.85;margin-bottom:1rem;}
+.results-icon{font-size:3.5rem;margin-bottom:.5rem;display:block;}
+.results-title{font-family:'Bebas Neue',sans-serif;font-size:3rem;letter-spacing:3px;}
+.results-score{font-family:'Bebas Neue',sans-serif;font-size:4.5rem;letter-spacing:2px;margin-top:1rem;line-height:1;}
+.results-points{font-family:'Barlow Condensed',sans-serif;font-size:.78rem;letter-spacing:2px;opacity:.85;margin-top:6px;}
+
+.results-body{
+  background:#fff;border:1px solid var(--border-l);border-top:none;border-radius:0 0 6px 6px;padding:2rem;
+}
+
+.review-q{
+  padding:1rem 1.25rem;border-left:4px solid;border-radius:0 4px 4px 0;margin-bottom:.85rem;
+  background:#fafbfd;
+}
+.review-q.correct{border-left-color:var(--success);background:rgba(39,174,96,.04);}
+.review-q.incorrect{border-left-color:var(--red);background:rgba(192,57,43,.04);}
+.review-meta{font-family:'Barlow Condensed',sans-serif;font-size:.65rem;letter-spacing:2px;color:var(--text3);text-transform:uppercase;margin-bottom:4px;font-weight:700;}
+.review-prompt{color:var(--text);font-size:.95rem;margin-bottom:.6rem;line-height:1.5;}
+.review-answer{font-size:.88rem;color:var(--text2);margin-top:5px;}
+.review-answer-label{font-family:'Barlow Condensed',sans-serif;font-size:.65rem;letter-spacing:1.5px;color:var(--text3);text-transform:uppercase;}
+.review-correct{color:var(--success);font-weight:600;}
+.review-hidden{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;color:var(--text3);font-style:italic;letter-spacing:.5px;margin-top:6px;}
+
+.download-card{
+  background:linear-gradient(135deg,var(--navy-mid) 0%,var(--navy-light) 100%);
+  border-radius:6px;padding:1.5rem;margin-bottom:1.5rem;color:#fff;
+  display:flex;gap:1.25rem;align-items:center;flex-wrap:wrap;
+}
+.download-card-text{flex:1;min-width:200px;}
+.download-card-title{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2px;color:var(--gold);margin-bottom:4px;}
+.download-card-desc{font-size:.88rem;color:#c8d0df;line-height:1.5;}
+
+.empty-state{text-align:center;padding:3rem 1rem;color:var(--text3);}
+.empty-state-icon{font-size:2.5rem;opacity:.3;margin-bottom:.75rem;}
+
+@media(max-width:640px){
+  .tf-grid{grid-template-columns:1fr;}
+  .test-list-card{flex-direction:column;align-items:stretch;}
+  .page-title-bar{padding:1.25rem 1rem;}
+  .page-title-bar h1{font-size:1.4rem;}
+  .main{padding:0 1rem 3rem;}
+  .q-card{padding:1.25rem;}
+}
+
+/* Print styles for results PDF */
+@media print {
+  .no-print{display:none !important;}
+  body{background:#fff;}
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo-area">
+    <svg width="38" height="38" viewBox="0 0 40 48" fill="none">
+      <path d="M20 2L3 9V22C3 32 10.5 41 20 45C29.5 41 37 32 37 22V9L20 2Z" fill="#0a1628" stroke="#c9a84c" stroke-width="1.8"/>
+      <path d="M20 7L8 13V22C8 29.5 13.5 37 20 40C26.5 37 32 29.5 32 22V13L20 7Z" fill="rgba(201,168,76,0.08)" stroke="rgba(201,168,76,0.3)" stroke-width="1"/>
+      <text x="20" y="28" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="12" fill="#c9a84c">USA</text>
+    </svg>
+    <div>
+      <div class="brand-name">Security USA®</div>
+      <div class="brand-tag">Officer Certifications</div>
+    </div>
+  </div>
+  <div class="header-right" id="headerRight" style="display:none;">
+    <div class="header-officer">Officer: <strong id="hdrOfficerName">—</strong></div>
+    <button class="header-nav-btn" onclick="signOut()">Sign Out</button>
+  </div>
+</header>
+
+<div class="page-title-bar">
+  <div class="page-title-bar-inner">
+    <h1 id="pageTitle">Officer Certification Portal</h1>
+    <p id="pageSub">Sign in with your officer ID to access your certification tests</p>
+  </div>
+</div>
+
+<div class="main-scroll">
+  <div class="main">
+
+    <!-- ═══ LOGIN VIEW ═══ -->
+    <div id="view-login">
+      <div class="section-block">
+        <div class="section-head">Officer Sign-In</div>
+        <div class="section-body">
+          <p style="color:var(--text2);font-size:.95rem;line-height:1.6;margin-bottom:1.5rem;">
+            Enter your full name and Security USA officer ID to begin. If this is your first time, your record will be created automatically.
+          </p>
+          <div id="loginErr" class="error-msg"></div>
+          <div class="field">
+            <label>Full Name <span class="req">*</span></label>
+            <input type="text" id="loginName" placeholder="Last, First" autocomplete="name">
+          </div>
+          <div class="field">
+            <label>Officer ID <span class="req">*</span></label>
+            <input type="text" id="loginId" placeholder="e.g. SUSA-00421" autocomplete="off" style="font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;">
+          </div>
+          <button class="btn-full" id="loginBtn" onclick="signIn()">Continue →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ TEST LIST VIEW ═══ -->
+    <div id="view-list" style="display:none;">
+      <div class="section-block">
+        <div class="section-head">Available Certifications</div>
+        <div class="section-body" id="testListBody">
+          <div class="empty-state">
+            <div class="empty-state-icon">⏳</div>
+            <div>Loading tests...</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-block">
+        <div class="section-head">Your Recent Attempts</div>
+        <div class="section-body" id="historyBody">
+          <div class="empty-state" style="padding:1.5rem;">
+            <div style="font-size:.9rem;">No attempts yet.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ TAKE TEST VIEW ═══ -->
+    <div id="view-test" style="display:none;">
+      <div class="test-status-bar">
+        <div class="test-status-bar-left">
+          <div class="test-status-eyebrow">Testing in Progress</div>
+          <div class="test-status-title" id="testTitle">Test Title</div>
+        </div>
+        <div class="test-status-stats">
+          <div class="test-stat">
+            <div class="test-stat-label">Progress</div>
+            <div class="test-stat-val"><span id="answeredCount">0</span> / <span id="totalCount">0</span></div>
+          </div>
+          <div class="timer-box" id="timerBox">
+            <div class="test-stat-label">Time Left</div>
+            <div class="test-stat-val" id="timerDisplay">30:00</div>
+          </div>
+        </div>
+      </div>
+      <div class="q-nav" id="qNav"></div>
+      <div class="q-card" id="qCard">
+        <div class="q-meta" id="qMeta"></div>
+        <div class="q-prompt" id="qPrompt"></div>
+        <div id="qOptions"></div>
+        <div id="submitErr" class="error-msg" style="margin-top:1rem;"></div>
+        <div class="q-nav-bottom">
+          <button class="btn btn-outline" id="prevBtn" onclick="navigateQ(-1)">← Previous</button>
+          <button class="btn btn-gold" id="nextBtn" onclick="navigateQ(1)">Next →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ RESULTS VIEW ═══ -->
+    <div id="view-results" style="display:none;">
+      <div class="results-banner" id="resultsBanner">
+        <div class="results-eyebrow">Certification Result</div>
+        <div class="results-icon" id="resultsIcon">✓</div>
+        <div class="results-title" id="resultsTitle">Passed</div>
+        <div class="results-score" id="resultsScore">100%</div>
+        <div class="results-points" id="resultsPoints">10 / 10 POINTS · PASSING 80%</div>
+      </div>
+      <div class="results-body">
+        <div style="margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid var(--border-l);">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:2px;color:var(--text3);text-transform:uppercase;">Officer</div>
+          <div style="color:var(--text);font-size:1rem;margin-top:2px;" id="resultsOfficer">—</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:.78rem;color:var(--text3);margin-top:4px;letter-spacing:.5px;" id="resultsDate">—</div>
+        </div>
+
+        <div class="download-card">
+          <div class="download-card-text">
+            <div class="download-card-title" id="downloadTitle">Download Your Study Sheet</div>
+            <div class="download-card-desc" id="downloadDesc">Review your results and missed questions.</div>
+          </div>
+          <button class="btn btn-gold" onclick="downloadResultsPDF()">⬇ Download PDF</button>
+        </div>
+
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;color:var(--text);margin-bottom:1rem;">Answer Review</div>
+        <div id="reviewList"></div>
+
+        <button class="btn-full" style="margin-top:1.5rem;" onclick="returnToList()">Return to Certifications →</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer class="site-footer">
+  <strong>Security USA, Inc.</strong> &nbsp;·&nbsp; License# 11000033301 &nbsp;·&nbsp; <a href="https://www.securityusainc.com">securityusainc.com</a>
+</footer>
+
+<script>
+// ═════════════════════════════════════════════════
+// SUPABASE
+// ═════════════════════════════════════════════════
+const SUPABASE_URL = 'https://stvagyjcjoxnbslafmyf.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0dmFneWpjam94bmJzbGFmbXlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NTcxNTIsImV4cCI6MjA4OTQzMzE1Mn0.da_l4ogYdc_XL7DqmK_RmmR6cC_X6Lq102ddnN7QYY4';
+
+let sb = null;
+function getSB() {
+  if (sb) return sb;
+  if (!window.supabase) {
+    showErr('loginErr', 'Authentication service failed to load. Please refresh the page (Ctrl+R).');
+    return null;
+  }
+  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+  return sb;
+}
+
+// ═════════════════════════════════════════════════
+// STATE
+// ═════════════════════════════════════════════════
+const STORAGE_KEY = 'susa_officer_session';
+let session = null; // { uuid, officerId, fullName }
+let currentTest = null; // { id, title, passing_score, time_limit_minutes, questions: [...] }
+let answers = {}; // { questionId: answer }
+let currentQIdx = 0;
+let timerInterval = null;
+let timeRemaining = 0;
+let lastResults = null;
+
+// ═════════════════════════════════════════════════
+// VIEW SWITCHING
+// ═════════════════════════════════════════════════
+function showView(name, title, sub) {
+  ['view-login','view-list','view-test','view-results'].forEach(id => {
+    document.getElementById(id).style.display = (id === 'view-' + name) ? 'block' : 'none';
+  });
+  if (title) document.getElementById('pageTitle').textContent = title;
+  if (sub) document.getElementById('pageSub').textContent = sub;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showErr(id, msg) {
+  const el = document.getElementById(id);
+  if (el) { el.textContent = '⚠ ' + msg; el.style.display = 'block'; }
+}
+function hideErr(id) {
+  const el = document.getElementById(id);
+  if (el) el.style.display = 'none';
+}
+
+// ═════════════════════════════════════════════════
+// AUTH (officer ID-only "session")
+// ═════════════════════════════════════════════════
+async function signIn() {
+  hideErr('loginErr');
+  const name = document.getElementById('loginName').value.trim();
+  const officerId = document.getElementById('loginId').value.trim();
+  const btn = document.getElementById('loginBtn');
+
+  if (!name) { showErr('loginErr', 'Please enter your full name.'); return; }
+  if (!officerId) { showErr('loginErr', 'Please enter your officer ID.'); return; }
+
+  const client = getSB();
+  if (!client) return;
+
+  btn.disabled = true;
+  btn.textContent = 'Signing in...';
+
+  try {
+    // Look up officer by ID
+    const { data: existing, error: lookupErr } = await client
+      .from('officers')
+      .select('id, officer_id, full_name')
+      .eq('officer_id', officerId)
+      .maybeSingle();
+
+    if (lookupErr) throw lookupErr;
+
+    let officer;
+    if (existing) {
+      // Update last_seen_at and name
+      await client.from('officers').update({
+        last_seen_at: new Date().toISOString(),
+        full_name: name
+      }).eq('id', existing.id);
+      officer = { ...existing, full_name: name };
+    } else {
+      // First sign-in — create officer record
+      const { data: created, error: insertErr } = await client
+        .from('officers')
+        .insert({ officer_id: officerId, full_name: name })
+        .select('id, officer_id, full_name')
+        .single();
+      if (insertErr) throw insertErr;
+      officer = created;
+    }
+
+    session = {
+      uuid: officer.id,
+      officerId: officer.officer_id,
+      fullName: officer.full_name
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+    afterLogin();
+  } catch (e) {
+    console.error(e);
+    showErr('loginErr', 'Sign in failed: ' + (e.message || 'unknown error'));
+    btn.disabled = false;
+    btn.textContent = 'Continue →';
+  }
+}
+
+function signOut() {
+  localStorage.removeItem(STORAGE_KEY);
+  session = null;
+  document.getElementById('headerRight').style.display = 'none';
+  document.getElementById('loginName').value = '';
+  document.getElementById('loginId').value = '';
+  document.getElementById('loginBtn').disabled = false;
+  document.getElementById('loginBtn').textContent = 'Continue →';
+  showView('login', 'Officer Certification Portal', 'Sign in with your officer ID to access your certification tests');
+}
+
+function afterLogin() {
+  document.getElementById('headerRight').style.display = 'flex';
+  document.getElementById('hdrOfficerName').textContent = session.fullName + ' · ' + session.officerId;
+  loadTestList();
+}
+
+// ═════════════════════════════════════════════════
+// TEST LIST
+// ═════════════════════════════════════════════════
+async function loadTestList() {
+  showView('list', 'Officer Certification Portal', 'Welcome back, ' + session.fullName.split(',')[0].trim() || session.fullName);
+  const client = getSB();
+  if (!client) return;
+
+  const listBody = document.getElementById('testListBody');
+  const histBody = document.getElementById('historyBody');
+
+  try {
+    const [testsRes, attemptsRes] = await Promise.all([
+      client.from('tests').select('*').eq('is_active', true).order('test_number', { ascending: true }),
+      client.from('attempts').select('*').eq('officer_id', session.uuid).not('completed_at','is',null).order('completed_at',{ ascending:false }).limit(50)
+    ]);
+
+    if (testsRes.error) throw testsRes.error;
+    const tests = testsRes.data || [];
+    const attempts = attemptsRes.data || [];
+
+    // Best score per test
+    const bestByTest = {};
+    attempts.forEach(a => {
+      if (!bestByTest[a.test_id] || a.percent > bestByTest[a.test_id].percent) {
+        bestByTest[a.test_id] = a;
+      }
+    });
+
+    if (tests.length === 0) {
+      listBody.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📋</div><div>No active tests right now. Please check back later.</div></div>';
+    } else {
+      listBody.innerHTML = tests.map(t => {
+        const best = bestByTest[t.id];
+        let statusHtml = '';
+        if (best) {
+          if (best.passed) statusHtml = '<div class="test-status status-passed">✓ Passed (' + best.percent + '%)</div>';
+          else statusHtml = '<div class="test-status status-failed">Retake required</div>';
+        } else {
+          statusHtml = '<div class="test-status status-new">New</div>';
+        }
+        return `
+          <div class="test-list-card">
+            <div class="test-info">
+              ${t.test_number ? '<div class="test-num">Test #' + escapeHtml(t.test_number) + '</div>' : ''}
+              <div class="test-title">${escapeHtml(t.title)}</div>
+              <div class="test-meta">
+                <span>⏱ ${t.time_limit_minutes} MIN</span>
+                <span>✓ PASS ${t.passing_score}%</span>
+                ${t.description ? '<span>' + escapeHtml(t.description.substring(0,60)) + (t.description.length > 60 ? '…' : '') + '</span>' : ''}
+              </div>
+            </div>
+            ${statusHtml}
+            <button class="btn btn-gold" onclick="startTest('${t.id}')">${best ? 'Retake' : 'Begin'} →</button>
+          </div>`;
+      }).join('');
+    }
+
+    if (attempts.length === 0) {
+      histBody.innerHTML = '<div class="empty-state" style="padding:1.5rem;"><div style="font-size:.9rem;">No attempts yet. Take your first test above.</div></div>';
+    } else {
+      const rows = attempts.map(a => {
+        const t = tests.find(x => x.id === a.test_id);
+        const date = new Date(a.completed_at).toLocaleString();
+        const tag = a.passed
+          ? '<span class="test-status status-passed">Passed</span>'
+          : '<span class="test-status status-failed">Failed</span>';
+        return `
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem 0;border-bottom:1px solid var(--border-l);gap:1rem;flex-wrap:wrap;">
+            <div style="flex:1;min-width:200px;">
+              <div style="color:var(--text);font-size:.95rem;">${t ? escapeHtml(t.title) : 'Unknown Test'}</div>
+              <div style="font-family:'Barlow Condensed',sans-serif;font-size:.72rem;color:var(--text3);letter-spacing:.5px;margin-top:2px;">${date}</div>
+            </div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.05rem;color:var(--text);font-weight:700;">${a.percent}%</div>
+            ${tag}
+          </div>`;
+      }).join('');
+      histBody.innerHTML = rows;
+    }
+  } catch (e) {
+    console.error(e);
+    listBody.innerHTML = '<div class="empty-state"><div>Failed to load tests. ' + escapeHtml(e.message) + '</div></div>';
+  }
+}
+
+// ═════════════════════════════════════════════════
+// TAKE TEST
+// ═════════════════════════════════════════════════
+async function startTest(testId) {
+  const client = getSB();
+  if (!client) return;
+  showView('test');
+  document.getElementById('qCard').innerHTML = '<div class="empty-state"><div class="empty-state-icon">⏳</div><div>Loading test...</div></div>';
+  document.getElementById('qNav').innerHTML = '';
+
+  try {
+    const [testRes, qsRes] = await Promise.all([
+      client.from('tests').select('*').eq('id', testId).single(),
+      client.from('questions').select('*').eq('test_id', testId).order('position', { ascending: true })
+    ]);
+    if (testRes.error) throw testRes.error;
+    if (qsRes.error) throw qsRes.error;
+
+    currentTest = { ...testRes.data, questions: qsRes.data || [] };
+    if (currentTest.questions.length === 0) throw new Error('This test has no questions yet.');
+
+    answers = {};
+    currentQIdx = 0;
+    timeRemaining = currentTest.time_limit_minutes * 60;
+
+    document.getElementById('testTitle').textContent = currentTest.title;
+    document.getElementById('totalCount').textContent = currentTest.questions.length;
+
+    // Re-render the test container (it was replaced by loading state)
+    showView('test');
+    document.getElementById('view-test').innerHTML = renderTestShell();
+
+    document.getElementById('testTitle').textContent = currentTest.title;
+    document.getElementById('totalCount').textContent = currentTest.questions.length;
+
+    renderQuestionNav();
+    renderQuestion();
+    startTimer();
+  } catch (e) {
+    console.error(e);
+    document.getElementById('qCard').innerHTML = '<div class="empty-state"><div>Failed to load test: ' + escapeHtml(e.message) + '</div></div>';
+  }
+}
+
+// Re-renders the test view container (since the loading state replaced it)
+function renderTestShell() {
+  return `
+    <div class="test-status-bar">
+      <div class="test-status-bar-left">
+        <div class="test-status-eyebrow">Testing in Progress</div>
+        <div class="test-status-title" id="testTitle">Test Title</div>
+      </div>
+      <div class="test-status-stats">
+        <div class="test-stat">
+          <div class="test-stat-label">Progress</div>
+          <div class="test-stat-val"><span id="answeredCount">0</span> / <span id="totalCount">0</span></div>
+        </div>
+        <div class="timer-box" id="timerBox">
+          <div class="test-stat-label">Time Left</div>
+          <div class="test-stat-val" id="timerDisplay">30:00</div>
+        </div>
+      </div>
+    </div>
+    <div class="q-nav" id="qNav"></div>
+    <div class="q-card" id="qCard">
+      <div class="q-meta" id="qMeta"></div>
+      <div class="q-prompt" id="qPrompt"></div>
+      <div id="qOptions"></div>
+      <div id="submitErr" class="error-msg" style="margin-top:1rem;"></div>
+      <div class="q-nav-bottom">
+        <button class="btn btn-outline" id="prevBtn" onclick="navigateQ(-1)">← Previous</button>
+        <button class="btn btn-gold" id="nextBtn" onclick="navigateQ(1)">Next →</button>
+      </div>
+    </div>`;
+}
+
+function startTimer() {
+  if (timerInterval) clearInterval(timerInterval);
+  updateTimerDisplay();
+  timerInterval = setInterval(() => {
+    timeRemaining--;
+    updateTimerDisplay();
+    if (timeRemaining <= 0) {
+      clearInterval(timerInterval);
+      submitTest(true);
+    }
+  }, 1000);
+}
+
+function updTimerDisplay() {} // typo guard
+function updateTimerDisplay() {
+  const m = Math.floor(timeRemaining / 60);
+  const s = timeRemaining % 60;
+  const display = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  const tEl = document.getElementById('timerDisplay');
+  if (tEl) tEl.textContent = display;
+  const box = document.getElementById('timerBox');
+  if (box) box.classList.toggle('warn', timeRemaining < 60);
+}
+
+function hasAnswer(q) {
+  const v = answers[q.id];
+  if (v === undefined || v === null || v === '') return false;
+  if (Array.isArray(v)) return v.length > 0;
+  if (typeof v === 'object') return Object.keys(v).length > 0;
+  return true;
+}
+
+function renderQuestionNav() {
+  const nav = document.getElementById('qNav');
+  if (!nav) return;
+  let answered = 0;
+  nav.innerHTML = currentTest.questions.map((q, i) => {
+    const isAnswered = hasAnswer(q);
+    if (isAnswered) answered++;
+    const cls = i === currentQIdx ? 'q-nav-btn current' : (isAnswered ? 'q-nav-btn answered' : 'q-nav-btn');
+    return `<button class="${cls}" onclick="jumpToQ(${i})">${i + 1}</button>`;
+  }).join('');
+  const ac = document.getElementById('answeredCount');
+  if (ac) ac.textContent = answered;
+}
+
+function jumpToQ(i) {
+  currentQIdx = i;
+  renderQuestion();
+  renderQuestionNav();
+}
+
+function navigateQ(delta) {
+  const newIdx = currentQIdx + delta;
+  if (newIdx < 0) return;
+  if (newIdx >= currentTest.questions.length) {
+    submitTest(false);
+    return;
+  }
+  currentQIdx = newIdx;
+  renderQuestion();
+  renderQuestionNav();
+}
+
+function renderQuestion() {
+  const q = currentTest.questions[currentQIdx];
+  const meta = document.getElementById('qMeta');
+  const prompt = document.getElementById('qPrompt');
+  const opts = document.getElementById('qOptions');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+
+  if (!q) return;
+  meta.textContent = `Question ${currentQIdx + 1} of ${currentTest.questions.length}  ·  ${q.points} pts  ·  ${typeLabel(q.type)}`;
+  prompt.textContent = q.prompt;
+  opts.innerHTML = renderQuestionInput(q);
+  prevBtn.disabled = currentQIdx === 0;
+  prevBtn.style.visibility = currentQIdx === 0 ? 'hidden' : 'visible';
+  nextBtn.textContent = (currentQIdx === currentTest.questions.length - 1) ? 'Submit Test ✓' : 'Next →';
+  nextBtn.classList.toggle('btn-gold', true);
+}
+
+function renderQuestionInput(q) {
+  if (q.type === 'mc') {
+    const data = q.data || {};
+    const options = data.options || [];
+    return options.map((opt, i) => {
+      const sel = answers[q.id] === i ? ' selected' : '';
+      return `
+        <label class="opt${sel}" onclick="selectMC('${q.id}', ${i})">
+          <input type="radio" name="q-${q.id}" ${answers[q.id]===i?'checked':''}>
+          <span class="opt-letter">${String.fromCharCode(65+i)}.</span>
+          <span class="opt-text">${escapeHtml(opt)}</span>
+        </label>`;
+    }).join('');
+  }
+  if (q.type === 'tf') {
+    const v = answers[q.id];
+    return `
+      <div class="tf-grid">
+        <button class="tf-btn${v===true?' selected':''}" onclick="setAnswer('${q.id}', true)">TRUE</button>
+        <button class="tf-btn${v===false?' selected':''}" onclick="setAnswer('${q.id}', false)">FALSE</button>
+      </div>`;
+  }
+  if (q.type === 'multi') {
+    const data = q.data || {};
+    const opts = data.options || [];
+    const cur = Array.isArray(answers[q.id]) ? answers[q.id] : [];
+    return `
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:2px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:.5rem;font-weight:700;">Select all that apply</div>
+      ${opts.map((opt, i) => {
+        const sel = cur.includes(i) ? ' selected' : '';
+        return `
+          <label class="opt${sel}" onclick="toggleMulti('${q.id}', ${i})">
+            <input type="checkbox" ${cur.includes(i)?'checked':''}>
+            <span class="opt-letter">${String.fromCharCode(65+i)}.</span>
+            <span class="opt-text">${escapeHtml(opt)}</span>
+          </label>`;
+      }).join('')}`;
+  }
+  if (q.type === 'matching') {
+    const data = q.data || {};
+    const lefts = data.lefts || [];
+    const rights = data.rights || [];
+    const cur = (answers[q.id] && typeof answers[q.id] === 'object') ? answers[q.id] : {};
+    const used = new Set(Object.values(cur));
+    return `
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:2px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:.5rem;font-weight:700;">Match each item on the left to one on the right</div>
+      ${lefts.map((l, i) => `
+        <div class="match-row">
+          <div class="match-num">${i+1}.</div>
+          <div class="match-text">${escapeHtml(l.text)}</div>
+          <select class="match-select" onchange="setMatch('${q.id}', '${l.id}', this.value)">
+            <option value="">—</option>
+            ${rights.map((r, ri) => {
+              const isUsed = used.has(r.id) && cur[l.id] !== r.id;
+              const isSel = cur[l.id] === r.id;
+              return `<option value="${r.id}" ${isSel?'selected':''} ${isUsed?'disabled':''}>${String.fromCharCode(65+ri)}${isUsed?' (used)':''}</option>`;
+            }).join('')}
+          </select>
+        </div>
+      `).join('')}
+      <div class="match-rights">
+        <div class="match-rights-title">Right Column Options</div>
+        ${rights.map((r, ri) => `
+          <div class="match-right-item">
+            <span class="match-right-letter">${String.fromCharCode(65+ri)}.</span>
+            <span>${escapeHtml(r.text)}</span>
+          </div>
+        `).join('')}
+      </div>`;
+  }
+  if (q.type === 'written') {
+    const v = typeof answers[q.id] === 'string' ? answers[q.id] : '';
+    return `<textarea oninput="setAnswer('${q.id}', this.value)" placeholder="Write your answer here..." style="min-height:160px;">${escapeHtml(v)}</textarea>`;
+  }
+  return '<div style="color:var(--red);">Unknown question type.</div>';
+}
+
+function selectMC(qId, idx) { setAnswer(qId, idx); }
+function toggleMulti(qId, idx) {
+  const cur = Array.isArray(answers[qId]) ? [...answers[qId]] : [];
+  const i = cur.indexOf(idx);
+  if (i >= 0) cur.splice(i, 1); else cur.push(idx);
+  answers[qId] = cur;
+  renderQuestion();
+  renderQuestionNav();
+}
+function setMatch(qId, leftId, rightId) {
+  const cur = (answers[qId] && typeof answers[qId] === 'object') ? { ...answers[qId] } : {};
+  if (rightId) cur[leftId] = rightId; else delete cur[leftId];
+  answers[qId] = cur;
+  renderQuestion();
+  renderQuestionNav();
+}
+function setAnswer(qId, val) {
+  answers[qId] = val;
+  renderQuestion();
+  renderQuestionNav();
+}
+
+function typeLabel(t) {
+  return ({mc:'Multiple Choice', tf:'True / False', multi:'Select All', matching:'Matching', written:'Written'})[t] || t;
+}
+
+// ═════════════════════════════════════════════════
+// GRADING (client-side; service role would be safer but anon works fine for trusted internal use)
+// ═════════════════════════════════════════════════
+function gradeQuestion(q, ans) {
+  if (ans === undefined || ans === null || ans === '') return { correct:false };
+  if (q.type === 'mc')   return { correct: ans === (q.data||{}).correct };
+  if (q.type === 'tf')   return { correct: ans === (q.data||{}).correct };
+  if (q.type === 'multi') {
+    const c = (q.data||{}).correct || [];
+    if (!Array.isArray(ans)) return { correct:false };
+    const a = [...ans].sort(); const cs = [...c].sort();
+    return { correct: a.length === cs.length && a.every((v,i) => v === cs[i]) };
+  }
+  if (q.type === 'matching') {
+    const map = (q.data||{}).correctMap || {};
+    if (typeof ans !== 'object' || Array.isArray(ans)) return { correct:false };
+    return { correct: Object.keys(map).every(k => ans[k] === map[k]) };
+  }
+  if (q.type === 'written') {
+    const kw = (q.data||{}).keywords || [];
+    const t = String(ans).toLowerCase();
+    const hit = kw.filter(k => t.includes(String(k).toLowerCase())).length;
+    const need = Math.ceil(kw.length / 2);
+    return { correct: hit >= need && t.length > 20 };
+  }
+  return { correct:false };
+}
+
+async function submitTest(autoSubmitted) {
+  if (timerInterval) clearInterval(timerInterval);
+  const client = getSB();
+  if (!client) return;
+
+  // Grade
+  let earned = 0, total = 0;
+  const graded = currentTest.questions.map(q => {
+    total += q.points;
+    const ans = answers[q.id];
+    const { correct } = gradeQuestion(q, ans);
+    if (correct) earned += q.points;
+    return { qId: q.id, answer: ans === undefined ? null : ans, correct, autoGraded: true };
+  });
+  const percent = total > 0 ? Math.round((earned / total) * 100) : 0;
+  const passed = percent >= currentTest.passing_score;
+
+  try {
+    const { data: attempt, error } = await client.from('attempts').insert({
+      officer_id: session.uuid,
+      test_id: currentTest.id,
+      completed_at: new Date().toISOString(),
+      answers, graded,
+      earned_points: earned, total_points: total,
+      percent, passed
+    }).select('id').single();
+    if (error) throw error;
+
+    lastResults = {
+      attemptId: attempt.id,
+      test: currentTest,
+      questions: currentTest.questions,
+      answers, graded,
+      earned, total, percent, passed,
+      autoSubmitted
+    };
+    showResults();
+  } catch (e) {
+    console.error(e);
+    showErr('submitErr', 'Failed to submit attempt: ' + e.message);
+  }
+}
+
+// ═════════════════════════════════════════════════
+// RESULTS
+// ═════════════════════════════════════════════════
+function showResults() {
+  if (!lastResults) return;
+  showView('results');
+  const r = lastResults;
+  const banner = document.getElementById('resultsBanner');
+  banner.className = 'results-banner ' + (r.passed ? 'pass' : 'fail');
+  document.getElementById('resultsIcon').textContent = r.passed ? '✓' : '✗';
+  document.getElementById('resultsTitle').textContent = r.passed ? 'Passed' : 'Did Not Pass';
+  document.getElementById('resultsScore').textContent = r.percent + '%';
+  document.getElementById('resultsPoints').textContent =
+    `${r.earned} / ${r.total} POINTS  ·  PASSING ${r.test.passing_score}%`;
+
+  document.getElementById('resultsOfficer').textContent = `${session.fullName}  ·  ${session.officerId}`;
+  document.getElementById('resultsDate').textContent = new Date().toLocaleString() + (r.autoSubmitted ? '  ·  AUTO-SUBMITTED (TIMER EXPIRED)' : '');
+
+  const wrongCount = r.graded.filter(g => !g.correct).length;
+  if (r.passed) {
+    document.getElementById('downloadTitle').textContent = 'Download your review sheet';
+    document.getElementById('downloadDesc').textContent =
+      wrongCount > 0
+        ? `You passed, but ${wrongCount} question${wrongCount===1?' was':'s were'} answered incorrectly. Download the full review with correct answers shown for missed items.`
+        : 'Perfect score. Download the full answer sheet for your records.';
+  } else {
+    document.getElementById('downloadTitle').textContent = 'Download your study sheet';
+    document.getElementById('downloadDesc').textContent =
+      `Download a study sheet showing the ${wrongCount} question${wrongCount===1?'':'s'} you missed. Correct answers are not shown — review the training materials before retaking.`;
+  }
+
+  // Render review list
+  document.getElementById('reviewList').innerHTML = r.questions.map((q, i) => {
+    const g = r.graded.find(x => x.qId === q.id);
+    const cls = g.correct ? 'correct' : 'incorrect';
+    return `
+      <div class="review-q ${cls}">
+        <div class="review-meta">Q${i+1}  ·  ${q.points} pts  ·  ${typeLabel(q.type)}  ·  ${g.correct ? 'CORRECT' : 'INCORRECT'}</div>
+        <div class="review-prompt">${escapeHtml(q.prompt)}</div>
+        <div class="review-answer">
+          <span class="review-answer-label">Your answer: </span>${formatAnswer(q, g.answer)}
+        </div>
+        ${!g.correct && r.passed ? `<div class="review-answer review-correct"><span class="review-answer-label">Correct: </span>${formatCorrect(q)}</div>` : ''}
+        ${!g.correct && !r.passed ? `<div class="review-hidden">Correct answer hidden — review the training materials and retake.</div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+function formatAnswer(q, ans) {
+  if (ans === undefined || ans === null || ans === '') return '<em>(no answer)</em>';
+  if (q.type === 'mc') {
+    const o = (q.data||{}).options || [];
+    return `<strong>${String.fromCharCode(65+ans)}.</strong> ${escapeHtml(o[ans] || '')}`;
+  }
+  if (q.type === 'tf') return `<strong>${ans ? 'TRUE' : 'FALSE'}</strong>`;
+  if (q.type === 'multi') {
+    const o = (q.data||{}).options || [];
+    if (!Array.isArray(ans) || ans.length === 0) return '<em>(no answer)</em>';
+    return ans.map(i => `<strong>${String.fromCharCode(65+i)}.</strong> ${escapeHtml(o[i] || '')}`).join('; ');
+  }
+  if (q.type === 'matching') {
+    const lefts = (q.data||{}).lefts || [];
+    const rights = (q.data||{}).rights || [];
+    return lefts.map((l, i) => {
+      const ri = rights.findIndex(r => r.id === ans[l.id]);
+      return `${i+1}→${ri >= 0 ? String.fromCharCode(65+ri) : '—'}`;
+    }).join(', ');
+  }
+  return escapeHtml(String(ans));
+}
+
+function formatCorrect(q) {
+  if (q.type === 'mc') {
+    const o = (q.data||{}).options || [];
+    const c = (q.data||{}).correct;
+    return `<strong>${String.fromCharCode(65+c)}.</strong> ${escapeHtml(o[c] || '')}`;
+  }
+  if (q.type === 'tf') return `<strong>${(q.data||{}).correct ? 'TRUE' : 'FALSE'}</strong>`;
+  if (q.type === 'multi') {
+    const o = (q.data||{}).options || [];
+    const c = (q.data||{}).correct || [];
+    return c.map(i => `<strong>${String.fromCharCode(65+i)}.</strong> ${escapeHtml(o[i] || '')}`).join('; ');
+  }
+  if (q.type === 'matching') {
+    const lefts = (q.data||{}).lefts || [];
+    const rights = (q.data||{}).rights || [];
+    const map = (q.data||{}).correctMap || {};
+    return lefts.map((l, i) => {
+      const ri = rights.findIndex(r => r.id === map[l.id]);
+      return `${i+1}→${String.fromCharCode(65+ri)}`;
+    }).join(', ');
+  }
+  return '—';
+}
+
+function returnToList() {
+  lastResults = null;
+  loadTestList();
+}
+
+// ═════════════════════════════════════════════════
+// PDF (print to PDF in new window)
+// ═════════════════════════════════════════════════
+function downloadResultsPDF() {
+  const r = lastResults;
+  if (!r) return;
+  const passed = r.passed;
+  const visibleQs = passed ? r.questions : r.questions.filter(q => {
+    const g = r.graded.find(x => x.qId === q.id);
+    return g && !g.correct;
+  });
+
+  const intro = passed
+    ? 'Complete answer review. Questions answered incorrectly are highlighted with the correct answer shown for study.'
+    : `Review the ${visibleQs.length} question${visibleQs.length===1?'':'s'} you missed. Study the training materials and retake the test.`;
+
+  const blocks = visibleQs.map(q => {
+    const origIdx = r.questions.indexOf(q);
+    const g = r.graded.find(x => x.qId === q.id);
+    const wrong = !g.correct;
+    return `
+      <div class="q ${wrong ? 'q-wrong' : 'q-right'}">
+        <div class="q-meta">Q${origIdx+1} · ${q.points} PTS · ${typeLabel(q.type).toUpperCase()} · <span class="${wrong?'tag-wrong':'tag-right'}">${wrong?'INCORRECT':'CORRECT'}</span></div>
+        <div class="q-prompt">${escapeHtml(q.prompt)}</div>
+        <div class="q-label">Your answer</div>
+        <div class="q-your ${wrong?'your-wrong':'your-right'}">${formatAnswer(q, g.answer)}</div>
+        ${wrong && passed ? `<div class="q-label">Correct answer</div><div class="q-correct">${formatCorrect(q)}</div>` : ''}
+      </div>`;
+  }).join('');
+
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Review</title><style>
+    @page { margin: 0.6in; }
+    body { font-family: 'Barlow', -apple-system, sans-serif; color: #1a2340; margin: 0; line-height: 1.5; }
+    .bar { height: 6px; background: #c9a84c; margin-bottom: 18px; }
+    .company { font-size: 16px; font-weight: 700; color: #0a1628; }
+    .subtitle { font-size: 9px; color: #888; letter-spacing: 2px; margin-top: 2px; margin-bottom: 18px; text-transform: uppercase; }
+    h1 { font-size: 22px; color: #0a1628; margin: 0 0 14px; font-weight: 700; }
+    .meta-box { background: #f4f6fa; border: 1px solid #dde2ed; padding: 12px 14px; font-size: 10px; line-height: 1.7; margin-bottom: 14px; }
+    .meta-box strong { display: inline-block; width: 70px; color: #6b7a99; font-size: 9px; text-transform: uppercase; letter-spacing: 1px; }
+    .banner { padding: 14px 16px; color: white; display: flex; justify-content: space-between; margin-bottom: 18px; border-radius: 4px; }
+    .banner.pass { background: #1e8449; }
+    .banner.fail { background: #922b21; }
+    .banner-title { font-size: 16px; font-weight: 700; letter-spacing: 1px; }
+    .banner-score { font-size: 10px; opacity: .85; letter-spacing: 1px; }
+    .intro { font-size: 10px; color: #374060; margin-bottom: 22px; line-height: 1.6; }
+    .q { border-left: 3px solid #ccc; padding: 10px 14px; margin-bottom: 14px; page-break-inside: avoid; background: #fafaf7; }
+    .q-wrong { border-left-color: #c0392b; background: #fef2f2; }
+    .q-right { border-left-color: #1e8449; background: #f0fdf4; }
+    .q-meta { font-size: 8px; letter-spacing: 1px; color: #6b7a99; margin-bottom: 6px; text-transform: uppercase; font-weight: 600; }
+    .tag-wrong { color: #c0392b; font-weight: 700; }
+    .tag-right { color: #1e8449; font-weight: 700; }
+    .q-prompt { font-size: 11.5px; font-weight: 600; margin-bottom: 9px; color: #1a2340; }
+    .q-label { font-size: 8px; letter-spacing: 1.5px; color: #888; margin-top: 7px; margin-bottom: 3px; text-transform: uppercase; font-weight: 600; }
+    .q-your { font-size: 10.5px; padding-left: 4px; }
+    .your-wrong { color: #922b21; }
+    .your-right { color: #1e8449; }
+    .q-correct { font-size: 10.5px; color: #1e8449; font-weight: 600; padding-left: 4px; }
+    .footer { margin-top: 30px; padding-top: 12px; border-top: 1px solid #ddd; font-size: 8px; color: #999; display: flex; justify-content: space-between; }
+    .print-btn { position: fixed; top: 12px; right: 12px; padding: 10px 18px; background: #0a1628; color: #c9a84c; border: 1px solid #c9a84c; cursor: pointer; font-size: 11px; font-weight: 700; z-index: 9999; letter-spacing: 1px; text-transform: uppercase; }
+    @media print { .print-btn { display: none !important; } body { background: #fff; } }
+  </style></head><body>
+    <button class="print-btn" onclick="window.print()">⬇ Save as PDF</button>
+    <div class="bar"></div>
+    <div class="company">SECURITY USA®, INC.</div>
+    <div class="subtitle">Officer Certification — Study Sheet</div>
+    <h1>${passed ? 'Review — Full Answer Sheet' : 'Review — Incorrect Answers'}</h1>
+    <div class="meta-box">
+      <div><strong>Officer</strong>${escapeHtml(session.fullName)}</div>
+      <div><strong>ID</strong>${escapeHtml(session.officerId)}</div>
+      <div><strong>Test</strong>${escapeHtml(r.test.title)}</div>
+      <div><strong>Date</strong>${new Date().toLocaleString()}</div>
+    </div>
+    <div class="banner ${passed?'pass':'fail'}">
+      <div class="banner-title">${passed?'PASSED':'DID NOT PASS'} — ${r.percent}%</div>
+      <div class="banner-score">${r.earned} / ${r.total} PTS · PASSING ${r.test.passing_score}%</div>
+    </div>
+    <div class="intro">${intro}</div>
+    ${blocks}
+    <div class="footer">
+      <span>Security USA, Inc. — Confidential</span>
+      <span>Generated ${new Date().toLocaleString()}</span>
+    </div>
+    <script>setTimeout(() => window.print(), 400);<\/script>
+  </body></html>`;
+
+  const w = window.open('', '_blank');
+  if (!w) { alert('Please allow pop-ups to download the PDF.'); return; }
+  w.document.write(html);
+  w.document.close();
+}
+
+// ═════════════════════════════════════════════════
+// UTIL
+// ═════════════════════════════════════════════════
+function escapeHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+// ═════════════════════════════════════════════════
+// INIT
+// ═════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  // Restore session if any
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      session = JSON.parse(stored);
+      if (session && session.uuid && session.officerId) {
+        afterLogin();
+        return;
+      }
+    }
+  } catch(e) {}
+  showView('login', 'Officer Certification Portal', 'Sign in with your officer ID to access your certification tests');
+
+  // Enter key on login fields
+  ['loginName','loginId'].forEach(id => {
+    document.getElementById(id).addEventListener('keydown', e => {
+      if (e.key === 'Enter') signIn();
+    });
+  });
+});
+</script>
+</body>
+</html>
