@@ -46,6 +46,11 @@
   .step-link svg { width: 11px; height: 11px; flex-shrink: 0; }
   .step-link-outline { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; background: transparent; border: 1.5px solid var(--gold); color: var(--gold); font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; padding: 7px 14px; border-radius: 6px; text-decoration: none; transition: all 0.2s; margin-right: 8px; }
   .step-link-outline:hover { background: rgba(201,168,76,0.1); }
+  .notice-box { margin-top: 12px; background: rgba(201,168,76,0.08); border: 1px solid rgba(201,168,76,0.3); border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #c9b47a; line-height: 1.6; }
+  .notice-box strong { color: var(--gold-light); }
+  .reimburse-box { margin-top: 12px; background: rgba(39,174,96,0.08); border: 1.5px solid rgba(39,174,96,0.4); border-radius: 8px; padding: 12px 14px; font-size: 12px; color: #8fe0b5; line-height: 1.7; }
+  .reimburse-box strong { color: #a8f0c6; }
+  .reimburse-box a { color: #a8f0c6; font-weight: 600; text-decoration: underline; }
   .exam-box { margin-top: 12px; background: rgba(39,174,96,0.07); border: 1px solid rgba(39,174,96,0.3); border-radius: 8px; padding: 12px 14px; font-size: 12px; color: #7dd9a8; line-height: 1.7; }
   .exam-box strong { color: #a8f0c6; }
   .app-buttons { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
@@ -55,9 +60,8 @@
   .app-btn-text { display: flex; flex-direction: column; line-height: 1.2; }
   .app-btn-sub { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
   .app-btn-name { font-size: 13px; font-weight: 600; color: var(--white); }
-  .apply-step { display: none; }
-  .apply-step.visible { display: flex; }
-  .docusign-step { display: none; }
+  .state-block { display: none; }
+  .state-block.visible { display: block; }
   .video-toggle { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; background: transparent; border: 1.5px solid var(--gold); color: var(--gold); font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; padding: 7px 14px; border-radius: 6px; cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
   .video-toggle:hover { background: rgba(201,168,76,0.1); }
   .video-wrapper { display: none; margin-top: 14px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
@@ -102,48 +106,40 @@
     <div class="section-label">Select Your Position</div>
     <div class="state-grid">
       <button class="state-btn" onclick="selectState('nj', this)"><span class="flag">🗽</span>New Jersey</button>
-      <button class="state-btn" onclick="selectState('ny', this)"><span class="flag">&#127822;</span>New York</button>
-      <button class="state-btn" onclick="selectState('fl', this)"><span class="flag">&#127796;</span>Florida</button>
+      <button class="state-btn" onclick="selectState('ny', this)"><span class="flag">🍎</span>New York</button>
+      <button class="state-btn" onclick="selectState('fl', this)"><span class="flag">🌴</span>Florida</button>
     </div>
   </div>
 
-  <div class="steps-section">
-    <div class="section-label">Your Onboarding Steps</div>
+  <div class="steps-section" id="steps-section">
 
-    <div class="step apply-step" id="apply-nj">
-      <div class="step-num">1</div>
-      <div class="step-body">
-        <div class="step-title">Sexual Harassment Prevention Training</div>
-        <div class="step-desc">New Jersey requires all employees to complete a state-mandated Sexual Harassment Prevention course before starting. Click the link below to complete the training. Once finished, take a screenshot of your completion certificate and email it to <strong style="color:var(--white)">frontdesk@securityusainc.com</strong>.</div>
-        <a class="step-link" href="https://www.classroomclipboard.com/810397/Test/8947A6A2-2CB9-4746-865C-6CBC6E210C18" target="_blank">Start Course <svg viewBox="0 0 12 12" fill="none"><path d="M2 10L10 2M10 2H4M10 2V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></a>
-        <a class="step-link-outline" href="mailto:frontdesk@securityusainc.com?subject=Sexual Harassment Certificate - NJ">&#128231; Send Certificate</a>
-      </div>
-    </div>
-
-    <div class="step apply-step" id="apply-ny">
-      <div class="step-num">1</div>
-      <div class="step-body">
-        <div class="step-title">Sexual Harassment Prevention Training</div>
-        <div class="step-desc">New York requires all employees to complete a state-mandated Sexual Harassment Prevention course before starting. Click the link below to complete the training. Once finished, take a screenshot of your completion certificate and email it to <strong style="color:var(--white)">frontdesk@securityusainc.com</strong>.</div>
-        <a class="step-link" href="https://www.nyc.gov/assets/cchr/training/english/index.html" target="_blank">Start Course <svg viewBox="0 0 12 12" fill="none"><path d="M2 10L10 2M10 2H4M10 2V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></a>
-        <a class="step-link-outline" href="mailto:frontdesk@securityusainc.com?subject=Sexual Harassment Certificate - NY">&#128231; Send Certificate</a>
-      </div>
-    </div>
-
-    <div class="step apply-step" id="apply-fl">
-      <div class="step-num">1</div>
-      <div class="step-body">
-        <div class="step-title">Sexual Harassment Prevention Training</div>
-        <div class="step-desc">All Security USA employees are required to complete a Sexual Harassment Prevention course before starting. Click the link below to complete the training. Once finished, take a screenshot of your completion certificate and email it to <strong style="color:var(--white)">frontdesk@securityusainc.com</strong>.</div>
-        <a class="step-link" href="https://www.classroomclipboard.com/810397/Test/8947A6A2-2CB9-4746-865C-6CBC6E210C18" target="_blank">Start Course <svg viewBox="0 0 12 12" fill="none"><path d="M2 10L10 2M10 2H4M10 2V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></a>
-        <a class="step-link-outline" href="mailto:frontdesk@securityusainc.com?subject=Sexual Harassment Certificate - FL">&#128231; Send Certificate</a>
-      </div>
-    </div>
-
-    <div id="remaining-steps" style="display:none">
+    <!-- ============ NEW JERSEY BLOCK ============ -->
+    <div class="state-block" id="block-nj">
+      <div class="section-label">Your Onboarding Steps</div>
 
       <div class="step">
-        <div class="step-num" id="num-videos">2</div>
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Submit Your Application</div>
+          <div class="step-desc">Complete the online application for your New Jersey position.</div>
+          <a class="step-link" href="https://careers-securityusainc.icims.com/jobs/1213/security-guard---nj/job" target="_blank">Apply Now <svg viewBox="0 0 12 12" fill="none"><path d="M2 10L10 2M10 2H4M10 2V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></a>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Security Agency Employee's Statement <span style="font-size:10px; background:rgba(201,168,76,0.15); color:var(--gold); border-radius:4px; padding:2px 7px; margin-left:6px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase;">NJ Required</span></div>
+          <div class="step-desc">Download the form below, print it out, have it <strong style="color:var(--white)">notarized</strong>, then scan and email the completed form to Moshe.</div>
+          <a class="step-link" href="https://drive.google.com/uc?export=download&id=1ZGvFXdzIyKcRTyMfaKTXwfRDZiQcF6OV" target="_blank">&#11015; Download Form</a>
+          <a class="step-link-outline" href="mailto:Moshe@securityusainc.com?subject=Security Agency Employee's Statement">&#128231; Email to Moshe</a>
+          <div class="notice-box"><strong>&#9888; Important:</strong> This form must be printed, signed, notarized, and then scanned. Email the completed notarized scan to <strong>Moshe@securityusainc.com</strong> before your start date.</div>
+          <div class="reimburse-box"><strong>&#128176; Need a notary?</strong> You can get this notarized online at <a href="https://www.notarize.com/" target="_blank">notarize.com</a>. If you provide a receipt, you will be reimbursed for the cost.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
         <div class="step-body">
           <div class="step-title">Watch Training Videos</div>
           <div class="step-desc">Learn how to clock in/out using EHUB and how to use Tracktik for patrols and report writing.</div>
@@ -152,7 +148,7 @@
       </div>
 
       <div class="step">
-        <div class="step-num" id="num-ehub">3</div>
+        <div class="step-num">4</div>
         <div class="step-body">
           <div class="step-title">Download the EHUB App</div>
           <div class="step-desc">Install the EHUB app on your personal phone. You'll use this to clock in and out for every shift.</div>
@@ -170,15 +166,15 @@
       </div>
 
       <div class="step">
-        <div class="step-num" id="num-deposit">4</div>
+        <div class="step-num">5</div>
         <div class="step-body">
           <div class="step-title">Prepare Direct Deposit</div>
           <div class="step-desc">Have a voided check or a completed direct deposit form ready. Direct deposit takes 3 weeks to process — email it to <strong style="color:var(--white)">Payroll@securityusainc.com</strong></div>
         </div>
       </div>
 
-      <div class="step docusign-step" id="docusign-mid">
-        <div class="step-num" id="num-docusign-mid">5</div>
+      <div class="step">
+        <div class="step-num">6</div>
         <div class="step-body">
           <div class="step-title">Sign Your DocuSign Paperwork</div>
           <div class="step-desc">Check your inbox for a message with the subject line <strong style="color:var(--white)">"Moshe Sabaah Via DocuSign."</strong> If you have not received it yet, please contact us at <strong style="color:var(--white)">frontdesk@securityusainc.com</strong> directly. Once you have the email, open it and complete all documents before your start date.</div>
@@ -187,22 +183,20 @@
 
       <div class="step" style="flex-direction: column;">
         <div style="display:flex; gap:16px;">
-          <div class="step-num" id="num-policy">6</div>
+          <div class="step-num">7</div>
           <div class="step-body">
             <div class="step-title">Review Company Policies</div>
             <div class="step-desc">Watch the onboarding policy video below, then read through the full Information Sheet before your first day.</div>
-            <button class="video-toggle" onclick="toggleVideo()">&#9654; Watch Policy Video</button>
-            <button class="policy-toggle" onclick="togglePolicy()">&#128196; Read Full Document</button>
+            <button class="video-toggle" onclick="toggleVideo('nj')">&#9654; Watch Policy Video</button>
+            <button class="policy-toggle" onclick="togglePolicy('nj')">&#128196; Read Full Document</button>
           </div>
         </div>
-
-        <div class="video-wrapper" id="video-wrapper">
-          <div class="video-header">Onboarding Policies — Security USA<button class="close-btn" onclick="toggleVideo()">&#10005;</button></div>
+        <div class="video-wrapper" id="video-wrapper-nj">
+          <div class="video-header">Onboarding Policies — Security USA<button class="close-btn" onclick="toggleVideo('nj')">&#10005;</button></div>
           <div class="video-frame"><iframe src="https://drive.google.com/file/d/1mhbSRgtV21C2ojrR-ucVJtD5dgkcA2-m/preview" allow="autoplay" allowfullscreen></iframe></div>
         </div>
-
-        <div class="policy-viewer" id="policy-viewer">
-          <div class="policy-viewer-header">Information Sheet for New Employees — Security USA<button class="close-btn" onclick="togglePolicy()">&#10005;</button></div>
+        <div class="policy-viewer" id="policy-viewer-nj">
+          <div class="policy-viewer-header">Information Sheet for New Employees — Security USA<button class="close-btn" onclick="togglePolicy('nj')">&#10005;</button></div>
           <div class="policy-content">
             <h2>Information Sheet for New Employees</h2>
             <p class="welcome">Welcome to Security USA. We're excited to have you join our team. Please find this list as a helpful resource to get you started.</p>
@@ -249,11 +243,129 @@
             <ul><li>If you pick up a Flex Guard shift on Ehub, report to the NY office and you'll be assigned to a site anywhere in the 5 boroughs. Questions: Command Center <strong>212-594-4475</strong>.</li></ul>
             <p style="margin-top:20px; font-weight:600; text-align:center;">Welcome again — we're happy to have you with us!<br><em>Security USA Team</em></p>
           </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ============ NEW YORK BLOCK (UNCHANGED) ============ -->
+    <div class="state-block" id="block-ny">
+      <div class="section-label">Your Onboarding Steps</div>
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Sexual Harassment Prevention Training</div>
+          <div class="step-desc">New York requires all employees to complete a state-mandated Sexual Harassment Prevention course before starting. Click the link below to complete the training. Once finished, take a screenshot of your completion certificate and email it to <strong style="color:var(--white)">frontdesk@securityusainc.com</strong>.</div>
+          <a class="step-link" href="https://www.nyc.gov/assets/cchr/training/english/index.html" target="_blank">Start Course <svg viewBox="0 0 12 12" fill="none"><path d="M2 10L10 2M10 2H4M10 2V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></a>
+          <a class="step-link-outline" href="mailto:frontdesk@securityusainc.com?subject=Sexual Harassment Certificate - NY">&#128231; Send Certificate</a>
         </div>
       </div>
 
       <div class="step">
-        <div class="step-num" id="num-exam">7</div>
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Watch Training Videos</div>
+          <div class="step-desc">Learn how to clock in/out using EHUB and how to use Tracktik for patrols and report writing.</div>
+          <a class="step-link" href="https://www.securityusainc.com/employees/training-videos" target="_blank">Watch Now <svg viewBox="0 0 12 12" fill="none"><path d="M2 10L10 2M10 2H4M10 2V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></a>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Download the EHUB App</div>
+          <div class="step-desc">Install the EHUB app on your personal phone. You'll use this to clock in and out for every shift.</div>
+          <div class="app-buttons">
+            <a class="app-btn" href="https://apps.apple.com/us/app/ehub/id424304279" target="_blank">
+              <svg class="app-btn-icon" viewBox="0 0 24 24" fill="var(--white)"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98l-.09.06c-.22.14-2.18 1.27-2.16 3.79.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.37 2.84M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+              <div class="app-btn-text"><span class="app-btn-sub">Download on the</span><span class="app-btn-name">App Store</span></div>
+            </a>
+            <a class="app-btn" href="https://play.google.com/store/apps/details?id=org.ehub1100.eh.ui&hl=en_US" target="_blank">
+              <svg class="app-btn-icon" viewBox="0 0 24 24"><path d="M3.18 23.76c.3.17.64.24.99.2l13.24-11.95L13.54 8.1 3.18 23.76z" fill="#EA4335"/><path d="M20.96 10.34l-2.93-1.67-3.95 3.57 3.95 3.56 2.96-1.69c.84-.48.84-1.28-.03-1.77z" fill="#FBBC04"/><path d="M3.18.24C2.83.47 2.6.9 2.6 1.5v21c0 .6.23 1.02.58 1.26l.1.06L14.6 12v-.27L3.28.18l-.1.06z" fill="#4285F4"/><path d="M17.41 12L13.55 8.1l-10.37-7.86C3.53.1 3.84.04 4.17.21l13.24 11.54-.0001.25z" fill="#34A853"/></svg>
+              <div class="app-btn-text"><span class="app-btn-sub">Get it on</span><span class="app-btn-name">Google Play</span></div>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">Prepare Direct Deposit</div>
+          <div class="step-desc">Have a voided check or a completed direct deposit form ready. Direct deposit takes 3 weeks to process — email it to <strong style="color:var(--white)">Payroll@securityusainc.com</strong></div>
+        </div>
+      </div>
+
+      <div class="step" style="flex-direction: column;">
+        <div style="display:flex; gap:16px;">
+          <div class="step-num">5</div>
+          <div class="step-body">
+            <div class="step-title">Review Company Policies</div>
+            <div class="step-desc">Watch the onboarding policy video below, then read through the full Information Sheet before your first day.</div>
+            <button class="video-toggle" onclick="toggleVideo('ny')">&#9654; Watch Policy Video</button>
+            <button class="policy-toggle" onclick="togglePolicy('ny')">&#128196; Read Full Document</button>
+          </div>
+        </div>
+        <div class="video-wrapper" id="video-wrapper-ny">
+          <div class="video-header">Onboarding Policies — Security USA<button class="close-btn" onclick="toggleVideo('ny')">&#10005;</button></div>
+          <div class="video-frame"><iframe src="https://drive.google.com/file/d/1mhbSRgtV21C2ojrR-ucVJtD5dgkcA2-m/preview" allow="autoplay" allowfullscreen></iframe></div>
+        </div>
+        <div class="policy-viewer" id="policy-viewer-ny">
+          <div class="policy-viewer-header">Information Sheet for New Employees — Security USA<button class="close-btn" onclick="togglePolicy('ny')">&#10005;</button></div>
+          <div class="policy-content">
+            <h2>Information Sheet for New Employees</h2>
+            <p class="welcome">Welcome to Security USA. We're excited to have you join our team. Please find this list as a helpful resource to get you started.</p>
+            <h3>Payroll Process</h3>
+            <ul>
+              <li>Payday is every <strong>Friday</strong>. Each payroll period is Monday 12am to Sunday 11:59pm. You will be paid on the Friday of the following week.</li>
+              <li><span class="star">&#10023;</span> Payroll questions: <a href="mailto:Payroll@securityusainc.com">Payroll@securityusainc.com</a></li>
+              <li>Check pickup at the NYC office: Mon–Thu 9am–5pm, Fri 7:30am–6pm.</li>
+              <li>Direct deposit: email a voided check or direct deposit form to <a href="mailto:Payroll@securityusainc.com">Payroll@securityusainc.com</a>. Takes <strong>3 weeks</strong> to process.</li>
+              <li>Mailed checks go out on Fridays; USPS delivery typically 1–2 business days.</li>
+            </ul>
+            <h3>Time and Attendance</h3>
+            <ul>
+              <li><span class="star">&#10023;</span> Clock in/out daily via the <strong>Ehub app</strong> or registered site phone. Issues? Call Command Center: <strong>212-594-4475</strong>.</li>
+              <li>You may also call <strong>833-343-1773</strong> from the registered site phone.</li>
+            </ul>
+            <h3>Shift End — Wait for Relief</h3>
+            <ul><li><span class="star">&#10023;</span> Remain at your post until properly relieved. If relief is more than 15 minutes late, contact the office immediately. Do not leave your site without being officially relieved.</li></ul>
+            <h3>Lateness</h3>
+            <ul><li>Be at your post in full uniform at your scheduled start time. No lateness or grace periods. If you anticipate being late, contact the Command Center immediately.</li></ul>
+            <h3>Call Out</h3>
+            <ul><li><span class="star">&#10023;</span> Call out at least <strong>4 hours before</strong> your shift. Acceptable reasons: illness, doctor's appointment, family emergency, or bereavement. All callouts must be made by <strong>calling</strong> the Command Center — texts and emails are not permitted.</li></ul>
+            <h3>Uniform / Personal Hygiene</h3>
+            <ul><li><span class="star">&#10023;</span> Full uniform required at all times — clean, pressed, and presentable. Proper footwear must be worn on duty. Uniform inquiries: <a href="mailto:help@securityusa.info">help@securityusa.info</a></li></ul>
+            <h3>Drug Policy</h3>
+            <ul><li><span class="star">&#10023;</span> Use of illegal drugs or alcohol while working or reporting to work impaired is strictly prohibited. Violations may result in termination.</li></ul>
+            <h3>Field Inspection</h3>
+            <ul><li><span class="star">&#10023;</span> Routine inspections by Field Supervisors may include: a photo in proper uniform, review of the command logbook, and a brief electronic knowledge exam.</li></ul>
+            <hr class="divider">
+            <div class="isolved-header">Accessing Your Payroll — iSolved</div>
+            <p>Your employee email is used to set up your payroll account in <strong>iSolved</strong> for paystubs and W-2s. Watch for an activation email from <strong>Accudata@myisolved.com</strong>.</p>
+            <p style="margin-top:8px">Questions: <a href="mailto:Help@securityusainc.com">Help@securityusainc.com</a> | 24/7 support: <strong>212-594-4475</strong></p>
+            <h3>Sick Leave</h3>
+            <ul><li>Earn <strong>1 hour</strong> of paid sick leave for every <strong>30 hours worked</strong>. Notify the office at least 4 hours before your shift if sick. To claim: email <a href="mailto:Payroll@securityusainc.com">Payroll@securityusainc.com</a>.</li></ul>
+            <h3>Time Off Requests</h3>
+            <ul><li>Submit requests via the Ehub app or in person at the office. You must wait for approval.</li><li><strong>2 days or less:</strong> at least 14 days in advance. <strong>3+ days:</strong> at least 30 days in advance.</li></ul>
+            <h3>Licensing / Registration</h3>
+            <ul><li>Begin renewal at least <strong>3 months before expiration</strong>. Once renewed, provide a copy to <a href="mailto:help@securityusa.info">help@securityusa.info</a>. Assistance: <a href="mailto:help@securityusainc.com">help@securityusainc.com</a></li></ul>
+            <h3>Minor and Major Violations</h3>
+            <ul><li>Read and understand all violations in your onboarding documents and handbook. Any violation may result in discipline or termination.</li></ul>
+            <h3>Scheduling</h3>
+            <ul><li>Your most updated schedule is always on the <strong>Ehub app</strong>. Questions: call <strong>212-594-4475</strong> or email <a href="mailto:help@securityusa.info">help@securityusa.info</a></li></ul>
+            <h3>Flex Guard</h3>
+            <ul><li>If you pick up a Flex Guard shift on Ehub, report to the NY office and you'll be assigned to a site anywhere in the 5 boroughs. Questions: Command Center <strong>212-594-4475</strong>.</li></ul>
+            <p style="margin-top:20px; font-weight:600; text-align:center;">Welcome again — we're happy to have you with us!<br><em>Security USA Team</em></p>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">6</div>
         <div class="step-body">
           <div class="step-title">Take the Onboarding Exam</div>
           <div class="step-desc">Complete the Security USA onboarding exam and pass with a score of <strong style="color:var(--white)">80 or above</strong> to finalize your onboarding. Use the access code below when prompted.</div>
@@ -262,8 +374,8 @@
         </div>
       </div>
 
-      <div class="step docusign-step" id="docusign-last">
-        <div class="step-num" id="num-docusign-last">8</div>
+      <div class="step">
+        <div class="step-num">7</div>
         <div class="step-body">
           <div class="step-title">Sign Your DocuSign Paperwork</div>
           <div class="step-desc">Check your inbox for a message with the subject line <strong style="color:var(--white)">"Moshe Sabaah Via DocuSign."</strong> If you have not received it yet, please contact us at <strong style="color:var(--white)">frontdesk@securityusainc.com</strong> directly. Once you have the email, open it and complete all documents before your start date.</div>
@@ -271,6 +383,131 @@
       </div>
 
     </div>
+
+    <!-- ============ FLORIDA BLOCK ============ -->
+    <div class="state-block" id="block-fl">
+      <div class="section-label">Your Onboarding Steps</div>
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Submit Your Application</div>
+          <div class="step-desc">Complete the online application for your Florida position.</div>
+          <a class="step-link" href="https://careers-securityusainc.icims.com/jobs/1074/unarmed-security-officer/job" target="_blank">Apply Now <svg viewBox="0 0 12 12" fill="none"><path d="M2 10L10 2M10 2H4M10 2V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></a>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Watch Training Videos</div>
+          <div class="step-desc">Learn how to clock in/out using EHUB and how to use Tracktik for patrols and report writing.</div>
+          <a class="step-link" href="https://www.securityusainc.com/employees/training-videos" target="_blank">Watch Now <svg viewBox="0 0 12 12" fill="none"><path d="M2 10L10 2M10 2H4M10 2V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></a>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Download the EHUB App</div>
+          <div class="step-desc">Install the EHUB app on your personal phone. You'll use this to clock in and out for every shift.</div>
+          <div class="app-buttons">
+            <a class="app-btn" href="https://apps.apple.com/us/app/ehub/id424304279" target="_blank">
+              <svg class="app-btn-icon" viewBox="0 0 24 24" fill="var(--white)"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98l-.09.06c-.22.14-2.18 1.27-2.16 3.79.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.37 2.84M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+              <div class="app-btn-text"><span class="app-btn-sub">Download on the</span><span class="app-btn-name">App Store</span></div>
+            </a>
+            <a class="app-btn" href="https://play.google.com/store/apps/details?id=org.ehub1100.eh.ui&hl=en_US" target="_blank">
+              <svg class="app-btn-icon" viewBox="0 0 24 24"><path d="M3.18 23.76c.3.17.64.24.99.2l13.24-11.95L13.54 8.1 3.18 23.76z" fill="#EA4335"/><path d="M20.96 10.34l-2.93-1.67-3.95 3.57 3.95 3.56 2.96-1.69c.84-.48.84-1.28-.03-1.77z" fill="#FBBC04"/><path d="M3.18.24C2.83.47 2.6.9 2.6 1.5v21c0 .6.23 1.02.58 1.26l.1.06L14.6 12v-.27L3.28.18l-.1.06z" fill="#4285F4"/><path d="M17.41 12L13.55 8.1l-10.37-7.86C3.53.1 3.84.04 4.17.21l13.24 11.54-.0001.25z" fill="#34A853"/></svg>
+              <div class="app-btn-text"><span class="app-btn-sub">Get it on</span><span class="app-btn-name">Google Play</span></div>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">Prepare Direct Deposit</div>
+          <div class="step-desc">Have a voided check or a completed direct deposit form ready. Direct deposit takes 3 weeks to process — email it to <strong style="color:var(--white)">Payroll@securityusainc.com</strong></div>
+        </div>
+      </div>
+
+      <div class="step" style="flex-direction: column;">
+        <div style="display:flex; gap:16px;">
+          <div class="step-num">5</div>
+          <div class="step-body">
+            <div class="step-title">Review Company Policies</div>
+            <div class="step-desc">Watch the onboarding policy video below, then read through the full Information Sheet before your first day.</div>
+            <button class="video-toggle" onclick="toggleVideo('fl')">&#9654; Watch Policy Video</button>
+            <button class="policy-toggle" onclick="togglePolicy('fl')">&#128196; Read Full Document</button>
+          </div>
+        </div>
+        <div class="video-wrapper" id="video-wrapper-fl">
+          <div class="video-header">Onboarding Policies — Security USA<button class="close-btn" onclick="toggleVideo('fl')">&#10005;</button></div>
+          <div class="video-frame"><iframe src="https://drive.google.com/file/d/1mhbSRgtV21C2ojrR-ucVJtD5dgkcA2-m/preview" allow="autoplay" allowfullscreen></iframe></div>
+        </div>
+        <div class="policy-viewer" id="policy-viewer-fl">
+          <div class="policy-viewer-header">Information Sheet for New Employees — Security USA<button class="close-btn" onclick="togglePolicy('fl')">&#10005;</button></div>
+          <div class="policy-content">
+            <h2>Information Sheet for New Employees</h2>
+            <p class="welcome">Welcome to Security USA. We're excited to have you join our team. Please find this list as a helpful resource to get you started.</p>
+            <h3>Payroll Process</h3>
+            <ul>
+              <li>Payday is every <strong>Friday</strong>. Each payroll period is Monday 12am to Sunday 11:59pm. You will be paid on the Friday of the following week.</li>
+              <li><span class="star">&#10023;</span> Payroll questions: <a href="mailto:Payroll@securityusainc.com">Payroll@securityusainc.com</a></li>
+              <li>Check pickup at the NYC office: Mon–Thu 9am–5pm, Fri 7:30am–6pm.</li>
+              <li>Direct deposit: email a voided check or direct deposit form to <a href="mailto:Payroll@securityusainc.com">Payroll@securityusainc.com</a>. Takes <strong>3 weeks</strong> to process.</li>
+              <li>Mailed checks go out on Fridays; USPS delivery typically 1–2 business days.</li>
+            </ul>
+            <h3>Time and Attendance</h3>
+            <ul>
+              <li><span class="star">&#10023;</span> Clock in/out daily via the <strong>Ehub app</strong> or registered site phone. Issues? Call Command Center: <strong>212-594-4475</strong>.</li>
+              <li>You may also call <strong>833-343-1773</strong> from the registered site phone.</li>
+            </ul>
+            <h3>Shift End — Wait for Relief</h3>
+            <ul><li><span class="star">&#10023;</span> Remain at your post until properly relieved. If relief is more than 15 minutes late, contact the office immediately. Do not leave your site without being officially relieved.</li></ul>
+            <h3>Lateness</h3>
+            <ul><li>Be at your post in full uniform at your scheduled start time. No lateness or grace periods. If you anticipate being late, contact the Command Center immediately.</li></ul>
+            <h3>Call Out</h3>
+            <ul><li><span class="star">&#10023;</span> Call out at least <strong>4 hours before</strong> your shift. Acceptable reasons: illness, doctor's appointment, family emergency, or bereavement. All callouts must be made by <strong>calling</strong> the Command Center — texts and emails are not permitted.</li></ul>
+            <h3>Uniform / Personal Hygiene</h3>
+            <ul><li><span class="star">&#10023;</span> Full uniform required at all times — clean, pressed, and presentable. Proper footwear must be worn on duty. Uniform inquiries: <a href="mailto:help@securityusa.info">help@securityusa.info</a></li></ul>
+            <h3>Drug Policy</h3>
+            <ul><li><span class="star">&#10023;</span> Use of illegal drugs or alcohol while working or reporting to work impaired is strictly prohibited. Violations may result in termination.</li></ul>
+            <h3>Field Inspection</h3>
+            <ul><li><span class="star">&#10023;</span> Routine inspections by Field Supervisors may include: a photo in proper uniform, review of the command logbook, and a brief electronic knowledge exam.</li></ul>
+            <hr class="divider">
+            <div class="isolved-header">Accessing Your Payroll — iSolved</div>
+            <p>Your employee email is used to set up your payroll account in <strong>iSolved</strong> for paystubs and W-2s. Watch for an activation email from <strong>Accudata@myisolved.com</strong>.</p>
+            <p style="margin-top:8px">Questions: <a href="mailto:Help@securityusainc.com">Help@securityusainc.com</a> | 24/7 support: <strong>212-594-4475</strong></p>
+            <h3>Sick Leave</h3>
+            <ul><li>Earn <strong>1 hour</strong> of paid sick leave for every <strong>30 hours worked</strong>. Notify the office at least 4 hours before your shift if sick. To claim: email <a href="mailto:Payroll@securityusainc.com">Payroll@securityusainc.com</a>.</li></ul>
+            <h3>Time Off Requests</h3>
+            <ul><li>Submit requests via the Ehub app or in person at the office. You must wait for approval.</li><li><strong>2 days or less:</strong> at least 14 days in advance. <strong>3+ days:</strong> at least 30 days in advance.</li></ul>
+            <h3>Licensing / Registration</h3>
+            <ul><li>Begin renewal at least <strong>3 months before expiration</strong>. Once renewed, provide a copy to <a href="mailto:help@securityusa.info">help@securityusa.info</a>. Assistance: <a href="mailto:help@securityusainc.com">help@securityusainc.com</a></li></ul>
+            <h3>Minor and Major Violations</h3>
+            <ul><li>Read and understand all violations in your onboarding documents and handbook. Any violation may result in discipline or termination.</li></ul>
+            <h3>Scheduling</h3>
+            <ul><li>Your most updated schedule is always on the <strong>Ehub app</strong>. Questions: call <strong>212-594-4475</strong> or email <a href="mailto:help@securityusa.info">help@securityusa.info</a></li></ul>
+            <h3>Flex Guard</h3>
+            <ul><li>If you pick up a Flex Guard shift on Ehub, report to the NY office and you'll be assigned to a site anywhere in the 5 boroughs. Questions: Command Center <strong>212-594-4475</strong>.</li></ul>
+            <p style="margin-top:20px; font-weight:600; text-align:center;">Welcome again — we're happy to have you with us!<br><em>Security USA Team</em></p>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-body">
+          <div class="step-title">Sign Your DocuSign Paperwork</div>
+          <div class="step-desc">Check your inbox for a message with the subject line <strong style="color:var(--white)">"Moshe Sabaah Via DocuSign."</strong> If you have not received it yet, please contact us at <strong style="color:var(--white)">frontdesk@securityusainc.com</strong> directly. Once you have the email, open it and complete all documents before your start date.</div>
+        </div>
+      </div>
+
+    </div>
+
   </div>
 
   <div class="footer-note">
@@ -283,41 +520,19 @@
 <script>
   function selectState(state, btn) {
     document.querySelectorAll('.state-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.apply-step').forEach(s => s.classList.remove('visible'));
+    document.querySelectorAll('.state-block').forEach(s => s.classList.remove('visible'));
     btn.classList.add('active');
-    document.getElementById('apply-' + state).classList.add('visible');
-    document.getElementById('remaining-steps').style.display = 'block';
-
-    document.getElementById('docusign-mid').style.display = 'none';
-    document.getElementById('docusign-last').style.display = 'none';
-
-    if (state === 'ny') {
-      document.getElementById('docusign-last').style.display = 'flex';
-      document.getElementById('num-videos').textContent = 2;
-      document.getElementById('num-ehub').textContent = 3;
-      document.getElementById('num-deposit').textContent = 4;
-      document.getElementById('num-policy').textContent = 5;
-      document.getElementById('num-exam').textContent = 6;
-      document.getElementById('num-docusign-last').textContent = 7;
-    } else {
-      document.getElementById('docusign-mid').style.display = 'flex';
-      document.getElementById('num-videos').textContent = 2;
-      document.getElementById('num-ehub').textContent = 3;
-      document.getElementById('num-deposit').textContent = 4;
-      document.getElementById('num-docusign-mid').textContent = 5;
-      document.getElementById('num-policy').textContent = 6;
-      document.getElementById('num-exam').textContent = 7;
-    }
+    document.getElementById('block-' + state).classList.add('visible');
   }
 
-  function toggleVideo() {
-    const wrapper = document.getElementById('video-wrapper');
+  function toggleVideo(state) {
+    const wrapper = document.getElementById('video-wrapper-' + state);
     wrapper.classList.toggle('open');
     if (wrapper.classList.contains('open')) wrapper.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
-  function togglePolicy() {
-    const viewer = document.getElementById('policy-viewer');
+  function togglePolicy(state) {
+    const viewer = document.getElementById('policy-viewer-' + state);
     viewer.classList.toggle('open');
     if (viewer.classList.contains('open')) viewer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
