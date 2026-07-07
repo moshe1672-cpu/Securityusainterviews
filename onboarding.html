@@ -258,7 +258,7 @@
         <div class="step-body">
           <div class="step-title">Sexual Harassment Prevention Training</div>
           <div class="step-desc">New York requires all employees to complete a state-mandated Sexual Harassment Prevention course before starting. Click the link below to complete the training. Once finished, take a screenshot of your completion certificate and email it to <strong style="color:var(--white)">frontdesk@securityusainc.com</strong>.</div>
-          <a class="step-link" href="https://www.nyc.gov/assets/cchr/training/english/index.html" target="_blank">Start Course <svg viewBox="0 0 12 12" fill="none"><path d="M2 10L10 2M10 2H4M10 2V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></a>
+          <button class="step-link" onclick="openSexualHarassmentCourse('https://www.nyc.gov/assets/cchr/training/english/index.html')">Start Course <svg viewBox="0 0 12 12" fill="none"><path d="M2 10L10 2M10 2H4M10 2V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
           <a class="step-link-outline" href="mailto:frontdesk@securityusainc.com?subject=Sexual Harassment Certificate - NY">&#128231; Send Certificate</a>
         </div>
       </div>
@@ -523,6 +523,21 @@
     document.querySelectorAll('.state-block').forEach(s => s.classList.remove('visible'));
     btn.classList.add('active');
     document.getElementById('block-' + state).classList.add('visible');
+    setTimeout(() => {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }, 100);
+  }
+
+  function openSexualHarassmentCourse(url) {
+    const confirmed = confirm(
+      "⚠️ Important — Please Read Before Continuing\n\n" +
+      "You are about to open the Sexual Harassment Prevention Training in a new tab.\n\n" +
+      "Once you complete the training and receive your certificate, you MUST return to this page to continue with the remaining onboarding steps.\n\n" +
+      "Press OK to open the training now."
+    );
+    if (confirmed) {
+      window.open(url, '_blank');
+    }
   }
 
   function toggleVideo(state) {
