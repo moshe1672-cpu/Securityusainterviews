@@ -90,6 +90,20 @@
   @keyframes fadeDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: none; } }
   @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
   @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+  /* Slide-to-accept popup */
+  .popup-overlay { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(4,10,20,0.7); z-index: 100; padding: 20px; }
+  .popup-overlay.open { display: flex; }
+  .popup-card { background: #0d1f3c; border: 1.5px solid var(--gold); border-radius: 16px; padding: 32px 28px; max-width: 420px; width: 100%; text-align: center; box-shadow: 0 24px 64px rgba(0,0,0,0.5); animation: fadeUp 0.3s ease both; }
+  .popup-icon { width: 52px; height: 52px; margin: 0 auto 16px; background: rgba(201,168,76,0.12); border: 1.5px solid var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+  .popup-title { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 1.5px; color: var(--white); margin-bottom: 10px; }
+  .popup-text { font-size: 13.5px; color: #b0bec5; line-height: 1.7; margin-bottom: 6px; }
+  .popup-text strong { color: var(--white); }
+  .popup-text .state-name { color: var(--gold-light); }
+  .slider-track { position: relative; height: 52px; background: #0a1628; border: 1.5px solid rgba(201,168,76,0.35); border-radius: 100px; overflow: hidden; user-select: none; margin-top: 24px; }
+  .slider-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 52px; background: linear-gradient(90deg, rgba(201,168,76,0.25), rgba(201,168,76,0.1)); border-radius: 100px; }
+  .slider-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); pointer-events: none; }
+  .slider-knob { position: absolute; left: 3px; top: 3px; width: 46px; height: 46px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: grab; touch-action: none; font-size: 18px; color: var(--navy); box-shadow: 0 2px 12px rgba(201,168,76,0.4); }
+  .accepted-msg { display: none; margin-top: 16px; font-size: 13px; font-weight: 600; color: #7dd9a8; }
 </style>
 </head>
 <body>
@@ -130,11 +144,8 @@
         <div class="step-num">2</div>
         <div class="step-body">
           <div class="step-title">Security Agency Employee's Statement <span style="font-size:10px; background:rgba(201,168,76,0.15); color:var(--gold); border-radius:4px; padding:2px 7px; margin-left:6px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase;">NJ Required</span></div>
-          <div class="step-desc">Download the form below, print it out, have it <strong style="color:var(--white)">notarized</strong>, then scan and email the completed form to Moshe.</div>
-          <a class="step-link" href="https://drive.google.com/uc?export=download&id=1ZGvFXdzIyKcRTyMfaKTXwfRDZiQcF6OV" target="_blank">&#11015; Download Form</a>
-          <a class="step-link-outline" href="mailto:Moshe@securityusainc.com?subject=Security Agency Employee's Statement">&#128231; Email to Moshe</a>
-          <div class="notice-box"><strong>&#9888; Important:</strong> This form must be printed, signed, notarized, and then scanned. Email the completed notarized scan to <strong>Moshe@securityusainc.com</strong> before your start date.</div>
-          <div class="reimburse-box"><strong>&#128176; Need a notary?</strong> You can get this notarized online at <a href="https://www.notarize.com/" target="_blank">notarize.com</a>. If you provide a receipt, you will be reimbursed for the cost.</div>
+          <div class="step-desc">You will receive an email from <strong style="color:var(--white)">Proof.com</strong> with your Security Agency Employee's Statement. This form must be completed and <strong style="color:var(--white)">notarized online</strong> — Proof.com connects you with a licensed notary virtually, so there's nothing to print or scan.</div>
+          <div class="reimburse-box"><strong>&#128176; Notary fee?</strong> No payment needed — the notarization cost is charged directly to Security USA.</div>
         </div>
       </div>
 
@@ -518,7 +529,25 @@
 </div>
 
 <script>
+  const stepCounts = { nj: 7, ny: 7, fl: 6 };
+  const stateNames = { nj: 'New Jersey', ny: 'New York', fl: 'Florida' };
+  let pendingState = null;
+  let pendingBtn = null;
+
   function selectState(state, btn) {
+    if (!localStorage.getItem('susa_onboarding_accepted')) {
+      pendingState = state;
+      pendingBtn = btn;
+      document.getElementById('popup-state-name').textContent = stateNames[state];
+      document.getElementById('popup-step-count').textContent = stepCounts[state];
+      document.getElementById('accept-popup').classList.add('open');
+      resetSlider();
+      return;
+    }
+    revealState(state, btn);
+  }
+
+  function revealState(state, btn) {
     document.querySelectorAll('.state-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.state-block').forEach(s => s.classList.remove('visible'));
     btn.classList.add('active');
@@ -526,6 +555,14 @@
     setTimeout(() => {
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }, 100);
+  }
+
+  function onPopupAccepted() {
+    localStorage.setItem('susa_onboarding_accepted', 'true');
+    setTimeout(() => {
+      document.getElementById('accept-popup').classList.remove('open');
+      if (pendingState && pendingBtn) revealState(pendingState, pendingBtn);
+    }, 700);
   }
 
   function openSexualHarassmentCourse(url) {
@@ -551,6 +588,97 @@
     viewer.classList.toggle('open');
     if (viewer.classList.contains('open')) viewer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
+</script>
+
+<!-- Slide-to-accept popup -->
+<div class="popup-overlay" id="accept-popup">
+  <div class="popup-card">
+    <div class="popup-icon">&#128203;</div>
+    <div class="popup-title">Before You Begin</div>
+    <div class="popup-text">You have selected <strong class="state-name" id="popup-state-name">New Jersey</strong>.</div>
+    <div class="popup-text" style="margin-bottom:0;">You must complete <strong>all <span id="popup-step-count">7</span> steps</strong> to finish your onboarding. Incomplete onboarding may delay your start date.</div>
+    <div class="slider-track" id="slider-track">
+      <div class="slider-fill" id="slider-fill"></div>
+      <div class="slider-label" id="slider-label">Slide to Accept &nbsp;&#8594;</div>
+      <div class="slider-knob" id="slider-knob">&#10132;</div>
+    </div>
+    <div class="accepted-msg" id="accepted-msg">&#10003; Accepted — loading your steps...</div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    const knob = document.getElementById('slider-knob');
+    const track = document.getElementById('slider-track');
+    const fill = document.getElementById('slider-fill');
+    const label = document.getElementById('slider-label');
+    const msg = document.getElementById('accepted-msg');
+    let dragging = false, startX = 0, knobX = 0, accepted = false;
+
+    window.resetSlider = function() {
+      accepted = false;
+      knobX = 0;
+      knob.style.left = '3px';
+      knob.textContent = '\u27A4';
+      knob.style.background = 'var(--gold)';
+      knob.style.color = 'var(--navy)';
+      fill.style.width = '52px';
+      label.style.opacity = 1;
+      msg.style.display = 'none';
+    };
+
+    function maxX() { return track.offsetWidth - knob.offsetWidth - 6; }
+
+    function setKnob(x) {
+      x = Math.max(0, Math.min(x, maxX()));
+      knobX = x;
+      knob.style.left = (3 + x) + 'px';
+      fill.style.width = (52 + x) + 'px';
+      label.style.opacity = 1 - (x / maxX()) * 1.2;
+    }
+
+    function onStart(e) {
+      if (accepted) return;
+      dragging = true;
+      startX = (e.touches ? e.touches[0].clientX : e.clientX) - knobX;
+      knob.style.cursor = 'grabbing';
+    }
+
+    function onMove(e) {
+      if (!dragging || accepted) return;
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      setKnob(clientX - startX);
+      if (e.cancelable) e.preventDefault();
+    }
+
+    function onEnd() {
+      if (!dragging || accepted) return;
+      dragging = false;
+      knob.style.cursor = 'grab';
+      if (knobX >= maxX() * 0.92) {
+        accepted = true;
+        setKnob(maxX());
+        knob.textContent = '\u2713';
+        knob.style.background = '#27ae60';
+        knob.style.color = '#fff';
+        label.style.opacity = 0;
+        msg.style.display = 'block';
+        onPopupAccepted();
+      } else {
+        const snapBack = setInterval(() => {
+          if (knobX <= 2) { setKnob(0); clearInterval(snapBack); return; }
+          setKnob(knobX - Math.max(4, knobX * 0.2));
+        }, 12);
+      }
+    }
+
+    knob.addEventListener('mousedown', onStart);
+    knob.addEventListener('touchstart', onStart, { passive: false });
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('touchmove', onMove, { passive: false });
+    document.addEventListener('mouseup', onEnd);
+    document.addEventListener('touchend', onEnd);
+  })();
 </script>
 </body>
 </html>
