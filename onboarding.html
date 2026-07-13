@@ -552,8 +552,13 @@
     document.querySelectorAll('.state-block').forEach(s => s.classList.remove('visible'));
     btn.classList.add('active');
     document.getElementById('block-' + state).classList.add('visible');
+    // Scroll down so the candidate sees all the steps, then glide back up to Step 1
     setTimeout(() => {
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+      setTimeout(() => {
+        const block = document.getElementById('block-' + state);
+        block.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 1400);
     }, 100);
   }
 
