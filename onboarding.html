@@ -85,6 +85,8 @@
   .policy-content .isolved-header { font-size: 18px; font-weight: 700; margin: 20px 0 8px; }
   .policy-content .divider { border: none; border-top: 1px solid #ddd; margin: 20px 0; }
   .close-btn { background: none; border: none; color: var(--gold); cursor: pointer; font-size: 18px; line-height: 1; }
+  .fullscreen-btn { background: rgba(201,168,76,0.12); border: 1px solid rgba(201,168,76,0.4); color: var(--gold); cursor: pointer; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 5px 10px; border-radius: 5px; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .fullscreen-btn:hover { background: rgba(201,168,76,0.25); }
   .footer-note { margin-top: 36px; text-align: center; font-size: 12px; color: var(--muted); line-height: 1.7; animation: fadeUp 0.6s 0.45s ease both; }
   .footer-note a { color: var(--gold); text-decoration: none; }
   @keyframes fadeDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: none; } }
@@ -203,8 +205,8 @@
           </div>
         </div>
         <div class="video-wrapper" id="video-wrapper-nj">
-          <div class="video-header">Onboarding Policies — Security USA<button class="close-btn" onclick="toggleVideo('nj')">&#10005;</button></div>
-          <div class="video-frame"><iframe src="https://drive.google.com/file/d/1mhbSRgtV21C2ojrR-ucVJtD5dgkcA2-m/preview" allow="autoplay" allowfullscreen></iframe></div>
+          <div class="video-header">Onboarding Policies — Security USA<span style="display:flex; gap:12px; align-items:center;"><button class="fullscreen-btn" onclick="fullscreenVideo('nj')" title="Fullscreen">&#x26F6; Fullscreen</button><button class="close-btn" onclick="toggleVideo('nj')">&#10005;</button></span></div>
+          <div class="video-frame"><iframe id="video-iframe-nj" src="https://drive.google.com/file/d/1mhbSRgtV21C2ojrR-ucVJtD5dgkcA2-m/preview" allow="autoplay" allowfullscreen></iframe></div>
         </div>
         <div class="policy-viewer" id="policy-viewer-nj">
           <div class="policy-viewer-header">Information Sheet for New Employees — Security USA<button class="close-btn" onclick="togglePolicy('nj')">&#10005;</button></div>
@@ -320,8 +322,8 @@
           </div>
         </div>
         <div class="video-wrapper" id="video-wrapper-ny">
-          <div class="video-header">Onboarding Policies — Security USA<button class="close-btn" onclick="toggleVideo('ny')">&#10005;</button></div>
-          <div class="video-frame"><iframe src="https://drive.google.com/file/d/1mhbSRgtV21C2ojrR-ucVJtD5dgkcA2-m/preview" allow="autoplay" allowfullscreen></iframe></div>
+          <div class="video-header">Onboarding Policies — Security USA<span style="display:flex; gap:12px; align-items:center;"><button class="fullscreen-btn" onclick="fullscreenVideo('ny')" title="Fullscreen">&#x26F6; Fullscreen</button><button class="close-btn" onclick="toggleVideo('ny')">&#10005;</button></span></div>
+          <div class="video-frame"><iframe id="video-iframe-ny" src="https://drive.google.com/file/d/1mhbSRgtV21C2ojrR-ucVJtD5dgkcA2-m/preview" allow="autoplay" allowfullscreen></iframe></div>
         </div>
         <div class="policy-viewer" id="policy-viewer-ny">
           <div class="policy-viewer-header">Information Sheet for New Employees — Security USA<button class="close-btn" onclick="togglePolicy('ny')">&#10005;</button></div>
@@ -380,7 +382,11 @@
         <div class="step-body">
           <div class="step-title">Take the Onboarding Exam</div>
           <div class="step-desc">Complete the Security USA onboarding exam and pass with a score of <strong style="color:var(--white)">80 or above</strong> to finalize your onboarding. Use the access code below when prompted.</div>
-          <div class="exam-box"><strong>&#128273; Access Code: 1234</strong><br>You must score 80% or higher to pass. If you do not pass on your first attempt, you may retake the exam. Good luck!</div>
+          <div class="exam-box">
+            <div style="font-size:11px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:#7dd9a8; margin-bottom:4px;">&#128273; Your Access Code</div>
+            <div style="font-family:'Bebas Neue',sans-serif; font-size:28px; letter-spacing:0.3em; color:#a8f0c6; line-height:1.1; margin-bottom:8px; text-shadow:0 0 20px rgba(39,174,96,0.4);">1234</div>
+            You must score 80% or higher to pass. If you do not pass on your first attempt, you may retake the exam. Good luck!
+          </div>
           <a class="step-link" href="https://www.classroomclipboard.com/810397/Test/8947A6A2-2CB9-4746-865C-6CBC6E210C18" target="_blank" style="margin-top:12px;">Take the Exam <svg viewBox="0 0 12 12" fill="none"><path d="M2 10L10 2M10 2H4M10 2V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></a>
         </div>
       </div>
@@ -454,8 +460,8 @@
           </div>
         </div>
         <div class="video-wrapper" id="video-wrapper-fl">
-          <div class="video-header">Onboarding Policies — Security USA<button class="close-btn" onclick="toggleVideo('fl')">&#10005;</button></div>
-          <div class="video-frame"><iframe src="https://drive.google.com/file/d/1mhbSRgtV21C2ojrR-ucVJtD5dgkcA2-m/preview" allow="autoplay" allowfullscreen></iframe></div>
+          <div class="video-header">Onboarding Policies — Security USA<span style="display:flex; gap:12px; align-items:center;"><button class="fullscreen-btn" onclick="fullscreenVideo('fl')" title="Fullscreen">&#x26F6; Fullscreen</button><button class="close-btn" onclick="toggleVideo('fl')">&#10005;</button></span></div>
+          <div class="video-frame"><iframe id="video-iframe-fl" src="https://drive.google.com/file/d/1mhbSRgtV21C2ojrR-ucVJtD5dgkcA2-m/preview" allow="autoplay" allowfullscreen></iframe></div>
         </div>
         <div class="policy-viewer" id="policy-viewer-fl">
           <div class="policy-viewer-header">Information Sheet for New Employees — Security USA<button class="close-btn" onclick="togglePolicy('fl')">&#10005;</button></div>
@@ -586,6 +592,17 @@
     const wrapper = document.getElementById('video-wrapper-' + state);
     wrapper.classList.toggle('open');
     if (wrapper.classList.contains('open')) wrapper.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function fullscreenVideo(state) {
+    const iframe = document.getElementById('video-iframe-' + state);
+    if (iframe.requestFullscreen) {
+      iframe.requestFullscreen();
+    } else if (iframe.webkitRequestFullscreen) {
+      iframe.webkitRequestFullscreen();
+    } else if (iframe.msRequestFullscreen) {
+      iframe.msRequestFullscreen();
+    }
   }
 
   function togglePolicy(state) {
