@@ -67,8 +67,8 @@
   .video-wrapper { display: none; margin-top: 14px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
   .video-wrapper.open { display: block; }
   .video-header { background: rgba(201,168,76,0.1); border-bottom: 1px solid var(--border); padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: var(--gold); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
-  .video-frame { position: relative; padding-bottom: 56.25%; height: 0; background: #000; }
-  .video-frame iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+  .video-frame { background: #000; line-height: 0; display: flex; justify-content: center; }
+  .video-frame video { display: block; width: 100%; max-height: 72vh; object-fit: contain; background: #000; outline: none; }
   .policy-toggle { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; background: transparent; border: 1.5px solid rgba(201,168,76,0.5); color: var(--muted); font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; padding: 7px 14px; border-radius: 6px; cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
   .policy-toggle:hover { background: rgba(201,168,76,0.07); color: var(--gold); }
   .policy-viewer { margin-top: 12px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; display: none; }
@@ -179,7 +179,7 @@
         </div>
         <div class="video-wrapper" id="video-wrapper-nj">
           <div class="video-header">Onboarding Policies — Security USA<span style="display:flex; gap:12px; align-items:center;"><button class="fullscreen-btn" onclick="fullscreenVideo('nj')" title="Fullscreen">&#x26F6; Fullscreen</button><button class="close-btn" onclick="toggleVideo('nj')">&#10005;</button></span></div>
-          <div class="video-frame"><iframe id="video-iframe-nj" src="https://drive.google.com/file/d/1mhbSRgtV21C2ojrR-ucVJtD5dgkcA2-m/preview" allow="autoplay" allowfullscreen></iframe></div>
+          <div class="video-frame"><video id="video-iframe-nj" src="policy-video.mp4" controls playsinline preload="metadata"></video></div>
         </div>
         <div class="policy-viewer" id="policy-viewer-nj">
           <div class="policy-viewer-header">Information Sheet for New Employees — Security USA<button class="close-btn" onclick="togglePolicy('nj')">&#10005;</button></div>
@@ -245,12 +245,12 @@
 
       <div class="video-wrapper" id="video-wrapper-nj-ehub" style="margin-top:-6px; margin-bottom:14px;">
         <div class="video-header">EHUB Training — Security USA<span style="display:flex; gap:12px; align-items:center;"><button class="fullscreen-btn" onclick="fullscreenVideo('nj-ehub')" title="Fullscreen">&#x26F6; Fullscreen</button><button class="close-btn" onclick="toggleVideo('nj-ehub')">&#10005;</button></span></div>
-        <div class="video-frame"><iframe id="video-iframe-nj-ehub" src="https://drive.google.com/file/d/1jVFeiC1VCmS-ADh7cksv-3rON_6pS6OK/preview" allow="autoplay" allowfullscreen></iframe></div>
+        <div class="video-frame"><video id="video-iframe-nj-ehub" src="ehub-training.mp4" controls playsinline preload="metadata"></video></div>
       </div>
 
       <div class="video-wrapper" id="video-wrapper-nj-core" style="margin-top:-6px; margin-bottom:14px;">
         <div class="video-header">Central Core Training — Security USA<span style="display:flex; gap:12px; align-items:center;"><button class="fullscreen-btn" onclick="fullscreenVideo('nj-core')" title="Fullscreen">&#x26F6; Fullscreen</button><button class="close-btn" onclick="toggleVideo('nj-core')">&#10005;</button></span></div>
-        <div class="video-frame"><iframe id="video-iframe-nj-core" src="https://drive.google.com/file/d/1h-WhGNFPR6pyfIQbdgrMjLq4OKv_7n23/preview" allow="autoplay" allowfullscreen></iframe></div>
+        <div class="video-frame"><video id="video-iframe-nj-core" src="central-core-training.mp4" controls playsinline preload="metadata"></video></div>
       </div>
 
       <div class="step">
@@ -281,14 +281,22 @@
         <div class="step-num">1</div>
         <div class="step-body">
           <div class="step-title">Sexual Harassment Prevention Training</div>
-          <div class="step-desc">New York requires all employees to complete a state-mandated Sexual Harassment Prevention course before starting. Click the link below to complete the training. Once finished, take a screenshot of your completion certificate and email it to <strong style="color:var(--white)">frontdesk@securityusainc.com</strong>.</div>
-          <button class="step-link" onclick="openSexualHarassmentCourse('https://www.nyc.gov/assets/cchr/training/english/index.html')">Start Course <svg viewBox="0 0 12 12" fill="none"><path d="M2 10L10 2M10 2H4M10 2V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
-          <a class="step-link-outline" href="mailto:frontdesk@securityusainc.com?subject=Sexual Harassment Certificate - NY">&#128231; Send Certificate</a>
+          <div class="step-desc">New York requires all employees to complete a state-mandated Sexual Harassment Prevention course before starting. Click the link below to complete the training. When you finish, you will receive a completion certificate — keep it for the next step.</div>
+          <a class="step-link" href="https://www.nyc.gov/assets/cchr/training/english/index.html" target="_blank">Start Course <svg viewBox="0 0 12 12" fill="none"><path d="M2 10L10 2M10 2H4M10 2V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></a>
         </div>
       </div>
 
       <div class="step">
         <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Send Your Completion Certificate</div>
+          <div class="step-desc">Take a screenshot of the completion certificate you received at the end of the training and email it to <strong style="color:var(--white)">frontdesk@securityusainc.com</strong>.</div>
+          <a class="step-link-outline" href="mailto:frontdesk@securityusainc.com?subject=Sexual Harassment Certificate - NY">&#128231; Send Certificate</a>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
         <div class="step-body">
           <div class="step-title">Prepare Direct Deposit</div>
           <div class="step-desc">Have a voided check or a completed direct deposit form ready. Direct deposit takes 3 weeks to process — email it to <strong style="color:var(--white)">Payroll@securityusainc.com</strong></div>
@@ -297,7 +305,7 @@
 
       <div class="step" style="flex-direction: column;">
         <div style="display:flex; gap:16px;">
-          <div class="step-num">3</div>
+          <div class="step-num">4</div>
           <div class="step-body">
             <div class="step-title">Review Company Policies</div>
             <div class="step-desc">Watch the onboarding policy video below, then read through the full Information Sheet before your first day.</div>
@@ -307,7 +315,7 @@
         </div>
         <div class="video-wrapper" id="video-wrapper-ny">
           <div class="video-header">Onboarding Policies — Security USA<span style="display:flex; gap:12px; align-items:center;"><button class="fullscreen-btn" onclick="fullscreenVideo('ny')" title="Fullscreen">&#x26F6; Fullscreen</button><button class="close-btn" onclick="toggleVideo('ny')">&#10005;</button></span></div>
-          <div class="video-frame"><iframe id="video-iframe-ny" src="https://drive.google.com/file/d/1mhbSRgtV21C2ojrR-ucVJtD5dgkcA2-m/preview" allow="autoplay" allowfullscreen></iframe></div>
+          <div class="video-frame"><video id="video-iframe-ny" src="policy-video.mp4" controls playsinline preload="metadata"></video></div>
         </div>
         <div class="policy-viewer" id="policy-viewer-ny">
           <div class="policy-viewer-header">Information Sheet for New Employees — Security USA<button class="close-btn" onclick="togglePolicy('ny')">&#10005;</button></div>
@@ -362,7 +370,7 @@
       </div>
 
       <div class="step">
-        <div class="step-num">4</div>
+        <div class="step-num">5</div>
         <div class="step-body">
           <div class="step-title">Take the Onboarding Exam</div>
           <div class="step-desc">Complete the Security USA onboarding exam and pass with a score of <strong style="color:var(--white)">80 or above</strong> to finalize your onboarding. Use the access code below when prompted.</div>
@@ -376,7 +384,7 @@
       </div>
 
       <div class="step">
-        <div class="step-num">5</div>
+        <div class="step-num">6</div>
         <div class="step-body">
           <div class="step-title">Sign Your DocuSign Paperwork</div>
           <div class="step-desc">Check your inbox for a message with the subject line <strong style="color:var(--white)">"Moshe Sabaah Via DocuSign."</strong> If you have not received it yet, please contact us at <strong style="color:var(--white)">frontdesk@securityusainc.com</strong> directly. Once you have the email, open it and complete all documents before your start date.</div>
@@ -384,7 +392,7 @@
       </div>
 
       <div class="step">
-        <div class="step-num">6</div>
+        <div class="step-num">7</div>
         <div class="step-body">
           <div class="step-title">Watch Training Videos</div>
           <div class="step-desc">Watch both training videos below — learn how to clock in/out using EHUB and how to use Central Core for patrols and report writing.</div>
@@ -395,16 +403,16 @@
 
       <div class="video-wrapper" id="video-wrapper-ny-ehub" style="margin-top:-6px; margin-bottom:14px;">
         <div class="video-header">EHUB Training — Security USA<span style="display:flex; gap:12px; align-items:center;"><button class="fullscreen-btn" onclick="fullscreenVideo('ny-ehub')" title="Fullscreen">&#x26F6; Fullscreen</button><button class="close-btn" onclick="toggleVideo('ny-ehub')">&#10005;</button></span></div>
-        <div class="video-frame"><iframe id="video-iframe-ny-ehub" src="https://drive.google.com/file/d/1jVFeiC1VCmS-ADh7cksv-3rON_6pS6OK/preview" allow="autoplay" allowfullscreen></iframe></div>
+        <div class="video-frame"><video id="video-iframe-ny-ehub" src="ehub-training.mp4" controls playsinline preload="metadata"></video></div>
       </div>
 
       <div class="video-wrapper" id="video-wrapper-ny-core" style="margin-top:-6px; margin-bottom:14px;">
         <div class="video-header">Central Core Training — Security USA<span style="display:flex; gap:12px; align-items:center;"><button class="fullscreen-btn" onclick="fullscreenVideo('ny-core')" title="Fullscreen">&#x26F6; Fullscreen</button><button class="close-btn" onclick="toggleVideo('ny-core')">&#10005;</button></span></div>
-        <div class="video-frame"><iframe id="video-iframe-ny-core" src="https://drive.google.com/file/d/1h-WhGNFPR6pyfIQbdgrMjLq4OKv_7n23/preview" allow="autoplay" allowfullscreen></iframe></div>
+        <div class="video-frame"><video id="video-iframe-ny-core" src="central-core-training.mp4" controls playsinline preload="metadata"></video></div>
       </div>
 
       <div class="step">
-        <div class="step-num">7</div>
+        <div class="step-num">8</div>
         <div class="step-body">
           <div class="step-title">Download the EHUB App</div>
           <div class="step-desc">Install the EHUB app on your personal phone. You'll use this to clock in and out for every shift.</div>
@@ -464,7 +472,7 @@
         </div>
         <div class="video-wrapper" id="video-wrapper-fl">
           <div class="video-header">Onboarding Policies — Security USA<span style="display:flex; gap:12px; align-items:center;"><button class="fullscreen-btn" onclick="fullscreenVideo('fl')" title="Fullscreen">&#x26F6; Fullscreen</button><button class="close-btn" onclick="toggleVideo('fl')">&#10005;</button></span></div>
-          <div class="video-frame"><iframe id="video-iframe-fl" src="https://drive.google.com/file/d/1mhbSRgtV21C2ojrR-ucVJtD5dgkcA2-m/preview" allow="autoplay" allowfullscreen></iframe></div>
+          <div class="video-frame"><video id="video-iframe-fl" src="policy-video.mp4" controls playsinline preload="metadata"></video></div>
         </div>
         <div class="policy-viewer" id="policy-viewer-fl">
           <div class="policy-viewer-header">Information Sheet for New Employees — Security USA<button class="close-btn" onclick="togglePolicy('fl')">&#10005;</button></div>
@@ -530,12 +538,12 @@
 
       <div class="video-wrapper" id="video-wrapper-fl-ehub" style="margin-top:-6px; margin-bottom:14px;">
         <div class="video-header">EHUB Training — Security USA<span style="display:flex; gap:12px; align-items:center;"><button class="fullscreen-btn" onclick="fullscreenVideo('fl-ehub')" title="Fullscreen">&#x26F6; Fullscreen</button><button class="close-btn" onclick="toggleVideo('fl-ehub')">&#10005;</button></span></div>
-        <div class="video-frame"><iframe id="video-iframe-fl-ehub" src="https://drive.google.com/file/d/1jVFeiC1VCmS-ADh7cksv-3rON_6pS6OK/preview" allow="autoplay" allowfullscreen></iframe></div>
+        <div class="video-frame"><video id="video-iframe-fl-ehub" src="ehub-training.mp4" controls playsinline preload="metadata"></video></div>
       </div>
 
       <div class="video-wrapper" id="video-wrapper-fl-core" style="margin-top:-6px; margin-bottom:14px;">
         <div class="video-header">Central Core Training — Security USA<span style="display:flex; gap:12px; align-items:center;"><button class="fullscreen-btn" onclick="fullscreenVideo('fl-core')" title="Fullscreen">&#x26F6; Fullscreen</button><button class="close-btn" onclick="toggleVideo('fl-core')">&#10005;</button></span></div>
-        <div class="video-frame"><iframe id="video-iframe-fl-core" src="https://drive.google.com/file/d/1h-WhGNFPR6pyfIQbdgrMjLq4OKv_7n23/preview" allow="autoplay" allowfullscreen></iframe></div>
+        <div class="video-frame"><video id="video-iframe-fl-core" src="central-core-training.mp4" controls playsinline preload="metadata"></video></div>
       </div>
 
       <div class="step">
@@ -568,7 +576,7 @@
 </div>
 
 <script>
-  const stepCounts = { nj: 7, ny: 7, fl: 6 };
+  const stepCounts = { nj: 7, ny: 8, fl: 6 };
   const stateNames = { nj: 'New Jersey', ny: 'New York', fl: 'Florida' };
   let pendingState = null;
   let pendingBtn = null;
@@ -591,14 +599,21 @@
     document.querySelectorAll('.state-block').forEach(s => s.classList.remove('visible'));
     btn.classList.add('active');
     document.getElementById('block-' + state).classList.add('visible');
-    // Scroll down so the candidate sees all the steps, then glide back up to Step 1
-    setTimeout(() => {
-      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    // First time only: scroll down so the candidate sees all the steps, then glide back up to Step 1
+    const block = document.getElementById('block-' + state);
+    if (!localStorage.getItem('susa_scroll_tour_done')) {
+      localStorage.setItem('susa_scroll_tour_done', 'true');
       setTimeout(() => {
-        const block = document.getElementById('block-' + state);
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        setTimeout(() => {
+          block.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 1400);
+      }, 100);
+    } else {
+      setTimeout(() => {
         block.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 1400);
-    }, 100);
+      }, 100);
+    }
   }
 
   function onPopupAccepted() {
@@ -609,32 +624,27 @@
     }, 700);
   }
 
-  function openSexualHarassmentCourse(url) {
-    const confirmed = confirm(
-      "⚠️ Important — Please Read Before Continuing\n\n" +
-      "You are about to open the Sexual Harassment Prevention Training in a new tab.\n\n" +
-      "Once you complete the training and receive your certificate, you MUST return to this page to continue with the remaining onboarding steps.\n\n" +
-      "Press OK to open the training now."
-    );
-    if (confirmed) {
-      window.open(url, '_blank');
-    }
-  }
-
   function toggleVideo(state) {
     const wrapper = document.getElementById('video-wrapper-' + state);
     wrapper.classList.toggle('open');
-    if (wrapper.classList.contains('open')) wrapper.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    if (wrapper.classList.contains('open')) {
+      wrapper.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } else {
+      const vid = document.getElementById('video-iframe-' + state);
+      if (vid && vid.pause) vid.pause();
+    }
   }
 
   function fullscreenVideo(state) {
-    const iframe = document.getElementById('video-iframe-' + state);
-    if (iframe.requestFullscreen) {
-      iframe.requestFullscreen();
-    } else if (iframe.webkitRequestFullscreen) {
-      iframe.webkitRequestFullscreen();
-    } else if (iframe.msRequestFullscreen) {
-      iframe.msRequestFullscreen();
+    const vid = document.getElementById('video-iframe-' + state);
+    if (vid.requestFullscreen) {
+      vid.requestFullscreen();
+    } else if (vid.webkitRequestFullscreen) {
+      vid.webkitRequestFullscreen();
+    } else if (vid.webkitEnterFullscreen) {
+      vid.webkitEnterFullscreen();
+    } else if (vid.msRequestFullscreen) {
+      vid.msRequestFullscreen();
     }
   }
 
