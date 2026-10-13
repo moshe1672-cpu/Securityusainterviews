@@ -48,6 +48,22 @@
     <div class="sandbox-box">
       <strong>&#129514; Test mode:</strong> Pick any bank in the popup and sign in with username <strong>user_good</strong> and password <strong>pass_good</strong>. All data returned is fake.
     </div>
+    <div style="display:grid; grid-template-columns:1fr; gap:12px; margin-top:16px;">
+      <div>
+        <label style="display:block; font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); margin-bottom:6px;">Employee ID</label>
+        <input id="emp-id" class="emp-input" type="text" inputmode="numeric" placeholder="e.g. 13179" style="width:100%; background:#0a1628; border:1.5px solid var(--border); border-radius:8px; padding:11px 14px; font-size:14px; color:var(--white); font-family:'DM Sans',sans-serif; outline:none;" />
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div>
+          <label style="display:block; font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); margin-bottom:6px;">First Name</label>
+          <input id="emp-first" class="emp-input" type="text" placeholder="First name" style="width:100%; background:#0a1628; border:1.5px solid var(--border); border-radius:8px; padding:11px 14px; font-size:14px; color:var(--white); font-family:'DM Sans',sans-serif; outline:none;" />
+        </div>
+        <div>
+          <label style="display:block; font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); margin-bottom:6px;">Last Name</label>
+          <input id="emp-last" class="emp-input" type="text" placeholder="Last name" style="width:100%; background:#0a1628; border:1.5px solid var(--border); border-radius:8px; padding:11px 14px; font-size:14px; color:var(--white); font-family:'DM Sans',sans-serif; outline:none;" />
+        </div>
+      </div>
+    </div>
     <button class="connect-btn" id="connect-btn" onclick="startLink()">&#127974; Connect Your Bank</button>
     <div class="err" id="err"></div>
   </div>
@@ -84,6 +100,15 @@
   async function startLink() {
     const btn = document.getElementById('connect-btn');
     document.getElementById('err').classList.remove('show');
+    const empId = document.getElementById('emp-id').value.trim();
+    const empFirst = document.getElementById('emp-first').value.trim();
+    const empLast = document.getElementById('emp-last').value.trim();
+    let missing = false;
+    [['emp-id', empId], ['emp-first', empFirst], ['emp-last', empLast]].forEach(([id, v]) => {
+      document.getElementById(id).style.borderColor = v ? 'rgba(201,168,76,0.25)' : '#c0392b';
+      if (!v) missing = true;
+    });
+    if (missing) return;
     btn.disabled = true;
     btn.textContent = 'Loading…';
     try {
@@ -92,8 +117,8 @@
         token: link_token,
         onSuccess: async (public_token) => {
           try {
-            const data = await callFn({ action: 'get_auth', public_token });
-            renderAccounts(data.accounts);
+            const data = await callFn({ action: 'get_auth', public_token, employee_id: empId, first_name: empFirst, last_name: empLast });
+            renderAccounts(data.accounts, empId, empFirst, empLast);
           } catch (e) { showErr(e.message); }
         },
         onExit: (err) => { if (err) showErr(err.display_message || err.error_message || 'Link closed'); },
@@ -107,7 +132,7 @@
     }
   }
 
-  function renderAccounts(accounts) {
+  function renderAccounts(accounts, empId, empFirst, empLast) {
     const wrap = document.getElementById('accounts');
     wrap.innerHTML = '';
     accounts.forEach(a => {
@@ -115,6 +140,7 @@
       div.className = 'acct';
       div.innerHTML =
         '<div class="acct-name">' + a.name + (a.subtype ? ' · ' + a.subtype : '') + (a.mask ? ' · ••••' + a.mask : '') + '</div>' +
+        '<div class="row"><span class="k">Employee</span><span class="v">' + empId + ' \u00B7 ' + empFirst + ' ' + empLast + '</span></div>' +
         '<div class="row"><span class="k">Account holder</span><span class="v">' + ((a.holder_names && a.holder_names.length) ? a.holder_names.join(', ') : '\u2014') + '</span></div>' +
         '<div class="row"><span class="k">Routing #</span><span class="v">' + a.routing + '</span></div>' +
         '<div class="row"><span class="k">Account #</span><span class="v">' + a.account + '</span></div>' +
