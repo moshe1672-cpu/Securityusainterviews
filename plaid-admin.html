@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Direct Deposit Export — Admin</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --navy:#0a1628; --gold:#c9a84c; --gold-light:#e8c97a; --white:#f5f5f0; --muted:#8899aa; --step-bg:#0d1f3c; --border:rgba(201,168,76,0.25); }
+  body { font-family:'DM Sans',sans-serif; background:var(--navy); color:var(--white); min-height:100vh; }
+  .page { max-width:460px; margin:0 auto; padding:48px 24px 80px; }
+  .header { text-align:center; margin-bottom:36px; }
+  .badge { display:inline-flex; align-items:center; gap:8px; background:rgba(201,168,76,0.12); border:1px solid var(--border); border-radius:100px; padding:6px 16px; font-size:12px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--gold); margin-bottom:20px; }
+  .logo-text { font-family:'Bebas Neue',sans-serif; font-size:44px; letter-spacing:0.06em; color:var(--white); }
+  .logo-text span { color:var(--gold); }
+  .tagline { font-size:14px; color:var(--muted); margin-top:6px; }
+  .card { background:var(--step-bg); border:1px solid var(--border); border-radius:12px; padding:24px; }
+  label { display:block; font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); margin:14px 0 6px; }
+  input { width:100%; background:#0a1628; border:1.5px solid var(--border); border-radius:8px; padding:11px 14px; font-size:14px; color:var(--white); font-family:'DM Sans',sans-serif; outline:none; color-scheme:dark; }
+  input:focus { border-color:var(--gold); }
+  .dl-btn { width:100%; margin-top:20px; background:var(--gold); color:var(--navy); font-size:13px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; padding:12px; border-radius:8px; border:none; cursor:pointer; font-family:'DM Sans',sans-serif; }
+  .dl-btn:hover { background:var(--gold-light); }
+  .dl-btn:disabled { opacity:0.5; cursor:wait; }
+  .msg { display:none; margin-top:14px; border-radius:8px; padding:10px 14px; font-size:12px; line-height:1.6; }
+  .msg.show { display:block; }
+  .msg.ok { background:rgba(39,174,96,0.08); border:1px solid rgba(39,174,96,0.35); color:#7dd9a8; }
+  .msg.bad { background:rgba(192,57,43,0.1); border:1px solid rgba(192,57,43,0.4); color:#e88; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="badge">Admin Only</div>
+    <div class="logo-text">Security <span>USA</span></div>
+    <div class="tagline">Direct Deposit Submissions — CSV Export</div>
+  </div>
+
+  <div class="card">
+    <label>Passcode</label>
+    <input id="passcode" type="password" placeholder="Admin passcode" />
+    <label>From Date</label>
+    <input id="start" type="date" />
+    <label>To Date</label>
+    <input id="end" type="date" />
+    <button class="dl-btn" id="dl" onclick="downloadCsv()">&#11015; Download CSV</button>
+    <div class="msg" id="msg"></div>
+  </div>
+</div>
+
+<script>
+  const FN_URL = 'https://stvagyjcjoxnbslafmyf.supabase.co/functions/v1/plaid';
+  const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0dmFneWpjam94bmJzbGFmbXlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NTcxNTIsImV4cCI6MjA4OTQzMzE1Mn0.da_l4ogYdc_XL7DqmK_RmmR6cC_X6Lq102ddnN7QYY4';
+
+  // Default dates: last 7 days
+  (function() {
+    const today = new Date();
+    const week = new Date(today.getTime() - 6 * 86400000);
+    document.getElementById('end').value = today.toISOString().slice(0, 10);
+    document.getElementById('start').value = week.toISOString().slice(0, 10);
+  })();
+
+  function msg(text, ok) {
+    const el = document.getElementById('msg');
+    el.textContent = text;
+    el.className = 'msg show ' + (ok ? 'ok' : 'bad');
+  }
+
+  async function downloadCsv() {
+    const btn = document.getElementById('dl');
+    btn.disabled = true;
+    try {
+      const r = await fetch(FN_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + ANON },
+        body: JSON.stringify({
+          action: 'export_csv',
+          admin_key: document.getElementById('passcode').value,
+          start_date: document.getElementById('start').value || null,
+          end_date: document.getElementById('end').value || null,
+        }),
+      });
+      const data = await r.json();
+      if (!r.ok || data.error) throw new Error(data.error || ('HTTP ' + r.status));
+      if (data.count === 0) { msg('No submissions found in that date range.', true); return; }
+
+      const blob = new Blob([data.csv], { type: 'text/csv' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'direct-deposit_' + document.getElementById('start').value + '_to_' + document.getElementById('end').value + '.csv';
+      a.click();
+      URL.revokeObjectURL(a.href);
+      msg('Downloaded ' + data.count + ' submission' + (data.count === 1 ? '' : 's') + '.', true);
+    } catch (e) {
+      msg('⚠ ' + e.message, false);
+    } finally {
+      btn.disabled = false;
+    }
+  }
+</script>
+</body>
+</html>
