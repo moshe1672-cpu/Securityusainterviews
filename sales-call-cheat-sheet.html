@@ -82,6 +82,7 @@ textarea{min-height:58px;resize:vertical}
 .totals .big{font-size:17px;font-weight:600;border-top:1px solid var(--line);padding-top:6px}
 .out{margin-top:12px;display:flex;flex-direction:column;gap:4px}
 .out textarea{font-family:var(--mono);font-size:12.5px;line-height:1.45}
+a.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 a.btn{display:inline-block;font:inherit;font-weight:500;border-radius:6px;border:1px solid var(--line);background:var(--paper);color:var(--fg);padding:7px 12px;text-decoration:none}
 select.sel,#leadSource{width:100%;font:inherit;color:var(--fg);background:var(--field);border:1px solid var(--line);border-radius:5px;padding:7px 9px}
 footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)}
@@ -205,22 +206,23 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
 </section>
 
 <section class="step">
-  <h2><span class="n">7</span>CMS entry prompt (Claude in Chrome)</h2>
-  <p class="hint">Paste this into Claude in Chrome on https://www.securityusacms.com/clients/new. It stops before Save Client.</p>
+  <h2><span class="n">7</span>CMS entry</h2>
+  <p class="hint">One click opens the CMS New Client page with every field filled. You review and press Save Client. Needs the one-time Tampermonkey script installed in Chrome.</p>
   <div class="grid">
     <div class="f"><label for="leadSource">How did client hear about us?</label>
       <select id="leadSource"><option value="">leave blank</option><option>Google</option><option>Repeat Client</option><option>Referral</option><option>LinkedIn</option><option>Other</option></select></div>
     <div class="f"><label for="svcChecks">Services interested in (auto from calculator — type to override)</label><input type="text" id="svcChecks" placeholder="auto from calculator"></div>
     <div class="f full"><label for="repActions">Sales rep actions</label><textarea id="repActions" placeholder="Default text used if left blank"></textarea></div>
   </div>
-  <div class="out">
-    <label for="cmsOut">CMS prompt</label>
-    <textarea id="cmsOut" rows="22" spellcheck="false" readonly></textarea>
-    <div class="bar" style="margin-top:8px">
-      <button class="primary" id="copyCms">Copy prompt</button>
-      <span class="toast" id="cmsToast"></span>
-    </div>
+  <div class="bar" style="margin-top:12px">
+    <a class="btn primary" id="sendCms" href="#" target="_blank" rel="noopener">Send to CMS →</a>
+    <span class="toast" id="cmsToast"></span>
   </div>
+  <details class="out" style="margin-top:10px">
+    <summary style="cursor:pointer;font-size:13px;color:var(--muted)">Fallback: Claude in Chrome prompt</summary>
+    <textarea id="cmsOut" rows="22" spellcheck="false" readonly></textarea>
+    <div class="bar" style="margin-top:8px"><button id="copyCms">Copy prompt</button></div>
+  </details>
 </section>
 
 <div class="bar">
@@ -466,7 +468,16 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
       'Sales Rep Actions:',rep,'',
       'Fill every field above, then stop before clicking Save Client and confirm with me.'].join('\n');
   }
+  function cmsPayload(){
+    var t=calcAll(), p=P(), svc=(state.svcChecks||'').trim()||autoSvc();
+    var services=svc.split(',').map(function(x){return x.trim()}).filter(function(x){return ['Unarmed Security Guards','Event Security Guards','Fireguard / FLSD','Doorman / Concierge','Armed Guard','Patrol Service'].indexOf(x)>=0});
+    var quote=p.sites.map(function(s){ var c=calcSite(s); return num(s.officers,0)+' x '+TYPE_LABEL[s.type]+' @ $'+money2(num(s.rate,0))+'/hr, '+c.billed+' hrs x '+c.n+' '+shiftWord()+' ('+schedText(s)+')'; }).join('; ');
+    var notes=(state.notes||'').trim(); notes=(notes?notes+' ':'')+'Quote: '+quote+', subtotal $'+money2(t.sub)+', tax '+(t.tax===null?'TBD':'$'+money2(t.tax))+', total '+(t.total===null?'TBD':'$'+money2(t.total))+(mode()==='long'?' per week':'')+'. Payment terms: '+((state.payTerms||'').trim()||'Prepaid before service date')+'.';
+    var rep=(state.repActions||'').trim()||'Reached out to potential client for a briefing of the service needed and agreed to look over the service agreement. I will follow up once the contract is signed and payment is received.';
+    return {contact_name:(state.contactName||'').trim(),phone:(state.leadPhone||'').trim(),company:(state.leadName||'').trim(),email:(state.leadEmail||'').trim(),office:'New York',services:services,status:'In Progress',lead_source:(state.leadSource||'').trim(),sales_rep:'Moshe Sabaah',notes:notes,scope:(state.scope||'').trim(),rep_actions:rep};
+  }
   function renderOut(force){
+    document.getElementById('sendCms').href='https://www.securityusacms.com/clients/new#lead='+encodeURIComponent(JSON.stringify(cmsPayload()));
     var e=document.getElementById('emailOut'), c=document.getElementById('cmsOut');
     e.value=emailBody(); c.value=cmsPrompt();
     document.getElementById('mailto').href=mailtoHref();
