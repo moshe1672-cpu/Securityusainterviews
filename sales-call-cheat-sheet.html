@@ -33,7 +33,8 @@ header.top .sub{font-size:12px;color:var(--muted);font-family:var(--mono)}
 button{font:inherit;cursor:pointer;border-radius:6px;border:1px solid var(--line);background:var(--paper);color:var(--fg);padding:7px 12px;font-weight:500}
 button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
-.lead{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:16px 0 6px}
+.lead{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:16px 0 6px}
+@media(max-width:760px){.lead{grid-template-columns:1fr 1fr 1fr}}
 @media(max-width:560px){.lead{grid-template-columns:1fr 1fr}}
 section.step{background:var(--paper);border:1px solid var(--line);border-radius:8px;margin-top:14px;padding:14px 16px 16px}
 section.step h2{margin:0 0 10px;font-size:15px;font-weight:600;display:flex;gap:10px;align-items:baseline}
@@ -60,6 +61,25 @@ textarea{min-height:58px;resize:vertical}
 .bar{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px;align-items:center}
 .toast{font-size:13px;color:var(--ok);font-family:var(--mono)}
 .confirm{display:flex;gap:8px;align-items:center;font-size:13.5px}
+
+.site{border:1px solid var(--line);border-radius:6px;padding:10px 12px;margin-top:10px;background:var(--field)}
+.site .head{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.site .head input[type=text]{flex:1;background:var(--paper)}
+.site .head button{padding:4px 9px;font-size:12.5px}
+.site .grid{grid-template-columns:repeat(3,1fr)}
+@media(max-width:560px){.site .grid{grid-template-columns:1fr 1fr}}
+.site select{width:100%;font:inherit;color:var(--fg);background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:7px 9px}
+.site input[type=number],.site input[type=time]{width:100%;font:inherit;color:var(--fg);background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:7px 9px;font-variant-numeric:tabular-nums}
+.site .sub{margin-top:8px;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+.site .sub b{color:var(--fg);font-weight:500}
+.totals{margin-top:12px;display:grid;grid-template-columns:auto 1fr;gap:4px 16px;font-family:var(--mono);font-size:13.5px;font-variant-numeric:tabular-nums;max-width:360px}
+.totals .k{color:var(--muted)}
+.totals .v{text-align:right}
+.totals .big{font-size:17px;font-weight:600;border-top:1px solid var(--line);padding-top:6px}
+.out{margin-top:12px;display:flex;flex-direction:column;gap:4px}
+.out textarea{font-family:var(--mono);font-size:12.5px;line-height:1.45}
+a.btn{display:inline-block;font:inherit;font-weight:500;border-radius:6px;border:1px solid var(--line);background:var(--paper);color:var(--fg);padding:7px 12px;text-decoration:none}
+#leadSource{width:100%;font:inherit;color:var(--fg);background:var(--field);border:1px solid var(--line);border-radius:5px;padding:7px 9px}
 footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)}
 @media(prefers-reduced-motion:no-preference){.chip,button{transition:background .12s,color .12s}}
 </style>
@@ -76,8 +96,10 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
 </header>
 
 <div class="lead">
-  <div class="f"><label for="leadName">Prospect / company</label><input type="text" id="leadName"></div>
-  <div class="f"><label for="leadPhone">Caller phone</label><input type="text" id="leadPhone" inputmode="tel"></div>
+  <div class="f"><label for="leadName">Company</label><input type="text" id="leadName"></div>
+  <div class="f"><label for="contactName">Contact name</label><input type="text" id="contactName"></div>
+  <div class="f"><label for="leadPhone">Phone</label><input type="text" id="leadPhone" inputmode="tel"></div>
+  <div class="f"><label for="leadEmail">Email</label><input type="text" id="leadEmail" inputmode="email"></div>
   <div class="f"><label for="callDate">Call date</label><input type="date" id="callDate"></div>
 </div>
 
@@ -115,28 +137,38 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
 </section>
 
 <section class="step">
-  <h2><span class="n">3</span>Confirm site conditions</h2>
+  <h2><span class="n">3</span>Pricing calculator</h2>
+  <p class="hint">Per officer, per hour, before tax. Billed hours = max(actual, minimum). Each shift/guard is calculated separately, then summed.</p>
+  <div class="grid" style="margin-bottom:10px">
+    <div class="f full"><label for="taxMode">Tax</label>
+      <div class="chips" id="taxChips">
+        <button class="chip" data-v="nyc" aria-pressed="true">NYC · 8.875%</button>
+        <button class="chip" data-v="nj" aria-pressed="false">NJ / out-of-state · TBD</button>
+        <button class="chip" data-v="exempt" aria-pressed="false">Non-taxable org · 0%</button>
+      </div>
+    </div>
+  </div>
+  <div id="sites"></div>
+  <div class="bar" style="margin-top:10px"><button id="addSite">+ Add shift/guard</button></div>
+  <div class="totals" id="totals"></div>
+  <div class="req" id="taxNote"></div>
+</section>
+
+<section class="step">
+  <h2><span class="n">4</span>Confirm site conditions</h2>
   <p class="hint">Verification required before approval.</p>
   <div class="checks">
     <label><input type="checkbox" id="shelter"> Officers have access to shelter</label>
     <label><input type="checkbox" id="bathroom"> Officers have bathroom access</label>
     <label><input type="checkbox" id="verified"> Site conditions verified</label>
+    <label><input type="checkbox" id="notVerified"> Site conditions not verified</label>
   </div>
   <div class="req" id="siteReq"></div>
 </section>
 
 <section class="step">
-  <h2><span class="n">4</span>Internal approval</h2>
-  <div class="checks">
-    <label><input type="checkbox" id="apYisrael"> Yisrael</label>
-    <label><input type="checkbox" id="apDavid"> David</label>
-    <label><input type="checkbox" id="apYael"> Yael</label>
-  </div>
-</section>
-
-<section class="step">
   <h2><span class="n">5</span>Client information (for the service agreement)</h2>
-  <p class="hint">Once approved, email the client to confirm all of this.</p>
+  <p class="hint">Email the client to confirm all of this.</p>
   <div class="grid">
     <div class="f full"><label for="clientName">Client name</label><input type="text" id="clientName"></div>
     <div class="f"><label for="svcStart">Start date &amp; time</label><input type="datetime-local" id="svcStart"></div>
@@ -150,16 +182,7 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
 </section>
 
 <section class="step">
-  <h2><span class="n">6</span>Service agreement</h2>
-  <div class="checks">
-    <label><input type="checkbox" id="agPrep"> Service agreement prepared</label>
-    <label><input type="checkbox" id="agSent"> Sent to client with credit card authorization</label>
-    <label><input type="checkbox" id="agPrepaid"> Prepaid before service date (required for all events)</label>
-  </div>
-</section>
-
-<section class="step">
-  <h2><span class="n">7</span>CMS entry</h2>
+  <h2><span class="n">6</span>CMS entry</h2>
   <div class="checks">
     <label><input type="checkbox" id="cms"> Sales information entered into CMS</label>
   </div>
@@ -167,11 +190,42 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
 </section>
 
 <section class="step">
-  <h2><span class="n">8</span>Final steps</h2>
-  <div class="checks">
-    <label><input type="checkbox" id="fnSigned"> Signed agreement received</label>
-    <label><input type="checkbox" id="fnYisrael"> Sent to Yisrael for scheduling</label>
-    <label><input type="checkbox" id="fnIris"> Sent to Iris for credit card processing</label>
+  <h2><span class="n">7</span>Email to sales</h2>
+  <p class="hint">Built from everything above. Edit the text if needed, then copy or open in your mail app (to sales@securityusainc.com, cc yk@securityusainc.com).</p>
+  <div class="grid">
+    <div class="f"><label for="payTerms">Payment terms</label><input type="text" id="payTerms" placeholder="Prepaid before service date"></div>
+    <div class="f"><label for="leadStatus">Status</label><input type="text" id="leadStatus" placeholder="Quote sent / awaiting agreement"></div>
+    <div class="f full"><label for="notes">Notes</label><textarea id="notes"></textarea></div>
+  </div>
+  <div class="out">
+    <label for="emailOut">Email body</label>
+    <textarea id="emailOut" rows="16" spellcheck="false"></textarea>
+    <div class="bar" style="margin-top:8px">
+      <button class="primary" id="copyEmail">Copy email</button>
+      <a class="btn" id="mailto" href="#" target="_blank" rel="noopener">Open in mail app</a>
+      <button id="regenEmail">Rebuild from form</button>
+      <span class="toast" id="emailToast"></span>
+    </div>
+  </div>
+</section>
+
+<section class="step">
+  <h2><span class="n">8</span>CMS entry prompt (Claude in Chrome)</h2>
+  <p class="hint">Paste this into Claude in Chrome on https://www.securityusacms.com/clients/new. It stops before Save Client.</p>
+  <div class="grid">
+    <div class="f"><label for="leadSource">How did client hear about us?</label>
+      <select id="leadSource"><option value="">leave blank</option><option>Google</option><option>Repeat Client</option><option>Referral</option><option>LinkedIn</option><option>Other</option></select></div>
+    <div class="f"><label for="svcChecks">Services interested in (override)</label><input type="text" id="svcChecks" placeholder="auto from calculator"></div>
+    <div class="f full"><label for="repActions">Sales rep actions</label><textarea id="repActions" placeholder="Default text used if left blank"></textarea></div>
+  </div>
+  <div class="out">
+    <label for="cmsOut">CMS prompt</label>
+    <textarea id="cmsOut" rows="22" spellcheck="false"></textarea>
+    <div class="bar" style="margin-top:8px">
+      <button class="primary" id="copyCms">Copy prompt</button>
+      <button id="regenCms">Rebuild from form</button>
+      <span class="toast" id="cmsToast"></span>
+    </div>
   </div>
 </section>
 
@@ -185,7 +239,7 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
 <script>
 (function(){
   var KEY='sc-cheat-v1';
-  var fields=[].slice.call(document.querySelectorAll('input,textarea'));
+  var fields=[].slice.call(document.querySelectorAll('input,textarea,select')).filter(function(f){return !f.closest('#sites')&&f.id!=='emailOut'&&f.id!=='cmsOut'});
   var chips=[].slice.call(document.querySelectorAll('#asgChips .chip'));
   var state={};
   function load(){try{state=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){state={}}}
@@ -194,12 +248,14 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
     fields.forEach(function(f){ if(f.type==='checkbox') f.checked=!!state[f.id]; else f.value=state[f.id]||''; });
     chips.forEach(function(c){ c.setAttribute('aria-pressed', String((state.asg||[]).indexOf(c.dataset.v)>=0)); });
     if(!document.getElementById('callDate').value){ document.getElementById('callDate').value=new Date().toISOString().slice(0,10); state.callDate=document.getElementById('callDate').value; }
-    refresh();
+    renderSites(); refresh();
   }
   function refresh(){
+    if(typeof renderOut==='function') renderOut(false);
     var total=fields.length+1, n=0;
     fields.forEach(function(f){ if(f.type==='checkbox'?f.checked:f.value.trim()) n++; });
     var asg=state.asg||[]; if(asg.length) n++;
+    total++; if(state.pricing&&state.pricing.sites.some(function(x){return num(x.hours,0)>0})) n++;
     document.getElementById('prog').textContent=n+' / '+total+' filled';
     var d=document.getElementById('decide'); d.className='decide';
     var longTerm=asg.some(function(v){return v==='Ongoing'||v==='Multi-week'});
@@ -209,19 +265,177 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
     else if(asg.length){ d.textContent='Also pick Temporary/Event or Ongoing/Multi-week to decide the path.'; }
     else d.textContent='Pick an assignment type → Event/Temporary moves forward; Long-term/multi-week follows full protocol.';
     var miss=[]; if(!state.shelter) miss.push('shelter'); if(!state.bathroom) miss.push('bathroom');
-    document.getElementById('siteReq').textContent= miss.length && state.verified ? 'Verified but '+miss.join(' and ')+' not confirmed — approval cannot proceed.' : '';
+    document.getElementById('siteReq').textContent= state.notVerified ? 'Site conditions not verified — verification required before proceeding.' : (miss.length && state.verified ? 'Verified but '+miss.join(' and ')+' not confirmed — cannot proceed.' : '');
   }
-  fields.forEach(function(f){ f.addEventListener('input',function(){ state[f.id]=f.type==='checkbox'?f.checked:f.value; save(); refresh(); }); });
+  fields.forEach(function(f){ f.addEventListener('input',function(){ state[f.id]=f.type==='checkbox'?f.checked:f.value; dirtyOut=false;
+    if(f.id==='verified'&&f.checked){ state.notVerified=false; document.getElementById('notVerified').checked=false; }
+    if(f.id==='notVerified'&&f.checked){ state.verified=false; document.getElementById('verified').checked=false; }
+    save(); refresh(); }); });
   chips.forEach(function(c){ c.addEventListener('click',function(){
     var a=state.asg||[], i=a.indexOf(c.dataset.v); if(i>=0)a.splice(i,1); else a.push(c.dataset.v);
     state.asg=a; c.setAttribute('aria-pressed',String(i<0)); save(); refresh(); }); });
+
+
+  // ---- Pricing ----
+  var RATES={standard:45,mobile:55,event:45};
+  var TAX={nyc:0.08875,nj:null,exempt:0};
+  var TYPE_LABEL={standard:'Standard unarmed',mobile:'Mobile / patrol',event:'Event security'};
+  function P(){ if(!state.pricing) state.pricing={tax:'nyc',sites:[]}; if(!state.pricing.sites.length) state.pricing.sites.push(newSite()); return state.pricing; }
+  function newSite(){ return {name:'',type:'standard',rate:45,officers:1,hours:'',nights:1,min:6,tStart:'',tEnd:''}; }
+  function hoursBetween(a,b){ if(!a||!b) return null; var m=function(t){var p=t.split(':');return (+p[0])*60+(+p[1]);}; var d=m(b)-m(a); if(d<=0) d+=1440; return Math.round(d/60*4)/4; }
+  function num(x,d){ var n=parseFloat(x); return isNaN(n)?d:n; }
+  function money(n){ return '$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+  function calcSite(s){
+    var hours=num(s.hours,0), min=num(s.min,0), billed=Math.max(hours,min);
+    var sub=billed*num(s.rate,0)*num(s.officers,0)*Math.max(num(s.nights,1),0);
+    return {billed:billed,sub:sub,hours:hours,min:min};
+  }
+  function calcAll(){
+    var p=P(), sub=0; p.sites.forEach(function(s){ sub+=calcSite(s).sub; });
+    var rate=TAX[p.tax], tax=rate===null?null:sub*rate;
+    return {sub:sub,rate:rate,tax:tax,total:tax===null?null:sub+tax};
+  }
+  function renderSites(){
+    var p=P(), box=document.getElementById('sites'); box.innerHTML='';
+    p.sites.forEach(function(s,i){
+      var c=calcSite(s), el=document.createElement('div'); el.className='site'; el.dataset.i=i;
+      el.innerHTML=
+        '<div class="head"><input type="text" data-k="name" placeholder="Shift/guard '+(i+1)+' (post / site)" value=""><button data-rm="1"'+(p.sites.length<2?' disabled':'')+'>Remove</button></div>'+
+        '<div class="grid">'+
+        '<div class="f"><label>Service</label><select data-k="type"><option value="standard">Standard unarmed</option><option value="mobile">Mobile / patrol</option><option value="event">Event security</option></select></div>'+
+        '<div class="f"><label>Rate $/hr</label><input type="number" data-k="rate" step="0.5" min="0"></div>'+
+        '<div class="f"><label>Officers</label><input type="number" data-k="officers" step="1" min="0"></div>'+
+        '<div class="f"><label>Start time</label><input type="time" data-k="tStart"></div>'+
+        '<div class="f"><label>End time</label><input type="time" data-k="tEnd"></div>'+
+        '<div class="f"><label>Hours / shift</label><input type="number" data-k="hours" step="0.5" min="0" placeholder="actual"></div>'+
+        '<div class="f"><label>Shifts / nights</label><input type="number" data-k="nights" step="1" min="1"></div>'+
+        '<div class="f"><label>Minimum hrs</label><input type="number" data-k="min" step="1" min="0"></div>'+
+        '</div><div class="sub"></div>';
+      el.querySelector('[data-k=name]').value=s.name||'';
+      el.querySelector('[data-k=type]').value=s.type;
+      ['rate','officers','hours','nights','min','tStart','tEnd'].forEach(function(k){ el.querySelector('[data-k='+k+']').value=s[k]; });
+      el.querySelector('.sub').innerHTML=subLine(s);
+      box.appendChild(el);
+    });
+    updateTotals();
+  }
+  function subLine(s){ var c=calcSite(s); return 'Billed <b>'+c.billed+' hrs</b>/officer'+(c.hours<c.min&&c.hours>0?' (min applied)':'')+' × '+money(num(s.rate,0))+' × '+num(s.officers,0)+' officer(s) × '+num(s.nights,1)+' shift(s) = <b>'+money(c.sub)+'</b>'; }
+  function updateTotals(){
+    var p=P();
+    [].slice.call(document.querySelectorAll('#sites .site')).forEach(function(el){ var s=p.sites[+el.dataset.i]; if(s) el.querySelector('.sub').innerHTML=subLine(s); });
+    var t=calcAll(), tot=document.getElementById('totals'), lab=p.tax==='nyc'?'Tax (NYC 8.875%)':p.tax==='nj'?'Tax (NJ / out-of-state)':'Tax (non-taxable)';
+    tot.innerHTML='<span class="k">Subtotal</span><span class="v">'+money(t.sub)+'</span>'+
+      '<span class="k">'+lab+'</span><span class="v">'+(t.tax===null?'TBD':money(t.tax))+'</span>'+
+      '<span class="k big">Total</span><span class="v big">'+(t.total===null?money(t.sub)+' + tax TBD':money(t.total))+'</span>';
+    document.getElementById('taxNote').textContent=p.tax==='nj'?'NJ / out-of-state tax rate is TBD — do not assume NYC tax. Quote subtotal and confirm tax before sending.':'';
+    [].slice.call(document.querySelectorAll('#taxChips .chip')).forEach(function(c){ c.setAttribute('aria-pressed',String(c.dataset.v===p.tax)); });
+  }
+  document.getElementById('sites').addEventListener('input',function(e){
+    var el=e.target, k=el.dataset.k; if(!k) return; var site=el.closest('.site'), s=P().sites[+site.dataset.i];
+    if(k==='type'){ s.type=el.value; s.rate=RATES[el.value]; site.querySelector('[data-k=rate]').value=s.rate; }
+    else { s[k]=el.value; }
+    if(k==='tStart'||k==='tEnd'){ var h=hoursBetween(s.tStart,s.tEnd); if(h!==null){ s.hours=h; site.querySelector('[data-k=hours]').value=h; } }
+    save(); updateTotals(); refresh();
+  });
+  document.getElementById('sites').addEventListener('click',function(e){
+    if(!e.target.dataset.rm) return; var i=+e.target.closest('.site').dataset.i; P().sites.splice(i,1); save(); renderSites(); refresh();
+  });
+  document.getElementById('addSite').addEventListener('click',function(){ P().sites.push(newSite()); save(); renderSites(); refresh(); });
+  [].slice.call(document.querySelectorAll('#taxChips .chip')).forEach(function(c){ c.addEventListener('click',function(){ P().tax=c.dataset.v; save(); renderSites(); refresh(); }); });
+  function pricingLines(){
+    var p=P(), t=calcAll(), out=['3. PRICING'];
+    p.sites.forEach(function(s,i){ var c=calcSite(s);
+      out.push((s.name||('Shift/guard '+(i+1)))+': '+TYPE_LABEL[s.type]+' @ '+money(num(s.rate,0))+'/hr × '+num(s.officers,0)+' officer(s) × '+c.billed+' billed hrs'+(c.hours<c.min&&c.hours>0?' (min '+c.min+')':'')+' × '+num(s.nights,1)+' shift(s) = '+money(c.sub)); });
+    out.push('Subtotal: '+money(t.sub));
+    out.push('Tax: '+(p.tax==='nyc'?'NYC 8.875% = '+money(t.tax):p.tax==='nj'?'NJ / out-of-state — TBD':'Non-taxable org — $0.00'));
+    out.push('Total: '+(t.total===null?money(t.sub)+' + tax TBD':money(t.total)));
+    return out;
+  }
+
+
+  // ---- Generated outputs (email + CMS prompt) ----
+  var dirtyOut=false;
+  function tbd(id){ var x=(state[id]||'').toString().trim(); return x||'TBD'; }
+  function money2(n){ return n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+  function dParts(){
+    var a=state.svcStart?new Date(state.svcStart):null, b=state.svcEnd?new Date(state.svcEnd):null;
+    var ok=function(d){return d&&!isNaN(d)};
+    var date=ok(a)?a.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):(state.startDate||'TBD');
+    var t=function(d){return d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})};
+    var hrs=(ok(a)&&ok(b)&&b>a)?Math.round((b-a)/36e5*4)/4:null;
+    return {date:date,start:ok(a)?t(a):'TBD',end:ok(b)?t(b):'TBD',hrs:hrs===null?'TBD':hrs};
+  }
+  function taxLabel(){ var p=P(); return p.tax==='nyc'?'NYC Sales Tax (8.875%)':p.tax==='nj'?'NJ / Out-of-State Sales Tax':'Sales Tax (non-taxable org)'; }
+  function coverageLines(){
+    return P().sites.map(function(s){ var c=calcSite(s), minApplied=c.hours<c.min&&c.hours>0;
+      return num(s.officers,0)+' x '+TYPE_LABEL[s.type]+' @ $'+money2(num(s.rate,0))+'/hr (min '+c.min+' hrs; billing '+c.billed+' hrs'+(minApplied?', minimum applied':'')+(num(s.nights,1)>1?', x '+num(s.nights,1)+' shifts':'')+')'+(s.name?' – '+s.name:''); });
+  }
+  function emailBody(){
+    var t=calcAll(), d=dParts(), cov=coverageLines();
+    return ['Team,','',
+      'New lead – '+tbd('leadName')+' / '+tbd('contactName'),
+      'Contact: '+tbd('leadPhone')+' | '+tbd('leadEmail'),
+      'Event: '+tbd('svcType')+' – '+tbd('addr'),
+      'Date/Time: '+d.date+', '+d.start+' to '+d.end+' ('+d.hrs+' hrs)',
+      'Coverage: '+(cov.length?cov.join('; '):'TBD'),
+      'Subtotal: $'+money2(t.sub),
+      taxLabel()+': '+(t.tax===null?'TBD':'$'+money2(t.tax)),
+      'Total: '+(t.total===null?'$'+money2(t.sub)+' + tax TBD':'$'+money2(t.total)),
+      'Payment: '+((state.payTerms||'').trim()||'Prepaid before service date'),
+      'Status: '+tbd('leadStatus'),
+      'Notes: '+tbd('notes'),
+      '','Moshe'].join('\n');
+  }
+  function mailtoHref(){
+    var t=calcAll(), d=dParts();
+    var subject='New Lead – '+tbd('leadName')+' – '+d.date+' – '+(t.total===null?'$'+money2(t.sub)+' + tax':'$'+money2(t.total));
+    return 'mailto:sales@securityusainc.com?cc=yk@securityusainc.com&subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(document.getElementById('emailOut').value);
+  }
+  var SVC_MAP={standard:'Unarmed Security Guards',mobile:'Patrol Service',event:'Event Security Guards'};
+  function cmsPrompt(){
+    var t=calcAll(), p=P(), svc=(state.svcChecks||'').trim();
+    if(!svc){ var seen={}; svc=p.sites.map(function(s){return SVC_MAP[s.type]}).filter(function(x){ if(seen[x]) return false; seen[x]=1; return true; }).join(', ')||'TBD'; }
+    var quote=p.sites.map(function(s){ var c=calcSite(s); return num(s.officers,0)+' x '+TYPE_LABEL[s.type]+' @ $'+money2(num(s.rate,0))+'/hr, '+c.billed+' hrs'+(num(s.nights,1)>1?' x '+num(s.nights,1)+' shifts':''); }).join('; ');
+    var notes=(state.notes||'').trim(); notes=(notes?notes+' ':'')+'Quote: '+quote+', subtotal $'+money2(t.sub)+', tax '+(t.tax===null?'TBD':'$'+money2(t.tax))+', total '+(t.total===null?'TBD':'$'+money2(t.total))+'. Payment terms: '+((state.payTerms||'').trim()||'Prepaid before service date')+'.';
+    var rep=(state.repActions||'').trim()||'Reached out to potential client for a briefing of the service needed and agreed to look over the service agreement. I will follow up once the contract is signed and payment is received.';
+    return ['Please fill in this sales lead form with the following information:','',
+      'Contact Name: '+tbd('contactName'),
+      'Phone: '+tbd('leadPhone'),
+      'Company Name: '+tbd('leadName'),
+      'Email: '+tbd('leadEmail'),
+      'Office Location: New York',
+      'Services Interested In: '+svc,
+      'Client Status: In Progress',
+      'How did client hear about us?: '+((state.leadSource||'').trim()||'leave blank'),
+      'Sales Rep: Moshe Sabaah','',
+      'Notes:',notes,'',
+      'Scope of Service:',tbd('scope'),'',
+      'Sales Rep Actions:',rep,'',
+      'Fill every field above, then stop before clicking Save Client and confirm with me.'].join('\n');
+  }
+  function renderOut(force){
+    var e=document.getElementById('emailOut'), c=document.getElementById('cmsOut');
+    if(force||!dirtyOut){ e.value=emailBody(); c.value=cmsPrompt(); }
+    document.getElementById('mailto').href=mailtoHref();
+  }
+  document.getElementById('emailOut').addEventListener('input',function(){ dirtyOut=true; document.getElementById('mailto').href=mailtoHref(); });
+  document.getElementById('cmsOut').addEventListener('input',function(){ dirtyOut=true; });
+  document.getElementById('regenEmail').addEventListener('click',function(){ dirtyOut=false; renderOut(true); });
+  document.getElementById('regenCms').addEventListener('click',function(){ dirtyOut=false; renderOut(true); });
+  function copyText(text,toastId){
+    var toast=document.getElementById(toastId);
+    function done(ok){ toast.textContent=ok?'Copied.':'Copy blocked — select the text and copy it.'; setTimeout(function(){toast.textContent=''},3000); }
+    try{ navigator.clipboard.writeText(text).then(function(){done(true)},function(){done(false)}); }catch(e){done(false)}
+  }
+  document.getElementById('copyEmail').addEventListener('click',function(){ copyText(document.getElementById('emailOut').value,'emailToast'); });
+  document.getElementById('copyCms').addEventListener('click',function(){ copyText(document.getElementById('cmsOut').value,'cmsToast'); });
 
   function v(id){return (state[id]||'').toString().trim()||'—'}
   function ck(id){return state[id]?'[x]':'[ ]'}
   function fmtDT(s){ if(!s) return '—'; var d=new Date(s); return isNaN(d)?s:d.toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'}); }
   function summary(){
     return [
-      'SALES CALL — '+v('leadName')+' ('+v('callDate')+')  caller: '+v('leadPhone'),
+      'SALES CALL — '+v('leadName')+' / '+v('contactName')+' ('+v('callDate')+')  '+v('leadPhone')+' | '+v('leadEmail'),
       '',
       '1. ASSIGNMENT',
       'Service type: '+v('svcType'),
@@ -236,9 +450,9 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
       'Responsibilities: '+v('resp'),
       'Schedule expectations: '+v('sched'),
       'Special instructions: '+v('special'),
+      ''].concat(pricingLines()).concat([
       '',
-      '3. SITE CONDITIONS  '+ck('shelter')+' shelter  '+ck('bathroom')+' bathroom  '+ck('verified')+' verified',
-      '4. APPROVALS  '+ck('apYisrael')+' Yisrael  '+ck('apDavid')+' David  '+ck('apYael')+' Yael',
+      '4. SITE CONDITIONS  '+ck('shelter')+' shelter  '+ck('bathroom')+' bathroom  '+ck('verified')+' verified  '+ck('notVerified')+' NOT verified',
       '',
       '5. CLIENT INFO (service agreement)',
       'Client name: '+v('clientName'),
@@ -248,10 +462,8 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
       'Service address: '+v('addr'),
       'Scope & instructions: '+v('scope'),
       '',
-      '6. AGREEMENT  '+ck('agPrep')+' prepared  '+ck('agSent')+' sent w/ CC auth  '+ck('agPrepaid')+' prepaid',
-      '7. CMS  '+ck('cms')+' entered',
-      '8. FINAL  '+ck('fnSigned')+' signed received  '+ck('fnYisrael')+' to Yisrael (scheduling)  '+ck('fnIris')+' to Iris (CC processing)'
-    ].join('\n');
+      '6. CMS  '+ck('cms')+' entered'
+    ]).join('\n');
   }
   function copy(){
     var t=summary(), toast=document.getElementById('toast');
