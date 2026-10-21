@@ -131,7 +131,6 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
       <div class="decide" id="decide">Pick an assignment type → Event/Temporary moves forward; Long-term/multi-week follows full protocol.</div>
     </div>
     <div class="f"><label for="svcType">Type of service required</label><select class="sel" id="svcType"><option value="">Select…</option><option>Unarmed Security Guards</option><option>Event Security Guards</option><option>Fireguard / FLSD</option><option>Doorman / Concierge</option><option>Armed Guard</option><option>Patrol Service</option><option>Other</option></select></div>
-    <div class="f full"><label for="duties">Officer duties and responsibilities</label><textarea id="duties"></textarea></div>
     <div class="f full"><label>Shifts / guards — days &amp; hours</label>
       <p class="hint" id="shiftHint" style="margin:0 0 4px">Pick an assignment type above: Temporary/Event gives date ranges, Ongoing/Multi-week gives days of the week.</p>
       <div id="shifts"></div>
@@ -278,7 +277,7 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
     var g=(state.pricing&&state.pricing.sites&&state.pricing.sites[0])||{}, d=g.dStart||'';
     src.svcStart=(d&&g.tStart)?d+'T'+g.tStart:'';
     if(d&&g.tStart&&g.tEnd){ var ed=(mode()==='short'&&g.dEnd)?g.dEnd:d; if(g.tEnd<=g.tStart){ var x=new Date(ed+'T12:00'); x.setDate(x.getDate()+1); ed=x.toISOString().slice(0,10); } src.svcEnd=ed+'T'+g.tEnd; } else src.svcEnd='';
-    var sc=respText()||(state.duties||'').trim(); if((state.special||'').trim()) sc+=(sc?'\n':'')+'Instructions: '+state.special.trim(); src.scope=sc;
+    var sc=respText(); if((state.special||'').trim()) sc+=(sc?'\n':'')+'Instructions: '+state.special.trim(); src.scope=sc;
     Object.keys(src).forEach(function(id){ if(t[id]) return; if((state[id]||'')!==src[id]){ state[id]=src[id]; var el=document.getElementById(id); if(el&&document.activeElement!==el) el.value=src[id]; } });
   }
   function refresh(){
@@ -523,7 +522,6 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
       '1. ASSIGNMENT',
       'Service type: '+v('svcType'),
       'Assignment type: '+(state.asg||'—'),
-      'Duties: '+v('duties'),
       'Schedule: '+P().sites.map(function(s,i){return (s.name||('Shift/guard '+(i+1)))+' – '+num(s.officers,0)+' officer(s), '+schedText(s)}).join('; '),
       '',
       '2. SCOPE',
