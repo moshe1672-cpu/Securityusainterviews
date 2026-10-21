@@ -67,7 +67,11 @@ textarea{min-height:58px;resize:vertical}
 .site .head input[type=text]{flex:1;background:var(--paper)}
 .site .head button{padding:4px 9px;font-size:12.5px}
 .site .grid{grid-template-columns:repeat(3,1fr)}
-@media(max-width:560px){.site .grid{grid-template-columns:1fr 1fr}}
+.site .grid.p4{grid-template-columns:repeat(4,1fr)}
+.days{display:flex;flex-wrap:wrap;gap:4px}
+.days .chip{padding:4px 9px;font-size:12.5px}
+.site .ro{font-family:var(--mono);font-size:13px;padding:7px 0;color:var(--fg)}
+@media(max-width:560px){.site .grid,.site .grid.p4{grid-template-columns:1fr 1fr}}
 .site select{width:100%;font:inherit;color:var(--fg);background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:7px 9px}
 .site input[type=number],.site input[type=time]{width:100%;font:inherit;color:var(--fg);background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:7px 9px;font-variant-numeric:tabular-nums}
 .site .sub{margin-top:8px;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
@@ -79,7 +83,7 @@ textarea{min-height:58px;resize:vertical}
 .out{margin-top:12px;display:flex;flex-direction:column;gap:4px}
 .out textarea{font-family:var(--mono);font-size:12.5px;line-height:1.45}
 a.btn{display:inline-block;font:inherit;font-weight:500;border-radius:6px;border:1px solid var(--line);background:var(--paper);color:var(--fg);padding:7px 12px;text-decoration:none}
-#leadSource{width:100%;font:inherit;color:var(--fg);background:var(--field);border:1px solid var(--line);border-radius:5px;padding:7px 9px}
+select.sel,#leadSource{width:100%;font:inherit;color:var(--fg);background:var(--field);border:1px solid var(--line);border-radius:5px;padding:7px 9px}
 footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)}
 @media(prefers-reduced-motion:no-preference){.chip,button{transition:background .12s,color .12s}}
 </style>
@@ -107,20 +111,21 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
   <h2><span class="n">1</span>Understand the assignment</h2>
   <p class="hint">Gather full details before discussing pricing.</p>
   <div class="grid">
-    <div class="f"><label for="svcType">Type of service required</label><input type="text" id="svcType" placeholder="e.g. unarmed guard, concierge, fire guard"></div>
-    <div class="f"><label for="numOfficers">Number of officers needed</label><input type="text" id="numOfficers" inputmode="numeric"></div>
-    <div class="f full"><label for="duties">Officer duties and responsibilities</label><textarea id="duties"></textarea></div>
-    <div class="f full"><label for="daysHours">Service days and hours</label><input type="text" id="daysHours" placeholder="e.g. Sat 6pm–2am"></div>
     <div class="f full"><label>Assignment type</label>
       <div class="chips" id="asgChips">
         <button class="chip" data-v="Temporary" aria-pressed="false">Temporary</button>
         <button class="chip" data-v="Event" aria-pressed="false">Event</button>
-        <button class="chip" data-v="Overnight" aria-pressed="false">Overnight</button>
-        <button class="chip" data-v="Weekend" aria-pressed="false">Weekend</button>
         <button class="chip" data-v="Ongoing" aria-pressed="false">Ongoing / long-term</button>
         <button class="chip" data-v="Multi-week" aria-pressed="false">Multi-week</button>
       </div>
       <div class="decide" id="decide">Pick an assignment type → Event/Temporary moves forward; Long-term/multi-week follows full protocol.</div>
+    </div>
+    <div class="f"><label for="svcType">Type of service required</label><select class="sel" id="svcType"><option value="">Select…</option><option>Unarmed Security Guards</option><option>Event Security Guards</option><option>Fireguard / FLSD</option><option>Doorman / Concierge</option><option>Armed Guard</option><option>Patrol Service</option><option>Other</option></select></div>
+    <div class="f full"><label for="duties">Officer duties and responsibilities</label><textarea id="duties"></textarea></div>
+    <div class="f full"><label>Shifts / guards — days &amp; hours</label>
+      <p class="hint" id="shiftHint" style="margin:0 0 4px">Pick an assignment type above: Temporary/Event gives date ranges, Ongoing/Multi-week gives days of the week.</p>
+      <div id="shifts"></div>
+      <div class="bar" style="margin-top:8px"><button id="addShift">+ Add shift/guard</button></div>
     </div>
   </div>
 </section>
@@ -129,7 +134,6 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
   <h2><span class="n">2</span>Clarify scope</h2>
   <div class="grid">
     <div class="f"><label for="siteType">Site / property type</label><input type="text" id="siteType"></div>
-    <div class="f"><label for="startDate">Start date</label><input type="date" id="startDate"></div>
     <div class="f full"><label for="resp">Officer responsibilities (confirmed)</label><textarea id="resp"></textarea></div>
     <div class="f full"><label for="special">Special instructions or concerns</label><textarea id="special"></textarea></div>
   </div>
@@ -137,7 +141,7 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
 
 <section class="step">
   <h2><span class="n">3</span>Pricing calculator</h2>
-  <p class="hint">Per officer, per hour, before tax. Billed hours = max(actual, minimum). Each shift/guard is calculated separately, then summed.</p>
+  <p class="hint">Officers, days and hours come from step 1. Rate and minimum are adjustable here. Billed hours = max(actual, minimum); each shift/guard is calculated separately, then summed.</p>
   <div class="grid" style="margin-bottom:10px">
     <div class="f full"><label for="taxMode">Tax</label>
       <div class="chips" id="taxChips">
@@ -148,7 +152,6 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
     </div>
   </div>
   <div id="sites"></div>
-  <div class="bar" style="margin-top:10px"><button id="addSite">+ Add shift/guard</button></div>
   <div class="totals" id="totals"></div>
   <div class="req" id="taxNote"></div>
 </section>
@@ -228,24 +231,25 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
 
 <script>
 (function(){
-  var KEY='sc-cheat-v1';
-  var fields=[].slice.call(document.querySelectorAll('input,textarea,select')).filter(function(f){return !f.closest('#sites')&&f.id!=='emailOut'&&f.id!=='cmsOut'});
+  var KEY='sc-cheat-v2';
+  var fields=[].slice.call(document.querySelectorAll('input,textarea,select')).filter(function(f){return !f.closest('#sites')&&!f.closest('#shifts')&&f.id!=='emailOut'&&f.id!=='cmsOut'});
   var chips=[].slice.call(document.querySelectorAll('#asgChips .chip'));
   var state={};
   function load(){try{state=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){state={}}}
   function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
   function apply(){
     fields.forEach(function(f){ if(f.type==='checkbox') f.checked=!!state[f.id]; else f.value=state[f.id]||''; });
-    chips.forEach(function(c){ c.setAttribute('aria-pressed', String((state.asg||[]).indexOf(c.dataset.v)>=0)); });
+    if(Array.isArray(state.asg)) state.asg=state.asg[0]||'';
+    chips.forEach(function(c){ c.setAttribute('aria-pressed', String(state.asg===c.dataset.v)); });
     if(!document.getElementById('callDate').value){ document.getElementById('callDate').value=new Date().toISOString().slice(0,10); state.callDate=document.getElementById('callDate').value; }
-    renderSites(); refresh();
+    renderShifts(); renderSites(); refresh();
   }
   function autofill5(){
     var t=state.touched5||{}, src={};
     src.clientName=state.leadName||''; src.ocName=state.contactName||''; src.ocCell=state.leadPhone||''; src.ocEmail=state.leadEmail||'';
-    var g=(state.pricing&&state.pricing.sites&&state.pricing.sites[0])||{}, d=state.startDate||'';
+    var g=(state.pricing&&state.pricing.sites&&state.pricing.sites[0])||{}, d=g.dStart||'';
     src.svcStart=(d&&g.tStart)?d+'T'+g.tStart:'';
-    if(d&&g.tStart&&g.tEnd){ var ed=d; if(g.tEnd<=g.tStart){ var x=new Date(d+'T12:00'); x.setDate(x.getDate()+1); ed=x.toISOString().slice(0,10); } src.svcEnd=ed+'T'+g.tEnd; } else src.svcEnd='';
+    if(d&&g.tStart&&g.tEnd){ var ed=(mode()==='short'&&g.dEnd)?g.dEnd:d; if(g.tEnd<=g.tStart){ var x=new Date(ed+'T12:00'); x.setDate(x.getDate()+1); ed=x.toISOString().slice(0,10); } src.svcEnd=ed+'T'+g.tEnd; } else src.svcEnd='';
     var sc=(state.resp||'').trim()||(state.duties||'').trim(); if((state.special||'').trim()) sc+=(sc?'\n':'')+'Instructions: '+state.special.trim(); src.scope=sc;
     Object.keys(src).forEach(function(id){ if(t[id]) return; if((state[id]||'')!==src[id]){ state[id]=src[id]; var el=document.getElementById(id); if(el&&document.activeElement!==el) el.value=src[id]; } });
   }
@@ -254,15 +258,13 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
     if(typeof renderOut==='function') renderOut(false);
     var total=fields.length+1, n=0;
     fields.forEach(function(f){ if(f.type==='checkbox'?f.checked:f.value.trim()) n++; });
-    var asg=state.asg||[]; if(asg.length) n++;
-    total++; if(state.pricing&&state.pricing.sites.some(function(x){return num(x.hours,0)>0})) n++;
+    var asg=state.asg||''; if(asg) n++;
+    total++; if(state.pricing&&state.pricing.sites.some(function(x){return hoursOf(x)>0})) n++;
     document.getElementById('prog').textContent=n+' / '+total+' filled';
     var d=document.getElementById('decide'); d.className='decide';
-    var longTerm=asg.some(function(v){return v==='Ongoing'||v==='Multi-week'});
-    var shortTerm=asg.some(function(v){return v==='Event'||v==='Temporary'});
-    if(longTerm){ d.classList.add('full'); d.textContent='Long-term / multi-week → follow full protocol.'; }
-    else if(shortTerm){ d.classList.add('go'); d.textContent='Event / temporary → move forward.'; }
-    else if(asg.length){ d.textContent='Also pick Temporary/Event or Ongoing/Multi-week to decide the path.'; }
+    var m=mode();
+    if(m==='long'){ d.classList.add('full'); d.textContent='Long-term / multi-week → follow full protocol.'; }
+    else if(m==='short'){ d.classList.add('go'); d.textContent='Event / temporary → move forward.'; }
     else d.textContent='Pick an assignment type → Event/Temporary moves forward; Long-term/multi-week follows full protocol.';
     var miss=[]; if(!state.shelter) miss.push('shelter'); if(!state.bathroom) miss.push('bathroom');
     document.getElementById('siteReq').textContent= state.notVerified ? 'Site conditions not verified — verification required before proceeding.' : (miss.length && state.verified ? 'Verified but '+miss.join(' and ')+' not confirmed — cannot proceed.' : '');
@@ -270,90 +272,130 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
   var STEP5=['clientName','svcStart','svcEnd','ocName','ocCell','ocEmail','scope'];
   fields.forEach(function(f){ f.addEventListener('input',function(){ state[f.id]=f.type==='checkbox'?f.checked:f.value; dirtyOut=false;
     if(STEP5.indexOf(f.id)>=0){ state.touched5=state.touched5||{}; state.touched5[f.id]=true; }
+    if(f.id==='svcType'){ var g0=P().sites[0]; var mm=/Patrol/.test(f.value)?'mobile':/Event/.test(f.value)?'event':'standard'; g0.type=mm; g0.rate=RATES[mm]; renderShifts(); renderSites(); }
     if(f.id==='verified'&&f.checked){ state.notVerified=false; document.getElementById('notVerified').checked=false; }
     if(f.id==='notVerified'&&f.checked){ state.verified=false; document.getElementById('verified').checked=false; }
     save(); refresh(); }); });
   chips.forEach(function(c){ c.addEventListener('click',function(){
-    var a=state.asg||[], i=a.indexOf(c.dataset.v); if(i>=0)a.splice(i,1); else a.push(c.dataset.v);
-    state.asg=a; c.setAttribute('aria-pressed',String(i<0)); save(); refresh(); }); });
+    state.asg=(state.asg===c.dataset.v)?'':c.dataset.v;
+    chips.forEach(function(x){ x.setAttribute('aria-pressed',String(state.asg===x.dataset.v)); });
+    save(); renderShifts(); renderSites(); refresh(); }); });
 
 
-  // ---- Pricing ----
+  // ---- Schedule + Pricing ----
   var RATES={standard:45,mobile:55,event:45};
   var TAX={nyc:0.08875,nj:null,exempt:0};
   var TYPE_LABEL={standard:'Standard unarmed',mobile:'Mobile / patrol',event:'Event security'};
+  var DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  function mode(){ var a=state.asg||''; return (a==='Ongoing'||a==='Multi-week')?'long':(a==='Temporary'||a==='Event')?'short':''; }
   function P(){ if(!state.pricing) state.pricing={tax:'nyc',sites:[]}; if(!state.pricing.sites.length) state.pricing.sites.push(newSite()); return state.pricing; }
-  function newSite(){ return {name:'',type:'standard',rate:45,officers:1,hours:'',nights:1,min:6,tStart:'',tEnd:''}; }
+  function newSite(){ var t='standard', st=state.svcType||''; if(/Patrol/.test(st)) t='mobile'; else if(/Event/.test(st)) t='event'; return {name:'',type:t,rate:RATES[t],officers:1,min:6,tStart:'',tEnd:'',dStart:'',dEnd:'',days:[]}; }
   function hoursBetween(a,b){ if(!a||!b) return null; var m=function(t){var p=t.split(':');return (+p[0])*60+(+p[1]);}; var d=m(b)-m(a); if(d<=0) d+=1440; return Math.round(d/60*4)/4; }
   function num(x,d){ var n=parseFloat(x); return isNaN(n)?d:n; }
   function money(n){ return '$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+  function hoursOf(s){ return hoursBetween(s.tStart,s.tEnd)||0; }
+  function shiftsOf(s){
+    if(mode()==='long') return (s.days||[]).length;
+    if(s.dStart&&s.dEnd){ var a=new Date(s.dStart+'T12:00'), b=new Date(s.dEnd+'T12:00'); var d=Math.round((b-a)/864e5)+1; return d>0?d:1; }
+    return 1;
+  }
+  function shiftWord(){ return mode()==='long'?'shift(s)/week':'shift(s)'; }
   function calcSite(s){
-    var hours=num(s.hours,0), min=num(s.min,0), billed=Math.max(hours,min);
-    var sub=billed*num(s.rate,0)*num(s.officers,0)*Math.max(num(s.nights,1),0);
-    return {billed:billed,sub:sub,hours:hours,min:min};
+    var hours=hoursOf(s), min=num(s.min,0), billed=Math.max(hours,min), n=shiftsOf(s);
+    return {billed:billed,hours:hours,min:min,n:n,sub:billed*num(s.rate,0)*num(s.officers,0)*n};
   }
   function calcAll(){
     var p=P(), sub=0; p.sites.forEach(function(s){ sub+=calcSite(s).sub; });
     var rate=TAX[p.tax], tax=rate===null?null:sub*rate;
     return {sub:sub,rate:rate,tax:tax,total:tax===null?null:sub+tax};
   }
-  function renderSites(){
-    var p=P(), box=document.getElementById('sites'); box.innerHTML='';
+  function fmtD(d){ if(!d) return ''; var x=new Date(d+'T12:00'); return isNaN(x)?d:x.toLocaleDateString('en-US',{month:'short',day:'numeric'}); }
+  function fmtT(t){ if(!t) return 'TBD'; var p=t.split(':'), h=+p[0], ap=h>=12?'PM':'AM'; h=h%12||12; return h+':'+p[1]+' '+ap; }
+  function schedText(s){
+    var when = mode()==='long' ? ((s.days||[]).length?s.days.join('/'):'days TBD') : (s.dStart?(fmtD(s.dStart)+(s.dEnd&&s.dEnd!==s.dStart?'–'+fmtD(s.dEnd):'')):'date TBD');
+    return when+' '+fmtT(s.tStart)+'–'+fmtT(s.tEnd);
+  }
+  // Step 1: schedule rows
+  function renderShifts(){
+    var p=P(), m=mode(), box=document.getElementById('shifts'); box.innerHTML='';
+    document.getElementById('shiftHint').textContent = m==='long' ? 'Recurring: pick the days of the week each guard works, plus start/end times. Pricing is per week.' : m==='short' ? 'One-off: pick the date range and start/end times per guard. Each day in the range is one shift.' : 'Pick an assignment type above: Temporary/Event gives date ranges, Ongoing/Multi-week gives days of the week.';
     p.sites.forEach(function(s,i){
-      var c=calcSite(s), el=document.createElement('div'); el.className='site'; el.dataset.i=i;
+      var el=document.createElement('div'); el.className='site'; el.dataset.i=i;
+      var when = m==='long'
+        ? '<div class="f full"><label>Start date</label><input type="date" data-k="dStart"></div><div class="f full"><label>Days of week</label><div class="days">'+DAYS.map(function(d){return '<button type="button" class="chip" data-day="'+d+'" aria-pressed="'+String((s.days||[]).indexOf(d)>=0)+'">'+d+'</button>'}).join('')+'</div></div>'
+        : '<div class="f"><label>Start date</label><input type="date" data-k="dStart"></div><div class="f"><label>End date</label><input type="date" data-k="dEnd"></div>';
       el.innerHTML=
-        '<div class="head"><input type="text" data-k="name" placeholder="Shift/guard '+(i+1)+' (post / site)" value=""><button data-rm="1"'+(p.sites.length<2?' disabled':'')+'>Remove</button></div>'+
-        '<div class="grid">'+
+        '<div class="head"><input type="text" data-k="name" placeholder="Shift/guard '+(i+1)+' (post / site)"><button data-rm="1"'+(p.sites.length<2?' disabled':'')+'>Remove</button></div>'+
+        '<div class="grid p4">'+
         '<div class="f"><label>Service</label><select data-k="type"><option value="standard">Standard unarmed</option><option value="mobile">Mobile / patrol</option><option value="event">Event security</option></select></div>'+
-        '<div class="f"><label>Rate $/hr</label><input type="number" data-k="rate" step="0.5" min="0"></div>'+
         '<div class="f"><label>Officers</label><input type="number" data-k="officers" step="1" min="0"></div>'+
         '<div class="f"><label>Start time</label><input type="time" data-k="tStart"></div>'+
         '<div class="f"><label>End time</label><input type="time" data-k="tEnd"></div>'+
-        '<div class="f"><label>Hours / shift</label><input type="number" data-k="hours" step="0.5" min="0" placeholder="actual"></div>'+
-        '<div class="f"><label>Shifts / nights</label><input type="number" data-k="nights" step="1" min="1"></div>'+
-        '<div class="f"><label>Minimum hrs</label><input type="number" data-k="min" step="1" min="0"></div>'+
-        '</div><div class="sub"></div>';
+        when+'</div><div class="sub"></div>';
       el.querySelector('[data-k=name]').value=s.name||'';
       el.querySelector('[data-k=type]').value=s.type;
-      ['rate','officers','hours','nights','min','tStart','tEnd'].forEach(function(k){ el.querySelector('[data-k='+k+']').value=s[k]; });
-      el.querySelector('.sub').innerHTML=subLine(s);
+      ['officers','tStart','tEnd','dStart','dEnd'].forEach(function(k){ var q=el.querySelector('[data-k='+k+']'); if(q) q.value=s[k]||''; });
+      el.querySelector('.sub').innerHTML=shiftLine(s);
+      box.appendChild(el);
+    });
+  }
+  function shiftLine(s){ var c=calcSite(s); return '<b>'+c.hours+' hrs</b>/shift × <b>'+c.n+'</b> '+shiftWord()+' × '+num(s.officers,0)+' officer(s)'+(c.hours===0?' — set start/end time':''); }
+  // Step 3: pricing rows
+  function renderSites(){
+    var p=P(), box=document.getElementById('sites'); box.innerHTML='';
+    p.sites.forEach(function(s,i){
+      var el=document.createElement('div'); el.className='site'; el.dataset.i=i;
+      el.innerHTML=
+        '<div class="head"><span class="ro" style="flex:1">'+(s.name||('Shift/guard '+(i+1)))+' · '+TYPE_LABEL[s.type]+' · '+schedText(s)+'</span></div>'+
+        '<div class="grid p4">'+
+        '<div class="f"><label>Rate $/hr</label><input type="number" data-k="rate" step="0.5" min="0"></div>'+
+        '<div class="f"><label>Minimum hrs</label><input type="number" data-k="min" step="1" min="0"></div>'+
+        '<div class="f"><label>Officers</label><div class="ro" data-ro="officers"></div></div>'+
+        '<div class="f"><label>'+(mode()==='long'?'Shifts / week':'Shifts')+'</label><div class="ro" data-ro="n"></div></div>'+
+        '</div><div class="sub"></div>';
+      el.querySelector('[data-k=rate]').value=s.rate; el.querySelector('[data-k=min]').value=s.min;
       box.appendChild(el);
     });
     updateTotals();
   }
-  function subLine(s){ var c=calcSite(s); return 'Billed <b>'+c.billed+' hrs</b>/officer'+(c.hours<c.min&&c.hours>0?' (min applied)':'')+' × '+money(num(s.rate,0))+' × '+num(s.officers,0)+' officer(s) × '+num(s.nights,1)+' shift(s) = <b>'+money(c.sub)+'</b>'; }
+  function subLine(s){ var c=calcSite(s); return 'Billed <b>'+c.billed+' hrs</b>/officer'+(c.hours<c.min&&c.hours>0?' (min applied)':'')+' × '+money(num(s.rate,0))+' × '+num(s.officers,0)+' officer(s) × '+c.n+' '+shiftWord()+' = <b>'+money(c.sub)+'</b>'; }
   function updateTotals(){
-    var p=P();
-    [].slice.call(document.querySelectorAll('#sites .site')).forEach(function(el){ var s=p.sites[+el.dataset.i]; if(s) el.querySelector('.sub').innerHTML=subLine(s); });
+    var p=P(), weekly=mode()==='long';
+    [].slice.call(document.querySelectorAll('#sites .site')).forEach(function(el){ var s=p.sites[+el.dataset.i]; if(!s) return; var c=calcSite(s); el.querySelector('.sub').innerHTML=subLine(s); el.querySelector('[data-ro=officers]').textContent=num(s.officers,0); el.querySelector('[data-ro=n]').textContent=c.n; });
+    [].slice.call(document.querySelectorAll('#shifts .site')).forEach(function(el){ var s=p.sites[+el.dataset.i]; if(s) el.querySelector('.sub').innerHTML=shiftLine(s); });
     var t=calcAll(), tot=document.getElementById('totals'), lab=p.tax==='nyc'?'Tax (NYC 8.875%)':p.tax==='nj'?'Tax (NJ / out-of-state)':'Tax (non-taxable)';
-    tot.innerHTML='<span class="k">Subtotal</span><span class="v">'+money(t.sub)+'</span>'+
+    tot.innerHTML='<span class="k">Subtotal'+(weekly?' / week':'')+'</span><span class="v">'+money(t.sub)+'</span>'+
       '<span class="k">'+lab+'</span><span class="v">'+(t.tax===null?'TBD':money(t.tax))+'</span>'+
-      '<span class="k big">Total</span><span class="v big">'+(t.total===null?money(t.sub)+' + tax TBD':money(t.total))+'</span>';
+      '<span class="k big">Total'+(weekly?' / week':'')+'</span><span class="v big">'+(t.total===null?money(t.sub)+' + tax TBD':money(t.total))+'</span>';
     document.getElementById('taxNote').textContent=p.tax==='nj'?'NJ / out-of-state tax rate is TBD — do not assume NYC tax. Quote subtotal and confirm tax before sending.':'';
     [].slice.call(document.querySelectorAll('#taxChips .chip')).forEach(function(c){ c.setAttribute('aria-pressed',String(c.dataset.v===p.tax)); });
   }
-  document.getElementById('sites').addEventListener('input',function(e){
-    var el=e.target, k=el.dataset.k; if(!k) return; var site=el.closest('.site'), s=P().sites[+site.dataset.i];
-    if(k==='type'){ s.type=el.value; s.rate=RATES[el.value]; site.querySelector('[data-k=rate]').value=s.rate; }
+  document.getElementById('shifts').addEventListener('input',function(e){
+    var el=e.target, k=el.dataset.k; if(!k) return; var s=P().sites[+el.closest('.site').dataset.i];
+    if(k==='type'){ s.type=el.value; s.rate=RATES[el.value]; }
     else { s[k]=el.value; }
-    if(k==='tStart'||k==='tEnd'){ var h=hoursBetween(s.tStart,s.tEnd); if(h!==null){ s.hours=h; site.querySelector('[data-k=hours]').value=h; } }
-    save(); updateTotals(); refresh();
+    if(k==='dStart'&&mode()==='short'&&(!s.dEnd||s.dEnd<s.dStart)){ s.dEnd=s.dStart; var q=el.closest('.site').querySelector('[data-k=dEnd]'); if(q) q.value=s.dEnd; }
+    save(); renderSites(); updateTotals(); refresh();
   });
-  document.getElementById('sites').addEventListener('click',function(e){
-    if(!e.target.dataset.rm) return; var i=+e.target.closest('.site').dataset.i; P().sites.splice(i,1); save(); renderSites(); refresh();
+  document.getElementById('shifts').addEventListener('click',function(e){
+    var b=e.target.closest('button'); if(!b) return; var site=b.closest('.site'); if(!site) return; var i=+site.dataset.i, p=P();
+    if(b.dataset.rm){ p.sites.splice(i,1); save(); renderShifts(); renderSites(); refresh(); return; }
+    if(b.dataset.day){ var s=p.sites[i]; s.days=s.days||[]; var j=s.days.indexOf(b.dataset.day); if(j>=0) s.days.splice(j,1); else s.days.push(b.dataset.day); s.days.sort(function(x,y){return DAYS.indexOf(x)-DAYS.indexOf(y)}); b.setAttribute('aria-pressed',String(j<0)); save(); renderSites(); updateTotals(); refresh(); }
   });
-  document.getElementById('addSite').addEventListener('click',function(){ P().sites.push(newSite()); save(); renderSites(); refresh(); });
-  [].slice.call(document.querySelectorAll('#taxChips .chip')).forEach(function(c){ c.addEventListener('click',function(){ P().tax=c.dataset.v; save(); renderSites(); refresh(); }); });
+  document.getElementById('addShift').addEventListener('click',function(){ P().sites.push(newSite()); save(); renderShifts(); renderSites(); refresh(); });
+  document.getElementById('sites').addEventListener('input',function(e){
+    var el=e.target, k=el.dataset.k; if(!k) return; var s=P().sites[+el.closest('.site').dataset.i]; s[k]=el.value; save(); updateTotals(); refresh();
+  });
+  [].slice.call(document.querySelectorAll('#taxChips .chip')).forEach(function(c){ c.addEventListener('click',function(){ P().tax=c.dataset.v; save(); updateTotals(); refresh(); }); });
   function pricingLines(){
-    var p=P(), t=calcAll(), out=['3. PRICING'];
+    var p=P(), t=calcAll(), weekly=mode()==='long', out=['3. PRICING'+(weekly?' (per week)':'')];
     p.sites.forEach(function(s,i){ var c=calcSite(s);
-      out.push((s.name||('Shift/guard '+(i+1)))+': '+TYPE_LABEL[s.type]+' @ '+money(num(s.rate,0))+'/hr × '+num(s.officers,0)+' officer(s) × '+c.billed+' billed hrs'+(c.hours<c.min&&c.hours>0?' (min '+c.min+')':'')+' × '+num(s.nights,1)+' shift(s) = '+money(c.sub)); });
+      out.push((s.name||('Shift/guard '+(i+1)))+': '+TYPE_LABEL[s.type]+' @ '+money(num(s.rate,0))+'/hr × '+num(s.officers,0)+' officer(s) × '+c.billed+' billed hrs'+(c.hours<c.min&&c.hours>0?' (min '+c.min+')':'')+' × '+c.n+' '+shiftWord()+' = '+money(c.sub)); });
     out.push('Subtotal: '+money(t.sub));
     out.push('Tax: '+(p.tax==='nyc'?'NYC 8.875% = '+money(t.tax):p.tax==='nj'?'NJ / out-of-state — TBD':'Non-taxable org — $0.00'));
-    out.push('Total: '+(t.total===null?money(t.sub)+' + tax TBD':money(t.total)));
+    out.push('Total'+(weekly?' / week':'')+': '+(t.total===null?money(t.sub)+' + tax TBD':money(t.total)));
     return out;
   }
-
 
   // ---- Generated outputs (email + CMS prompt) ----
   var dirtyOut=false;
@@ -362,7 +404,7 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
   function dParts(){
     var a=state.svcStart?new Date(state.svcStart):null, b=state.svcEnd?new Date(state.svcEnd):null;
     var ok=function(d){return d&&!isNaN(d)};
-    var date=ok(a)?a.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):(state.startDate||'TBD');
+    var g=P().sites[0]||{}; var date=ok(a)?a.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):(g.dStart||'TBD');
     var t=function(d){return d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})};
     var hrs=(ok(a)&&ok(b)&&b>a)?Math.round((b-a)/36e5*4)/4:null;
     return {date:date,start:ok(a)?t(a):'TBD',end:ok(b)?t(b):'TBD',hrs:hrs===null?'TBD':hrs};
@@ -370,7 +412,7 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
   function taxLabel(){ var p=P(); return p.tax==='nyc'?'NYC Sales Tax (8.875%)':p.tax==='nj'?'NJ / Out-of-State Sales Tax':'Sales Tax (non-taxable org)'; }
   function coverageLines(){
     return P().sites.map(function(s){ var c=calcSite(s), minApplied=c.hours<c.min&&c.hours>0;
-      return num(s.officers,0)+' x '+TYPE_LABEL[s.type]+' @ $'+money2(num(s.rate,0))+'/hr (min '+c.min+' hrs; billing '+c.billed+' hrs'+(minApplied?', minimum applied':'')+(num(s.nights,1)>1?', x '+num(s.nights,1)+' shifts':'')+')'+(s.name?' – '+s.name:''); });
+      return num(s.officers,0)+' x '+TYPE_LABEL[s.type]+' @ $'+money2(num(s.rate,0))+'/hr (min '+c.min+' hrs; billing '+c.billed+' hrs'+(minApplied?', minimum applied':'')+(c.n>1||mode()==='long'?', x '+c.n+' '+shiftWord():'')+')'+(s.name?' – '+s.name:''); });
   }
   function emailBody(){
     var t=calcAll(), d=dParts(), cov=coverageLines();
@@ -378,7 +420,7 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
       'New lead – '+tbd('leadName')+' / '+tbd('contactName'),
       'Contact: '+tbd('leadPhone')+' | '+tbd('leadEmail'),
       'Event: '+tbd('svcType')+' – '+tbd('addr'),
-      'Date/Time: '+d.date+', '+d.start+' to '+d.end+' ('+d.hrs+' hrs)',
+      'Date/Time: '+(mode()==='long' ? ('Starting '+d.date+', '+(((P().sites[0]||{}).days||[]).join('/')||'days TBD')+', '+fmtT((P().sites[0]||{}).tStart)+' to '+fmtT((P().sites[0]||{}).tEnd)+' ('+hoursOf(P().sites[0]||{})+' hrs/shift, weekly)') : (d.date+', '+d.start+' to '+d.end+' ('+d.hrs+' hrs)')),
       'Coverage: '+(cov.length?cov.join('; '):'TBD'),
       'Subtotal: $'+money2(t.sub),
       taxLabel()+': '+(t.tax===null?'TBD':'$'+money2(t.tax)),
@@ -394,11 +436,11 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
     return 'mailto:sales@securityusainc.com?cc=yk@securityusainc.com&subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(document.getElementById('emailOut').value);
   }
   var SVC_MAP={standard:'Unarmed Security Guards',mobile:'Patrol Service',event:'Event Security Guards'};
-  function autoSvc(){ var seen={}; return P().sites.map(function(s){return SVC_MAP[s.type]}).filter(function(x){ if(seen[x]) return false; seen[x]=1; return true; }).join(', ')||'TBD'; }
+  function autoSvc(){ var st=(state.svcType||'').trim(); if(st&&st!=='Other') return st; var seen={}; return P().sites.map(function(s){return SVC_MAP[s.type]}).filter(function(x){ if(seen[x]) return false; seen[x]=1; return true; }).join(', ')||'TBD'; }
   function cmsPrompt(){
     var t=calcAll(), p=P(), svc=(state.svcChecks||'').trim()||autoSvc();
-    var quote=p.sites.map(function(s){ var c=calcSite(s); return num(s.officers,0)+' x '+TYPE_LABEL[s.type]+' @ $'+money2(num(s.rate,0))+'/hr, '+c.billed+' hrs'+(num(s.nights,1)>1?' x '+num(s.nights,1)+' shifts':''); }).join('; ');
-    var notes=(state.notes||'').trim(); notes=(notes?notes+' ':'')+'Quote: '+quote+', subtotal $'+money2(t.sub)+', tax '+(t.tax===null?'TBD':'$'+money2(t.tax))+', total '+(t.total===null?'TBD':'$'+money2(t.total))+'. Payment terms: '+((state.payTerms||'').trim()||'Prepaid before service date')+'.';
+    var quote=p.sites.map(function(s){ var c=calcSite(s); return num(s.officers,0)+' x '+TYPE_LABEL[s.type]+' @ $'+money2(num(s.rate,0))+'/hr, '+c.billed+' hrs x '+c.n+' '+shiftWord()+' ('+schedText(s)+')'; }).join('; ');
+    var notes=(state.notes||'').trim(); notes=(notes?notes+' ':'')+'Quote: '+quote+', subtotal $'+money2(t.sub)+', tax '+(t.tax===null?'TBD':'$'+money2(t.tax))+', total '+(t.total===null?'TBD':'$'+money2(t.total))+(mode()==='long'?' per week':'')+'. Payment terms: '+((state.payTerms||'').trim()||'Prepaid before service date')+'.';
     var rep=(state.repActions||'').trim()||'Reached out to potential client for a briefing of the service needed and agreed to look over the service agreement. I will follow up once the contract is signed and payment is received.';
     return ['Please fill in this sales lead form with the following information:','',
       'Contact Name: '+tbd('contactName'),
@@ -438,14 +480,12 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
       '',
       '1. ASSIGNMENT',
       'Service type: '+v('svcType'),
-      'Officers needed: '+v('numOfficers'),
+      'Assignment type: '+(state.asg||'—'),
       'Duties: '+v('duties'),
-      'Days/hours: '+v('daysHours'),
-      'Assignment type: '+((state.asg||[]).join(', ')||'—'),
+      'Schedule: '+P().sites.map(function(s,i){return (s.name||('Shift/guard '+(i+1)))+' – '+num(s.officers,0)+' officer(s), '+schedText(s)}).join('; '),
       '',
       '2. SCOPE',
       'Site/property type: '+v('siteType'),
-      'Start date: '+v('startDate'),
       'Responsibilities: '+v('resp'),
       'Special instructions: '+v('special'),
       ''].concat(pricingLines()).concat([
