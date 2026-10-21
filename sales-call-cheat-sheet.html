@@ -131,7 +131,6 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
     <div class="f"><label for="siteType">Site / property type</label><input type="text" id="siteType"></div>
     <div class="f"><label for="startDate">Start date</label><input type="date" id="startDate"></div>
     <div class="f full"><label for="resp">Officer responsibilities (confirmed)</label><textarea id="resp"></textarea></div>
-    <div class="f full"><label for="sched">Schedule expectations</label><input type="text" id="sched"></div>
     <div class="f full"><label for="special">Special instructions or concerns</label><textarea id="special"></textarea></div>
   </div>
 </section>
@@ -168,7 +167,7 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
 
 <section class="step">
   <h2><span class="n">5</span>Client information (for the service agreement)</h2>
-  <p class="hint">Email the client to confirm all of this.</p>
+  <p class="hint">Auto-filled from the steps above. Anything you type here stays as typed and doesn't change the rest of the page.</p>
   <div class="grid">
     <div class="f full"><label for="clientName">Client name</label><input type="text" id="clientName"></div>
     <div class="f"><label for="svcStart">Start date &amp; time</label><input type="datetime-local" id="svcStart"></div>
@@ -179,19 +178,12 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
     <div class="f full"><label for="addr">Service address</label><input type="text" id="addr"></div>
     <div class="f full"><label for="scope">Scope of services &amp; instructions</label><textarea id="scope"></textarea></div>
   </div>
+  <div class="bar" style="margin-top:10px"><button id="reset5">Re-sync from steps above</button><span class="toast" id="toast5"></span></div>
 </section>
 
 <section class="step">
-  <h2><span class="n">6</span>CMS entry</h2>
-  <div class="checks">
-    <label><input type="checkbox" id="cms"> Sales information entered into CMS</label>
-  </div>
-  <p class="hint" style="margin-top:8px">Login details: TBD</p>
-</section>
-
-<section class="step">
-  <h2><span class="n">7</span>Email to sales</h2>
-  <p class="hint">Built from everything above. Edit the text if needed, then copy or open in your mail app (to sales@securityusainc.com, cc yk@securityusainc.com).</p>
+  <h2><span class="n">6</span>Email to sales</h2>
+  <p class="hint">Built live from everything above. Copy it or open in your mail app (to sales@securityusainc.com, cc yk@securityusainc.com).</p>
   <div class="grid">
     <div class="f"><label for="payTerms">Payment terms</label><input type="text" id="payTerms" placeholder="Prepaid before service date"></div>
     <div class="f"><label for="leadStatus">Status</label><input type="text" id="leadStatus" placeholder="Quote sent / awaiting agreement"></div>
@@ -199,31 +191,29 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
   </div>
   <div class="out">
     <label for="emailOut">Email body</label>
-    <textarea id="emailOut" rows="16" spellcheck="false"></textarea>
+    <textarea id="emailOut" rows="16" spellcheck="false" readonly></textarea>
     <div class="bar" style="margin-top:8px">
       <button class="primary" id="copyEmail">Copy email</button>
       <a class="btn" id="mailto" href="#" target="_blank" rel="noopener">Open in mail app</a>
-      <button id="regenEmail">Rebuild from form</button>
       <span class="toast" id="emailToast"></span>
     </div>
   </div>
 </section>
 
 <section class="step">
-  <h2><span class="n">8</span>CMS entry prompt (Claude in Chrome)</h2>
+  <h2><span class="n">7</span>CMS entry prompt (Claude in Chrome)</h2>
   <p class="hint">Paste this into Claude in Chrome on https://www.securityusacms.com/clients/new. It stops before Save Client.</p>
   <div class="grid">
     <div class="f"><label for="leadSource">How did client hear about us?</label>
       <select id="leadSource"><option value="">leave blank</option><option>Google</option><option>Repeat Client</option><option>Referral</option><option>LinkedIn</option><option>Other</option></select></div>
-    <div class="f"><label for="svcChecks">Services interested in (override)</label><input type="text" id="svcChecks" placeholder="auto from calculator"></div>
+    <div class="f"><label for="svcChecks">Services interested in (auto from calculator — type to override)</label><input type="text" id="svcChecks" placeholder="auto from calculator"></div>
     <div class="f full"><label for="repActions">Sales rep actions</label><textarea id="repActions" placeholder="Default text used if left blank"></textarea></div>
   </div>
   <div class="out">
     <label for="cmsOut">CMS prompt</label>
-    <textarea id="cmsOut" rows="22" spellcheck="false"></textarea>
+    <textarea id="cmsOut" rows="22" spellcheck="false" readonly></textarea>
     <div class="bar" style="margin-top:8px">
       <button class="primary" id="copyCms">Copy prompt</button>
-      <button id="regenCms">Rebuild from form</button>
       <span class="toast" id="cmsToast"></span>
     </div>
   </div>
@@ -250,7 +240,17 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
     if(!document.getElementById('callDate').value){ document.getElementById('callDate').value=new Date().toISOString().slice(0,10); state.callDate=document.getElementById('callDate').value; }
     renderSites(); refresh();
   }
+  function autofill5(){
+    var t=state.touched5||{}, src={};
+    src.clientName=state.leadName||''; src.ocName=state.contactName||''; src.ocCell=state.leadPhone||''; src.ocEmail=state.leadEmail||'';
+    var g=(state.pricing&&state.pricing.sites&&state.pricing.sites[0])||{}, d=state.startDate||'';
+    src.svcStart=(d&&g.tStart)?d+'T'+g.tStart:'';
+    if(d&&g.tStart&&g.tEnd){ var ed=d; if(g.tEnd<=g.tStart){ var x=new Date(d+'T12:00'); x.setDate(x.getDate()+1); ed=x.toISOString().slice(0,10); } src.svcEnd=ed+'T'+g.tEnd; } else src.svcEnd='';
+    var sc=(state.resp||'').trim()||(state.duties||'').trim(); if((state.special||'').trim()) sc+=(sc?'\n':'')+'Instructions: '+state.special.trim(); src.scope=sc;
+    Object.keys(src).forEach(function(id){ if(t[id]) return; if((state[id]||'')!==src[id]){ state[id]=src[id]; var el=document.getElementById(id); if(el&&document.activeElement!==el) el.value=src[id]; } });
+  }
   function refresh(){
+    autofill5(); save();
     if(typeof renderOut==='function') renderOut(false);
     var total=fields.length+1, n=0;
     fields.forEach(function(f){ if(f.type==='checkbox'?f.checked:f.value.trim()) n++; });
@@ -267,7 +267,9 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
     var miss=[]; if(!state.shelter) miss.push('shelter'); if(!state.bathroom) miss.push('bathroom');
     document.getElementById('siteReq').textContent= state.notVerified ? 'Site conditions not verified — verification required before proceeding.' : (miss.length && state.verified ? 'Verified but '+miss.join(' and ')+' not confirmed — cannot proceed.' : '');
   }
+  var STEP5=['clientName','svcStart','svcEnd','ocName','ocCell','ocEmail','scope'];
   fields.forEach(function(f){ f.addEventListener('input',function(){ state[f.id]=f.type==='checkbox'?f.checked:f.value; dirtyOut=false;
+    if(STEP5.indexOf(f.id)>=0){ state.touched5=state.touched5||{}; state.touched5[f.id]=true; }
     if(f.id==='verified'&&f.checked){ state.notVerified=false; document.getElementById('notVerified').checked=false; }
     if(f.id==='notVerified'&&f.checked){ state.verified=false; document.getElementById('verified').checked=false; }
     save(); refresh(); }); });
@@ -392,9 +394,9 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
     return 'mailto:sales@securityusainc.com?cc=yk@securityusainc.com&subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(document.getElementById('emailOut').value);
   }
   var SVC_MAP={standard:'Unarmed Security Guards',mobile:'Patrol Service',event:'Event Security Guards'};
+  function autoSvc(){ var seen={}; return P().sites.map(function(s){return SVC_MAP[s.type]}).filter(function(x){ if(seen[x]) return false; seen[x]=1; return true; }).join(', ')||'TBD'; }
   function cmsPrompt(){
-    var t=calcAll(), p=P(), svc=(state.svcChecks||'').trim();
-    if(!svc){ var seen={}; svc=p.sites.map(function(s){return SVC_MAP[s.type]}).filter(function(x){ if(seen[x]) return false; seen[x]=1; return true; }).join(', ')||'TBD'; }
+    var t=calcAll(), p=P(), svc=(state.svcChecks||'').trim()||autoSvc();
     var quote=p.sites.map(function(s){ var c=calcSite(s); return num(s.officers,0)+' x '+TYPE_LABEL[s.type]+' @ $'+money2(num(s.rate,0))+'/hr, '+c.billed+' hrs'+(num(s.nights,1)>1?' x '+num(s.nights,1)+' shifts':''); }).join('; ');
     var notes=(state.notes||'').trim(); notes=(notes?notes+' ':'')+'Quote: '+quote+', subtotal $'+money2(t.sub)+', tax '+(t.tax===null?'TBD':'$'+money2(t.tax))+', total '+(t.total===null?'TBD':'$'+money2(t.total))+'. Payment terms: '+((state.payTerms||'').trim()||'Prepaid before service date')+'.';
     var rep=(state.repActions||'').trim()||'Reached out to potential client for a briefing of the service needed and agreed to look over the service agreement. I will follow up once the contract is signed and payment is received.';
@@ -415,13 +417,10 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
   }
   function renderOut(force){
     var e=document.getElementById('emailOut'), c=document.getElementById('cmsOut');
-    if(force||!dirtyOut){ e.value=emailBody(); c.value=cmsPrompt(); }
+    e.value=emailBody(); c.value=cmsPrompt();
     document.getElementById('mailto').href=mailtoHref();
+    document.getElementById('svcChecks').placeholder='Auto: '+autoSvc();
   }
-  document.getElementById('emailOut').addEventListener('input',function(){ dirtyOut=true; document.getElementById('mailto').href=mailtoHref(); });
-  document.getElementById('cmsOut').addEventListener('input',function(){ dirtyOut=true; });
-  document.getElementById('regenEmail').addEventListener('click',function(){ dirtyOut=false; renderOut(true); });
-  document.getElementById('regenCms').addEventListener('click',function(){ dirtyOut=false; renderOut(true); });
   function copyText(text,toastId){
     var toast=document.getElementById(toastId);
     function done(ok){ toast.textContent=ok?'Copied.':'Copy blocked — select the text and copy it.'; setTimeout(function(){toast.textContent=''},3000); }
@@ -448,7 +447,6 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
       'Site/property type: '+v('siteType'),
       'Start date: '+v('startDate'),
       'Responsibilities: '+v('resp'),
-      'Schedule expectations: '+v('sched'),
       'Special instructions: '+v('special'),
       ''].concat(pricingLines()).concat([
       '',
@@ -460,9 +458,7 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
       'End: '+fmtDT(state.svcEnd),
       'On-site contact: '+v('ocName')+' · '+v('ocEmail')+' · '+v('ocCell'),
       'Service address: '+v('addr'),
-      'Scope & instructions: '+v('scope'),
-      '',
-      '6. CMS  '+ck('cms')+' entered'
+      'Scope & instructions: '+v('scope')
     ]).join('\n');
   }
   function copy(){
@@ -470,6 +466,7 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
     function done(ok){ toast.textContent=ok?'Summary copied.':'Copy blocked — summary shown below; select and copy it.'; if(!ok){ var ta=document.createElement('textarea'); ta.value=t; ta.style.width='100%'; ta.rows=20; toast.parentNode.appendChild(ta); ta.select(); } setTimeout(function(){toast.textContent=''},3000); }
     try{ navigator.clipboard.writeText(t).then(function(){done(true)},function(){done(false)}); }catch(e){done(false)}
   }
+  document.getElementById('reset5').addEventListener('click',function(){ state.touched5={}; STEP5.forEach(function(id){ state[id]=''; }); refresh(); STEP5.forEach(function(id){ document.getElementById(id).value=state[id]||''; }); var t=document.getElementById('toast5'); t.textContent='Re-synced.'; setTimeout(function(){t.textContent=''},2000); });
   document.getElementById('copyBtn').addEventListener('click',copy);
   document.getElementById('copyBtn2').addEventListener('click',copy);
 
