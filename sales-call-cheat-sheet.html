@@ -173,7 +173,6 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
   <div class="checks">
     <label><input type="checkbox" id="shelter"> Officers have access to shelter</label>
     <label><input type="checkbox" id="bathroom"> Officers have bathroom access</label>
-    <label><input type="checkbox" id="verified"> Site conditions verified</label>
     <label><input type="checkbox" id="notVerified"> Site conditions not verified</label>
     <label><input type="checkbox" id="alcohol"> Alcohol will be served or present on premises</label>
   </div>
@@ -296,15 +295,12 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
     if(m==='long'){ d.classList.add('full'); d.textContent='Long-term / multi-week → follow full protocol.'; }
     else if(m==='short'){ d.classList.add('go'); d.textContent='Event / temporary → move forward.'; }
     else d.textContent='Pick an assignment type → Event/Temporary moves forward; Long-term/multi-week follows full protocol.';
-    var miss=[]; if(!state.shelter) miss.push('shelter'); if(!state.bathroom) miss.push('bathroom');
-    document.getElementById('siteReq').textContent= state.notVerified ? 'Site conditions not verified — verification required before proceeding.' : (miss.length && state.verified ? 'Verified but '+miss.join(' and ')+' not confirmed — cannot proceed.' : '');
+    document.getElementById('siteReq').textContent= state.notVerified ? 'Site conditions not verified — verification required before proceeding.' : '';
   }
   var STEP5=['clientName','svcStart','svcEnd','ocName','ocCell','ocEmail','scope'];
   fields.forEach(function(f){ f.addEventListener('input',function(){ state[f.id]=f.type==='checkbox'?f.checked:f.value; dirtyOut=false;
     if(STEP5.indexOf(f.id)>=0){ state.touched5=state.touched5||{}; state.touched5[f.id]=true; }
     if(f.id==='svcType'){ var g0=P().sites[0]; var mm=/Patrol/.test(f.value)?'mobile':/Event/.test(f.value)?'event':'standard'; g0.type=mm; g0.rate=RATES[mm]; renderShifts(); renderSites(); }
-    if(f.id==='verified'&&f.checked){ state.notVerified=false; document.getElementById('notVerified').checked=false; }
-    if(f.id==='notVerified'&&f.checked){ state.verified=false; document.getElementById('verified').checked=false; }
     save(); refresh(); }); });
   chips.forEach(function(c){ c.addEventListener('click',function(){
     state.asg=(state.asg===c.dataset.v)?'':c.dataset.v;
@@ -442,7 +438,7 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
     var hrs=(ok(a)&&ok(b)&&b>a)?Math.round((b-a)/36e5*4)/4:null;
     return {date:date,start:ok(a)?t(a):'TBD',end:ok(b)?t(b):'TBD',hrs:hrs===null?'TBD':hrs};
   }
-  function siteCondText(){ var a=[]; a.push('shelter '+(state.shelter?'yes':'TBD')); a.push('bathroom '+(state.bathroom?'yes':'TBD')); a.push(state.verified?'verified':state.notVerified?'NOT verified':'verification TBD'); a.push('alcohol on premises: '+(state.alcohol?'YES':'no')); return a.join('; '); }
+  function siteCondText(){ var a=[]; a.push('shelter '+(state.shelter?'yes':'TBD')); a.push('bathroom '+(state.bathroom?'yes':'TBD')); if(state.notVerified) a.push('NOT verified'); a.push('alcohol on premises: '+(state.alcohol?'YES':'no')); return a.join('; '); }
   function taxLabel(){ var p=P(); return p.tax==='nyc'?'NYC Sales Tax (8.875%)':p.tax==='nj'?'NJ / Out-of-State Sales Tax':'Sales Tax (non-taxable org)'; }
   function coverageLines(){
     return P().sites.map(function(s,i){ var c=calcSite(s), minApplied=c.hours<c.min&&c.hours>0;
@@ -536,7 +532,7 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
       'Special instructions: '+v('special'),
       ''].concat(pricingLines()).concat([
       '',
-      '4. SITE CONDITIONS  '+ck('shelter')+' shelter  '+ck('bathroom')+' bathroom  '+ck('verified')+' verified  '+ck('notVerified')+' NOT verified  '+ck('alcohol')+' alcohol on premises',
+      '4. SITE CONDITIONS  '+ck('shelter')+' shelter  '+ck('bathroom')+' bathroom  '+ck('notVerified')+' NOT verified  '+ck('alcohol')+' alcohol on premises',
       '',
       '5. CLIENT INFO (service agreement)',
       'Client name: '+v('clientName'),
