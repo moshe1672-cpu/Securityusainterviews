@@ -33,7 +33,7 @@ header.top .sub{font-size:12px;color:var(--muted);font-family:var(--mono)}
 button{font:inherit;cursor:pointer;border-radius:6px;border:1px solid var(--line);background:var(--paper);color:var(--fg);padding:7px 12px;font-weight:500}
 button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
-.lead{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:16px 0 6px}
+.lead{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:16px 0 6px}
 @media(max-width:760px){.lead{grid-template-columns:1fr 1fr 1fr}}
 @media(max-width:560px){.lead{grid-template-columns:1fr 1fr}}
 section.step{background:var(--paper);border:1px solid var(--line);border-radius:8px;margin-top:14px;padding:14px 16px 16px}
@@ -85,6 +85,9 @@ textarea{min-height:58px;resize:vertical}
 a.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 a.btn{display:inline-block;font:inherit;font-weight:500;border-radius:6px;border:1px solid var(--line);background:var(--paper);color:var(--fg);padding:7px 12px;text-decoration:none}
 select.sel,#leadSource{width:100%;font:inherit;color:var(--fg);background:var(--field);border:1px solid var(--line);border-radius:5px;padding:7px 9px}
+.setup{margin:6px 0 0;padding-left:22px;display:flex;flex-direction:column;gap:8px;font-size:14px}
+.setup a{color:var(--accent)}
+.mono{font-family:var(--mono);font-size:12.5px}
 footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)}
 @media(prefers-reduced-motion:no-preference){.chip,button{transition:background .12s,color .12s}}
 </style>
@@ -106,6 +109,7 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
   <div class="f"><label for="leadPhone">Phone</label><input type="text" id="leadPhone" inputmode="tel"></div>
   <div class="f"><label for="leadEmail">Email</label><input type="text" id="leadEmail" inputmode="email"></div>
   <div class="f"><label for="callDate">Call date</label><input type="date" id="callDate"></div>
+  <div class="f"><label for="salesRep">Sales rep (you)</label><select class="sel" id="salesRep"><option value="">Select…</option><option>Moshe Sabaah</option><option>Nicholas Miranda</option><option>Krystle Kelly</option><option>Oscar Rodriguez</option><option>Randy D</option><option>Roni Hahitti</option><option>Beni Hahitti</option><option>Rami Hahitti</option><option>Yael Kadosh</option><option>Yisrael Weiner</option></select></div>
 </div>
 
 <section class="step">
@@ -223,6 +227,19 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
     <textarea id="cmsOut" rows="22" spellcheck="false" readonly></textarea>
     <div class="bar" style="margin-top:8px"><button id="copyCms">Copy prompt</button></div>
   </details>
+</section>
+
+<section class="step">
+  <h2><span class="n">·</span>One-time setup for “Send to CMS” (Chrome)</h2>
+  <p class="hint">Do this once per computer. After that, Send to CMS fills the New Client form in one click. The script only reads the lead data from the link and never presses Save Client.</p>
+  <ol class="setup">
+    <li>Install the <a href="https://chromewebstore.google.com/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo" target="_blank" rel="noopener">Tampermonkey extension</a> from the Chrome Web Store.</li>
+    <li>In Chrome go to <span class="mono">chrome://extensions</span> → <b>Tampermonkey → Details</b> → turn on <b>Allow User Scripts</b>. If that switch isn’t there, turn on <b>Developer mode</b> (top-right of the Extensions page) first. Without this, Chrome silently disables every script.</li>
+    <li>Open the script link: <a href="https://securityusainterviews.vercel.app/securityusa-cms-autofill.user.js" target="_blank" rel="noopener">securityusa-cms-autofill.user.js</a>. Tampermonkey shows an install page — click <b>Install</b>. (If you only see code as plain text, Tampermonkey isn’t active yet — go back to step 1–2.)</li>
+    <li>Check: click the Tampermonkey icon → <b>Dashboard</b>. “Security USA CMS – lead autofill” should be listed with its switch on.</li>
+    <li>Fill the cheat sheet, click <b>Send to CMS →</b>. The CMS opens with every field filled and a blue banner at the top — review, then click <b>Save Client</b> yourself.</li>
+  </ol>
+  <p class="hint" style="margin-top:8px">Not working? Make sure you’re logged in to the CMS, that step 2 is on, and reload the CMS tab once after installing. If it still doesn’t fill, use the fallback prompt under step 7 with Claude in Chrome.</p>
 </section>
 
 <div class="bar">
@@ -439,7 +456,7 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
       'Payment: '+((state.payTerms||'').trim()||'Prepaid before service date'),
       'Status: '+tbd('leadStatus'),
       'Notes: '+tbd('notes'),
-      '','Moshe'].join('\n');
+      '',((state.salesRep||'').trim()||'Thank you')].join('\n');
   }
   function mailtoHref(){
     var t=calcAll(), d=dParts();
@@ -462,7 +479,7 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
       'Services Interested In: '+svc,
       'Client Status: In Progress',
       'How did client hear about us?: '+((state.leadSource||'').trim()||'leave blank'),
-      'Sales Rep: Moshe Sabaah','',
+      'Sales Rep: '+((state.salesRep||'').trim()||'TBD'),'',
       'Notes:',notes,'',
       'Scope of Service:',tbd('scope'),'',
       'Sales Rep Actions:',rep,'',
@@ -474,7 +491,7 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
     var quote=p.sites.map(function(s){ var c=calcSite(s); return num(s.officers,0)+' x '+TYPE_LABEL[s.type]+' @ $'+money2(num(s.rate,0))+'/hr, '+c.billed+' hrs x '+c.n+' '+shiftWord()+' ('+schedText(s)+')'; }).join('; ');
     var notes=(state.notes||'').trim(); notes=(notes?notes+' ':'')+'Quote: '+quote+', subtotal $'+money2(t.sub)+', tax '+(t.tax===null?'TBD':'$'+money2(t.tax))+', total '+(t.total===null?'TBD':'$'+money2(t.total))+(mode()==='long'?' per week':'')+'. Payment terms: '+((state.payTerms||'').trim()||'Prepaid before service date')+'.';
     var rep=(state.repActions||'').trim()||'Reached out to potential client for a briefing of the service needed and agreed to look over the service agreement. I will follow up once the contract is signed and payment is received.';
-    return {contact_name:(state.contactName||'').trim(),phone:(state.leadPhone||'').trim(),company:(state.leadName||'').trim(),email:(state.leadEmail||'').trim(),office:'New York',services:services,status:'In Progress',lead_source:(state.leadSource||'').trim(),sales_rep:'Moshe Sabaah',notes:notes,scope:(state.scope||'').trim(),rep_actions:rep};
+    return {contact_name:(state.contactName||'').trim(),phone:(state.leadPhone||'').trim(),company:(state.leadName||'').trim(),email:(state.leadEmail||'').trim(),office:'New York',services:services,status:'In Progress',lead_source:(state.leadSource||'').trim(),sales_rep:(state.salesRep||'').trim(),notes:notes,scope:(state.scope||'').trim(),rep_actions:rep};
   }
   function renderOut(force){
     document.getElementById('sendCms').href='https://www.securityusacms.com/clients/new#lead='+encodeURIComponent(JSON.stringify(cmsPayload()));
