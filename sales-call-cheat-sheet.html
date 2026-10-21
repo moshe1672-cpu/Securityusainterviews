@@ -36,10 +36,10 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
 .lead{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:16px 0 6px}
 @media(max-width:760px){.lead{grid-template-columns:1fr 1fr 1fr}}
 @media(max-width:560px){.lead{grid-template-columns:1fr 1fr}}
-section.step{background:var(--paper);border:1px solid var(--line);border-radius:8px;margin-top:14px;padding:14px 16px 16px}
-section.step h2{margin:0 0 10px;font-size:15px;font-weight:600;display:flex;gap:10px;align-items:baseline}
-section.step h2 .n{font-family:var(--mono);font-size:12px;color:var(--accent);font-weight:500;min-width:1.6em}
-section.step .hint{font-size:13px;color:var(--muted);margin:-4px 0 10px}
+.step{background:var(--paper);border:1px solid var(--line);border-radius:8px;margin-top:14px;padding:14px 16px 16px}
+.step h2{margin:0 0 10px;font-size:15px;font-weight:600;display:flex;gap:10px;align-items:baseline}
+.step h2 .n{font-family:var(--mono);font-size:12px;color:var(--accent);font-weight:500;min-width:1.6em}
+.step .hint{font-size:13px;color:var(--muted);margin:-4px 0 10px}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media(max-width:560px){.grid{grid-template-columns:1fr}}
 .f{display:flex;flex-direction:column;gap:4px;min-width:0}
@@ -85,6 +85,11 @@ textarea{min-height:58px;resize:vertical}
 a.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 a.btn{display:inline-block;font:inherit;font-weight:500;border-radius:6px;border:1px solid var(--line);background:var(--paper);color:var(--fg);padding:7px 12px;text-decoration:none}
 select.sel,#leadSource{width:100%;font:inherit;color:var(--fg);background:var(--field);border:1px solid var(--line);border-radius:5px;padding:7px 9px}
+.setup-wrap summary{list-style:none;margin:0;padding:0;cursor:pointer;display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline}
+.setup-wrap summary::-webkit-details-marker{display:none}
+.setup-wrap summary h2{margin:0}
+.setup-wrap[open] summary h2 .n{transform:rotate(90deg);display:inline-block}
+.setup-wrap[open] summary .hint{display:none}
 .setup{margin:6px 0 0;padding-left:22px;display:flex;flex-direction:column;gap:8px;font-size:14px}
 .setup a{color:var(--accent)}
 .mono{font-family:var(--mono);font-size:12.5px}
@@ -229,9 +234,9 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
   </details>
 </section>
 
-<section class="step">
-  <h2><span class="n">·</span>One-time setup for “Send to CMS” (Chrome)</h2>
-  <p class="hint">Do this once per computer. After that, Send to CMS fills the New Client form in one click. The script only reads the lead data from the link and never presses Save Client.</p>
+<details class="step setup-wrap">
+  <summary><h2><span class="n">▸</span>One-time setup for “Send to CMS” (Chrome)</h2><span class="hint" style="margin:0">Click to expand</span></summary>
+  <p class="hint" style="margin-top:10px">Do this once per computer. After that, Send to CMS fills the New Client form in one click. The script only reads the lead data from the link and never presses Save Client.</p>
   <ol class="setup">
     <li>Install the <a href="https://chromewebstore.google.com/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo" target="_blank" rel="noopener">Tampermonkey extension</a> from the Chrome Web Store.</li>
     <li>In Chrome go to <span class="mono">chrome://extensions</span> → <b>Tampermonkey → Details</b> → turn on <b>Allow User Scripts</b>. If that switch isn’t there, turn on <b>Developer mode</b> (top-right of the Extensions page) first. Without this, Chrome silently disables every script.</li>
@@ -240,7 +245,7 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
     <li>Fill the cheat sheet, click <b>Send to CMS →</b>. The CMS opens with every field filled and a blue banner at the top — review, then click <b>Save Client</b> yourself.</li>
   </ol>
   <p class="hint" style="margin-top:8px">Not working? Make sure you’re logged in to the CMS, that step 2 is on, and reload the CMS tab once after installing. If it still doesn’t fill, use the fallback prompt under step 7 with Claude in Chrome.</p>
-</section>
+</details>
 
 <div class="bar">
   <button class="primary" id="copyBtn2">Copy summary</button>
