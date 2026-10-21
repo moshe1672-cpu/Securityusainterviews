@@ -1,0 +1,267 @@
+<title>Sales Call Cheat Sheet</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one column clipboard form — numbered steps from the SOP, sticky toolbar with progress + copy. */
+:root{
+  --bg:#f6f5f1; --paper:#ffffff; --fg:#1c1f24; --muted:#6a6f78; --line:#d9d6ce;
+  --accent:#0f4c81; --accent-ink:#ffffff; --field:#fbfaf7; --ok:#2e7d4f; --warn:#b2641a;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#15171b; --paper:#1e2126; --fg:#e8e6e0; --muted:#9a9ea7; --line:#363a42;
+  --accent:#6fa8dc; --accent-ink:#0f1a26; --field:#171a1e; --ok:#6cc08b; --warn:#e0a05a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#15171b; --paper:#1e2126; --fg:#e8e6e0; --muted:#9a9ea7; --line:#363a42;
+  --accent:#6fa8dc; --accent-ink:#0f1a26; --field:#171a1e; --ok:#6cc08b; --warn:#e0a05a; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.45 var(--sans);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:760px;margin:0 auto}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding:14px 0 10px;border-bottom:1px solid var(--line);
+  display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+header.top h1{font-size:18px;margin:0;font-weight:700;letter-spacing:-.01em}
+header.top .sub{font-size:12px;color:var(--muted);font-family:var(--mono)}
+.spacer{flex:1}
+.prog{font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap}
+button{font:inherit;cursor:pointer;border-radius:6px;border:1px solid var(--line);background:var(--paper);color:var(--fg);padding:7px 12px;font-weight:500}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.lead{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:16px 0 6px}
+@media(max-width:560px){.lead{grid-template-columns:1fr 1fr}}
+section.step{background:var(--paper);border:1px solid var(--line);border-radius:8px;margin-top:14px;padding:14px 16px 16px}
+section.step h2{margin:0 0 10px;font-size:15px;font-weight:600;display:flex;gap:10px;align-items:baseline}
+section.step h2 .n{font-family:var(--mono);font-size:12px;color:var(--accent);font-weight:500;min-width:1.6em}
+section.step .hint{font-size:13px;color:var(--muted);margin:-4px 0 10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:560px){.grid{grid-template-columns:1fr}}
+.f{display:flex;flex-direction:column;gap:4px;min-width:0}
+.f.full{grid-column:1/-1}
+label{font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+input[type=text],input[type=date],input[type=datetime-local],textarea{width:100%;font:inherit;color:var(--fg);background:var(--field);border:1px solid var(--line);border-radius:5px;padding:7px 9px}
+textarea{min-height:58px;resize:vertical}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border-radius:999px;padding:5px 12px;font-size:13px}
+.chip[aria-pressed=true]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.decide{margin-top:10px;padding:9px 12px;border-radius:6px;font-size:13.5px;border:1px dashed var(--line);color:var(--muted)}
+.decide.go{border-style:solid;border-color:var(--ok);color:var(--ok)}
+.decide.full{border-style:solid;border-color:var(--warn);color:var(--warn)}
+.checks{display:flex;flex-direction:column;gap:8px}
+.checks label{display:flex;gap:10px;align-items:center;text-transform:none;letter-spacing:0;font-size:14.5px;font-weight:400;color:var(--fg);cursor:pointer}
+.checks input{width:18px;height:18px;accent-color:var(--accent);margin:0}
+.req{font-size:12.5px;color:var(--warn);margin-top:8px}
+.req:empty{display:none}
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px;align-items:center}
+.toast{font-size:13px;color:var(--ok);font-family:var(--mono)}
+.confirm{display:flex;gap:8px;align-items:center;font-size:13.5px}
+footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)}
+@media(prefers-reduced-motion:no-preference){.chip,button{transition:background .12s,color .12s}}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div><h1>Sales Call Cheat Sheet</h1><div class="sub">Security USA Inc. · call SOP</div></div>
+  <div class="spacer"></div>
+  <div class="prog" id="prog">0 / 29 filled</div>
+  <button class="primary" id="copyBtn">Copy summary</button>
+  <button id="clearBtn">New call</button>
+</header>
+
+<div class="lead">
+  <div class="f"><label for="leadName">Prospect / company</label><input type="text" id="leadName"></div>
+  <div class="f"><label for="leadPhone">Caller phone</label><input type="text" id="leadPhone" inputmode="tel"></div>
+  <div class="f"><label for="callDate">Call date</label><input type="date" id="callDate"></div>
+</div>
+
+<section class="step">
+  <h2><span class="n">1</span>Understand the assignment</h2>
+  <p class="hint">Gather full details before discussing pricing.</p>
+  <div class="grid">
+    <div class="f"><label for="svcType">Type of service required</label><input type="text" id="svcType" placeholder="e.g. unarmed guard, concierge, fire guard"></div>
+    <div class="f"><label for="numOfficers">Number of officers needed</label><input type="text" id="numOfficers" inputmode="numeric"></div>
+    <div class="f full"><label for="duties">Officer duties and responsibilities</label><textarea id="duties"></textarea></div>
+    <div class="f full"><label for="daysHours">Service days and hours</label><input type="text" id="daysHours" placeholder="e.g. Sat 6pm–2am"></div>
+    <div class="f full"><label>Assignment type</label>
+      <div class="chips" id="asgChips">
+        <button class="chip" data-v="Temporary" aria-pressed="false">Temporary</button>
+        <button class="chip" data-v="Event" aria-pressed="false">Event</button>
+        <button class="chip" data-v="Overnight" aria-pressed="false">Overnight</button>
+        <button class="chip" data-v="Weekend" aria-pressed="false">Weekend</button>
+        <button class="chip" data-v="Ongoing" aria-pressed="false">Ongoing / long-term</button>
+        <button class="chip" data-v="Multi-week" aria-pressed="false">Multi-week</button>
+      </div>
+      <div class="decide" id="decide">Pick an assignment type → Event/Temporary moves forward; Long-term/multi-week follows full protocol.</div>
+    </div>
+  </div>
+</section>
+
+<section class="step">
+  <h2><span class="n">2</span>Clarify scope</h2>
+  <div class="grid">
+    <div class="f"><label for="siteType">Site / property type</label><input type="text" id="siteType"></div>
+    <div class="f"><label for="startDate">Start date</label><input type="date" id="startDate"></div>
+    <div class="f full"><label for="resp">Officer responsibilities (confirmed)</label><textarea id="resp"></textarea></div>
+    <div class="f full"><label for="sched">Schedule expectations</label><input type="text" id="sched"></div>
+    <div class="f full"><label for="special">Special instructions or concerns</label><textarea id="special"></textarea></div>
+  </div>
+</section>
+
+<section class="step">
+  <h2><span class="n">3</span>Confirm site conditions</h2>
+  <p class="hint">Verification required before approval.</p>
+  <div class="checks">
+    <label><input type="checkbox" id="shelter"> Officers have access to shelter</label>
+    <label><input type="checkbox" id="bathroom"> Officers have bathroom access</label>
+    <label><input type="checkbox" id="verified"> Site conditions verified</label>
+  </div>
+  <div class="req" id="siteReq"></div>
+</section>
+
+<section class="step">
+  <h2><span class="n">4</span>Internal approval</h2>
+  <div class="checks">
+    <label><input type="checkbox" id="apYisrael"> Yisrael</label>
+    <label><input type="checkbox" id="apDavid"> David</label>
+    <label><input type="checkbox" id="apYael"> Yael</label>
+  </div>
+</section>
+
+<section class="step">
+  <h2><span class="n">5</span>Client information (for the service agreement)</h2>
+  <p class="hint">Once approved, email the client to confirm all of this.</p>
+  <div class="grid">
+    <div class="f full"><label for="clientName">Client name</label><input type="text" id="clientName"></div>
+    <div class="f"><label for="svcStart">Start date &amp; time</label><input type="datetime-local" id="svcStart"></div>
+    <div class="f"><label for="svcEnd">End date &amp; time</label><input type="datetime-local" id="svcEnd"></div>
+    <div class="f"><label for="ocName">On-site contact name</label><input type="text" id="ocName"></div>
+    <div class="f"><label for="ocCell">On-site contact cell</label><input type="text" id="ocCell" inputmode="tel"></div>
+    <div class="f full"><label for="ocEmail">On-site contact email</label><input type="text" id="ocEmail" inputmode="email"></div>
+    <div class="f full"><label for="addr">Service address</label><input type="text" id="addr"></div>
+    <div class="f full"><label for="scope">Scope of services &amp; instructions</label><textarea id="scope"></textarea></div>
+  </div>
+</section>
+
+<section class="step">
+  <h2><span class="n">6</span>Service agreement</h2>
+  <div class="checks">
+    <label><input type="checkbox" id="agPrep"> Service agreement prepared</label>
+    <label><input type="checkbox" id="agSent"> Sent to client with credit card authorization</label>
+    <label><input type="checkbox" id="agPrepaid"> Prepaid before service date (required for all events)</label>
+  </div>
+</section>
+
+<section class="step">
+  <h2><span class="n">7</span>CMS entry</h2>
+  <div class="checks">
+    <label><input type="checkbox" id="cms"> Sales information entered into CMS</label>
+  </div>
+  <p class="hint" style="margin-top:8px">Login details: TBD</p>
+</section>
+
+<section class="step">
+  <h2><span class="n">8</span>Final steps</h2>
+  <div class="checks">
+    <label><input type="checkbox" id="fnSigned"> Signed agreement received</label>
+    <label><input type="checkbox" id="fnYisrael"> Sent to Yisrael for scheduling</label>
+    <label><input type="checkbox" id="fnIris"> Sent to Iris for credit card processing</label>
+  </div>
+</section>
+
+<div class="bar">
+  <button class="primary" id="copyBtn2">Copy summary</button>
+  <span class="toast" id="toast"></span>
+</div>
+<footer>Fields save in this browser as you type. “New call” clears them.</footer>
+</div>
+
+<script>
+(function(){
+  var KEY='sc-cheat-v1';
+  var fields=[].slice.call(document.querySelectorAll('input,textarea'));
+  var chips=[].slice.call(document.querySelectorAll('#asgChips .chip'));
+  var state={};
+  function load(){try{state=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){state={}}}
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
+  function apply(){
+    fields.forEach(function(f){ if(f.type==='checkbox') f.checked=!!state[f.id]; else f.value=state[f.id]||''; });
+    chips.forEach(function(c){ c.setAttribute('aria-pressed', String((state.asg||[]).indexOf(c.dataset.v)>=0)); });
+    if(!document.getElementById('callDate').value){ document.getElementById('callDate').value=new Date().toISOString().slice(0,10); state.callDate=document.getElementById('callDate').value; }
+    refresh();
+  }
+  function refresh(){
+    var total=fields.length+1, n=0;
+    fields.forEach(function(f){ if(f.type==='checkbox'?f.checked:f.value.trim()) n++; });
+    var asg=state.asg||[]; if(asg.length) n++;
+    document.getElementById('prog').textContent=n+' / '+total+' filled';
+    var d=document.getElementById('decide'); d.className='decide';
+    var longTerm=asg.some(function(v){return v==='Ongoing'||v==='Multi-week'});
+    var shortTerm=asg.some(function(v){return v==='Event'||v==='Temporary'});
+    if(longTerm){ d.classList.add('full'); d.textContent='Long-term / multi-week → follow full protocol.'; }
+    else if(shortTerm){ d.classList.add('go'); d.textContent='Event / temporary → move forward.'; }
+    else if(asg.length){ d.textContent='Also pick Temporary/Event or Ongoing/Multi-week to decide the path.'; }
+    else d.textContent='Pick an assignment type → Event/Temporary moves forward; Long-term/multi-week follows full protocol.';
+    var miss=[]; if(!state.shelter) miss.push('shelter'); if(!state.bathroom) miss.push('bathroom');
+    document.getElementById('siteReq').textContent= miss.length && state.verified ? 'Verified but '+miss.join(' and ')+' not confirmed — approval cannot proceed.' : '';
+  }
+  fields.forEach(function(f){ f.addEventListener('input',function(){ state[f.id]=f.type==='checkbox'?f.checked:f.value; save(); refresh(); }); });
+  chips.forEach(function(c){ c.addEventListener('click',function(){
+    var a=state.asg||[], i=a.indexOf(c.dataset.v); if(i>=0)a.splice(i,1); else a.push(c.dataset.v);
+    state.asg=a; c.setAttribute('aria-pressed',String(i<0)); save(); refresh(); }); });
+
+  function v(id){return (state[id]||'').toString().trim()||'—'}
+  function ck(id){return state[id]?'[x]':'[ ]'}
+  function fmtDT(s){ if(!s) return '—'; var d=new Date(s); return isNaN(d)?s:d.toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'}); }
+  function summary(){
+    return [
+      'SALES CALL — '+v('leadName')+' ('+v('callDate')+')  caller: '+v('leadPhone'),
+      '',
+      '1. ASSIGNMENT',
+      'Service type: '+v('svcType'),
+      'Officers needed: '+v('numOfficers'),
+      'Duties: '+v('duties'),
+      'Days/hours: '+v('daysHours'),
+      'Assignment type: '+((state.asg||[]).join(', ')||'—'),
+      '',
+      '2. SCOPE',
+      'Site/property type: '+v('siteType'),
+      'Start date: '+v('startDate'),
+      'Responsibilities: '+v('resp'),
+      'Schedule expectations: '+v('sched'),
+      'Special instructions: '+v('special'),
+      '',
+      '3. SITE CONDITIONS  '+ck('shelter')+' shelter  '+ck('bathroom')+' bathroom  '+ck('verified')+' verified',
+      '4. APPROVALS  '+ck('apYisrael')+' Yisrael  '+ck('apDavid')+' David  '+ck('apYael')+' Yael',
+      '',
+      '5. CLIENT INFO (service agreement)',
+      'Client name: '+v('clientName'),
+      'Start: '+fmtDT(state.svcStart),
+      'End: '+fmtDT(state.svcEnd),
+      'On-site contact: '+v('ocName')+' · '+v('ocEmail')+' · '+v('ocCell'),
+      'Service address: '+v('addr'),
+      'Scope & instructions: '+v('scope'),
+      '',
+      '6. AGREEMENT  '+ck('agPrep')+' prepared  '+ck('agSent')+' sent w/ CC auth  '+ck('agPrepaid')+' prepaid',
+      '7. CMS  '+ck('cms')+' entered',
+      '8. FINAL  '+ck('fnSigned')+' signed received  '+ck('fnYisrael')+' to Yisrael (scheduling)  '+ck('fnIris')+' to Iris (CC processing)'
+    ].join('\n');
+  }
+  function copy(){
+    var t=summary(), toast=document.getElementById('toast');
+    function done(ok){ toast.textContent=ok?'Summary copied.':'Copy blocked — summary shown below; select and copy it.'; if(!ok){ var ta=document.createElement('textarea'); ta.value=t; ta.style.width='100%'; ta.rows=20; toast.parentNode.appendChild(ta); ta.select(); } setTimeout(function(){toast.textContent=''},3000); }
+    try{ navigator.clipboard.writeText(t).then(function(){done(true)},function(){done(false)}); }catch(e){done(false)}
+  }
+  document.getElementById('copyBtn').addEventListener('click',copy);
+  document.getElementById('copyBtn2').addEventListener('click',copy);
+
+  var clearBtn=document.getElementById('clearBtn');
+  clearBtn.addEventListener('click',function(){
+    if(clearBtn.dataset.arm){ state={}; save(); apply(); clearBtn.textContent='New call'; delete clearBtn.dataset.arm; window.scrollTo(0,0); return; }
+    clearBtn.dataset.arm='1'; clearBtn.textContent='Click again to clear';
+    setTimeout(function(){ clearBtn.textContent='New call'; delete clearBtn.dataset.arm; },4000);
+  });
+
+  load(); apply();
+})();
+</script>
