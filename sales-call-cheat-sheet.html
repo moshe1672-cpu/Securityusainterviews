@@ -445,8 +445,8 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
   function siteCondText(){ var a=[]; a.push('shelter '+(state.shelter?'yes':'TBD')); a.push('bathroom '+(state.bathroom?'yes':'TBD')); a.push(state.verified?'verified':state.notVerified?'NOT verified':'verification TBD'); a.push('alcohol on premises: '+(state.alcohol?'YES':'no')); return a.join('; '); }
   function taxLabel(){ var p=P(); return p.tax==='nyc'?'NYC Sales Tax (8.875%)':p.tax==='nj'?'NJ / Out-of-State Sales Tax':'Sales Tax (non-taxable org)'; }
   function coverageLines(){
-    return P().sites.map(function(s){ var c=calcSite(s), minApplied=c.hours<c.min&&c.hours>0;
-      return num(s.officers,0)+' x '+TYPE_LABEL[s.type]+' @ $'+money2(num(s.rate,0))+'/hr (min '+c.min+' hrs; billing '+c.billed+' hrs'+(minApplied?', minimum applied':'')+(c.n>1||mode()==='long'?', x '+c.n+' '+shiftWord():'')+')'+(s.name?' – '+s.name:''); });
+    return P().sites.map(function(s,i){ var c=calcSite(s), minApplied=c.hours<c.min&&c.hours>0;
+      return '- '+(s.name||('Shift/guard '+(i+1)))+': '+num(s.officers,0)+' x '+TYPE_LABEL[s.type]+' | '+schedText(s)+' | '+c.hours+' hrs/shift x '+c.n+' '+shiftWord()+' | $'+money2(num(s.rate,0))+'/hr, billing '+c.billed+' hrs'+(minApplied?' (min '+c.min+' applied)':'')+' = $'+money2(c.sub); });
   }
   function emailBody(){
     var t=calcAll(), d=dParts(), cov=coverageLines();
@@ -454,8 +454,8 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
       'New lead – '+tbd('leadName')+' / '+tbd('contactName'),
       'Contact: '+tbd('leadPhone')+' | '+tbd('leadEmail'),
       'Event: '+tbd('svcType')+' – '+tbd('addr'),
-      'Date/Time: '+(mode()==='long' ? ('Starting '+d.date+', '+(((P().sites[0]||{}).days||[]).join('/')||'days TBD')+', '+fmtT((P().sites[0]||{}).tStart)+' to '+fmtT((P().sites[0]||{}).tEnd)+' ('+hoursOf(P().sites[0]||{})+' hrs/shift, weekly)') : (d.date+', '+d.start+' to '+d.end+' ('+d.hrs+' hrs)')),
-      'Coverage: '+(cov.length?cov.join('; '):'TBD'),
+      'Date/Time: '+(function(){ var g=P().sites[0]||{}; if(!g.dStart) return 'TBD'; var yr=function(x){var d=new Date(x+'T12:00');return isNaN(d)?x:d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}; var when=mode()==='long'?('Starting '+yr(g.dStart)+', '+((g.days||[]).join('/')||'days TBD')):(yr(g.dStart)+(g.dEnd&&g.dEnd!==g.dStart?' – '+yr(g.dEnd):'')); return when+', '+fmtT(g.tStart)+' to '+fmtT(g.tEnd)+' ('+hoursOf(g)+' hrs/shift'+(mode()==='long'?', weekly':'')+')'; })(),
+      'Coverage:'].concat(cov.length?cov:['- TBD']).concat([
       'Site type: '+tbd('siteType'),
       'Scope of service: '+(respText()||'TBD'),
       'Special instructions: '+tbd('special'),
@@ -465,7 +465,7 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
       'Total'+(mode()==='long'?' (per week)':'')+': '+(t.total===null?'$'+money2(t.sub)+' + tax TBD':'$'+money2(t.total)),
       'Status: '+tbd('leadStatus'),
       'Notes: '+tbd('notes'),
-      '',((state.salesRep||'').trim()||'Thank you')].join('\n');
+      '',((state.salesRep||'').trim()||'Thank you')]).join('\n');
   }
   function mailtoHref(){
     var t=calcAll(), d=dParts();
@@ -476,8 +476,8 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
   function autoSvc(){ var st=(state.svcType||'').trim(); if(st&&st!=='Other') return st; var seen={}; return P().sites.map(function(s){return SVC_MAP[s.type]}).filter(function(x){ if(seen[x]) return false; seen[x]=1; return true; }).join(', ')||'TBD'; }
   function cmsPrompt(){
     var t=calcAll(), p=P(), svc=(state.svcChecks||'').trim()||autoSvc();
-    var quote=p.sites.map(function(s){ var c=calcSite(s); return num(s.officers,0)+' x '+TYPE_LABEL[s.type]+' @ $'+money2(num(s.rate,0))+'/hr, '+c.billed+' hrs x '+c.n+' '+shiftWord()+' ('+schedText(s)+')'; }).join('; ');
-    var notes=(state.notes||'').trim(); notes=(notes?notes+' ':'')+'Quote: '+quote+', subtotal $'+money2(t.sub)+', tax '+(t.tax===null?'TBD':'$'+money2(t.tax))+', total '+(t.total===null?'TBD':'$'+money2(t.total))+(mode()==='long'?' per week':'')+'. Site conditions: '+siteCondText()+'.';
+    var quote='\n'+coverageLines().join('\n')+'\n';
+    var notes=(state.notes||'').trim(); notes=(notes?notes+'\n':'')+'Quote:'+quote+'Subtotal $'+money2(t.sub)+', tax '+(t.tax===null?'TBD':'$'+money2(t.tax))+', total '+(t.total===null?'TBD':'$'+money2(t.total))+(mode()==='long'?' per week':'')+'. Site conditions: '+siteCondText()+'.';
     var rep=(state.repActions||'').trim()||'Took the sales call and forwarded an email to sales. Client is awaiting contact for further info and the service agreement.';
     return ['Please fill in this sales lead form with the following information:','',
       'Contact Name: '+tbd('contactName'),
@@ -497,8 +497,8 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
   function cmsPayload(){
     var t=calcAll(), p=P(), svc=(state.svcChecks||'').trim()||autoSvc();
     var services=svc.split(',').map(function(x){return x.trim()}).filter(function(x){return ['Unarmed Security Guards','Event Security Guards','Fireguard / FLSD','Doorman / Concierge','Armed Guard','Patrol Service'].indexOf(x)>=0});
-    var quote=p.sites.map(function(s){ var c=calcSite(s); return num(s.officers,0)+' x '+TYPE_LABEL[s.type]+' @ $'+money2(num(s.rate,0))+'/hr, '+c.billed+' hrs x '+c.n+' '+shiftWord()+' ('+schedText(s)+')'; }).join('; ');
-    var notes=(state.notes||'').trim(); notes=(notes?notes+' ':'')+'Quote: '+quote+', subtotal $'+money2(t.sub)+', tax '+(t.tax===null?'TBD':'$'+money2(t.tax))+', total '+(t.total===null?'TBD':'$'+money2(t.total))+(mode()==='long'?' per week':'')+'. Site conditions: '+siteCondText()+'.';
+    var quote='\n'+coverageLines().join('\n')+'\n';
+    var notes=(state.notes||'').trim(); notes=(notes?notes+'\n':'')+'Quote:'+quote+'Subtotal $'+money2(t.sub)+', tax '+(t.tax===null?'TBD':'$'+money2(t.tax))+', total '+(t.total===null?'TBD':'$'+money2(t.total))+(mode()==='long'?' per week':'')+'. Site conditions: '+siteCondText()+'.';
     var rep=(state.repActions||'').trim()||'Took the sales call and forwarded an email to sales. Client is awaiting contact for further info and the service agreement.';
     return {contact_name:(state.contactName||'').trim(),phone:(state.leadPhone||'').trim(),company:(state.leadName||'').trim(),email:(state.leadEmail||'').trim(),office:'New York',services:services,status:'In Progress',lead_source:(state.leadSource||'').trim(),sales_rep:(state.salesRep||'').trim(),notes:notes,scope:(state.scope||'').trim(),rep_actions:rep};
   }
