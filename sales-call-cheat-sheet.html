@@ -133,8 +133,9 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
 <section class="step">
   <h2><span class="n">2</span>Clarify scope</h2>
   <div class="grid">
-    <div class="f"><label for="siteType">Site / property type</label><input type="text" id="siteType"></div>
-    <div class="f full"><label for="resp">Officer responsibilities (confirmed)</label><textarea id="resp"></textarea></div>
+    <div class="f"><label for="siteType">Site / property type</label><select class="sel" id="siteType"><option value="">Select…</option><option>Residential</option><option>Commercial</option><option>School</option><option>Shelter</option><option>Retail</option><option>Hotel</option><option>Corporate office</option><option>Synagogue</option><option>Church / house of worship</option><option>Construction site</option><option>Medical / wellness clinic</option><option>Consulate / diplomatic mission</option><option>Gated community</option><option>Event venue</option><option>Parking / garage</option><option>Other</option></select></div>
+    <div class="f full"><label>Officer responsibilities (confirmed) — tap all that apply</label><div class="chips" id="respChips"><button class="chip" data-v="Access control" aria-pressed="false">Access control</button><button class="chip" data-v="Front desk / lobby" aria-pressed="false">Front desk / lobby</button><button class="chip" data-v="Doorman / concierge" aria-pressed="false">Doorman / concierge</button><button class="chip" data-v="Visitor & contractor sign-in" aria-pressed="false">Visitor & contractor sign-in</button><button class="chip" data-v="Package / delivery handling" aria-pressed="false">Package / delivery handling</button><button class="chip" data-v="Patrols / rounds" aria-pressed="false">Patrols / rounds</button><button class="chip" data-v="CCTV monitoring" aria-pressed="false">CCTV monitoring</button><button class="chip" data-v="Crowd control" aria-pressed="false">Crowd control</button><button class="chip" data-v="Bag check / screening" aria-pressed="false">Bag check / screening</button><button class="chip" data-v="Fire guard / FLSD" aria-pressed="false">Fire guard / FLSD</button><button class="chip" data-v="Lock / unlock building" aria-pressed="false">Lock / unlock building</button><button class="chip" data-v="Key control" aria-pressed="false">Key control</button><button class="chip" data-v="Incident reports / DAR" aria-pressed="false">Incident reports / DAR</button><button class="chip" data-v="Alarm response" aria-pressed="false">Alarm response</button><button class="chip" data-v="Loss prevention" aria-pressed="false">Loss prevention</button><button class="chip" data-v="Parking / traffic control" aria-pressed="false">Parking / traffic control</button><button class="chip" data-v="Elevator / freight post" aria-pressed="false">Elevator / freight post</button><button class="chip" data-v="Escort staff / residents" aria-pressed="false">Escort staff / residents</button><button class="chip" data-v="Enforce house rules" aria-pressed="false">Enforce house rules</button><button class="chip" data-v="Emergency / evacuation response" aria-pressed="false">Emergency / evacuation response</button><button class="chip" data-v="Vehicle patrol" aria-pressed="false">Vehicle patrol</button></div></div>
+    <div class="f full"><label for="respOther">Other responsibilities / details</label><textarea id="respOther"></textarea></div>
     <div class="f full"><label for="special">Special instructions or concerns</label><textarea id="special"></textarea></div>
   </div>
 </section>
@@ -234,6 +235,8 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
   var KEY='sc-cheat-v2';
   var fields=[].slice.call(document.querySelectorAll('input,textarea,select')).filter(function(f){return !f.closest('#sites')&&!f.closest('#shifts')&&f.id!=='emailOut'&&f.id!=='cmsOut'});
   var chips=[].slice.call(document.querySelectorAll('#asgChips .chip'));
+  var respChips=[].slice.call(document.querySelectorAll('#respChips .chip'));
+  function respText(){ var a=(state.resp||[]); var t=a.join(', '); var o=(state.respOther||'').trim(); return t+(t&&o?'; ':'')+o; }
   var state={};
   function load(){try{state=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){state={}}}
   function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
@@ -241,6 +244,8 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
     fields.forEach(function(f){ if(f.type==='checkbox') f.checked=!!state[f.id]; else f.value=state[f.id]||''; });
     if(Array.isArray(state.asg)) state.asg=state.asg[0]||'';
     chips.forEach(function(c){ c.setAttribute('aria-pressed', String(state.asg===c.dataset.v)); });
+    if(!Array.isArray(state.resp)) state.resp=[];
+    respChips.forEach(function(c){ c.setAttribute('aria-pressed', String(state.resp.indexOf(c.dataset.v)>=0)); });
     if(!document.getElementById('callDate').value){ document.getElementById('callDate').value=new Date().toISOString().slice(0,10); state.callDate=document.getElementById('callDate').value; }
     renderShifts(); renderSites(); refresh();
   }
@@ -250,7 +255,7 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
     var g=(state.pricing&&state.pricing.sites&&state.pricing.sites[0])||{}, d=g.dStart||'';
     src.svcStart=(d&&g.tStart)?d+'T'+g.tStart:'';
     if(d&&g.tStart&&g.tEnd){ var ed=(mode()==='short'&&g.dEnd)?g.dEnd:d; if(g.tEnd<=g.tStart){ var x=new Date(ed+'T12:00'); x.setDate(x.getDate()+1); ed=x.toISOString().slice(0,10); } src.svcEnd=ed+'T'+g.tEnd; } else src.svcEnd='';
-    var sc=(state.resp||'').trim()||(state.duties||'').trim(); if((state.special||'').trim()) sc+=(sc?'\n':'')+'Instructions: '+state.special.trim(); src.scope=sc;
+    var sc=respText()||(state.duties||'').trim(); if((state.special||'').trim()) sc+=(sc?'\n':'')+'Instructions: '+state.special.trim(); src.scope=sc;
     Object.keys(src).forEach(function(id){ if(t[id]) return; if((state[id]||'')!==src[id]){ state[id]=src[id]; var el=document.getElementById(id); if(el&&document.activeElement!==el) el.value=src[id]; } });
   }
   function refresh(){
@@ -259,6 +264,7 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
     var total=fields.length+1, n=0;
     fields.forEach(function(f){ if(f.type==='checkbox'?f.checked:f.value.trim()) n++; });
     var asg=state.asg||''; if(asg) n++;
+    total++; if((state.resp||[]).length) n++;
     total++; if(state.pricing&&state.pricing.sites.some(function(x){return hoursOf(x)>0})) n++;
     document.getElementById('prog').textContent=n+' / '+total+' filled';
     var d=document.getElementById('decide'); d.className='decide';
@@ -280,6 +286,9 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
     state.asg=(state.asg===c.dataset.v)?'':c.dataset.v;
     chips.forEach(function(x){ x.setAttribute('aria-pressed',String(state.asg===x.dataset.v)); });
     save(); renderShifts(); renderSites(); refresh(); }); });
+  respChips.forEach(function(c){ c.addEventListener('click',function(){
+    var a=state.resp||[], i=a.indexOf(c.dataset.v); if(i>=0) a.splice(i,1); else a.push(c.dataset.v); state.resp=a;
+    c.setAttribute('aria-pressed',String(i<0)); save(); refresh(); }); });
 
 
   // ---- Schedule + Pricing ----
@@ -486,7 +495,7 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
       '',
       '2. SCOPE',
       'Site/property type: '+v('siteType'),
-      'Responsibilities: '+v('resp'),
+      'Responsibilities: '+(respText()||'—'),
       'Special instructions: '+v('special'),
       ''].concat(pricingLines()).concat([
       '',
