@@ -20,6 +20,10 @@
   --bg:#15171b; --paper:#1e2126; --fg:#e8e6e0; --muted:#9a9ea7; --line:#363a42;
   --accent:#6fa8dc; --accent-ink:#0f1a26; --field:#171a1e; --ok:#6cc08b; --warn:#e0a05a; color-scheme:dark}
 *{box-sizing:border-box}
+input,select,textarea{min-width:0;max-width:100%;box-sizing:border-box}
+input[type=date],input[type=time],input[type=datetime-local]{-webkit-appearance:none;appearance:none;display:block;width:100%;min-height:36px;text-align:left}
+input::-webkit-date-and-time-value{text-align:left}
+.grid>*,.lead>*{min-width:0}
 body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.45 var(--sans);
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
@@ -93,6 +97,13 @@ select.sel,#leadSource{width:100%;font:inherit;color:var(--fg);background:var(--
 .setup{margin:6px 0 0;padding-left:22px;display:flex;flex-direction:column;gap:8px;font-size:14px}
 .setup a{color:var(--accent)}
 .mono{font-family:var(--mono);font-size:12.5px}
+
+.help{position:relative;display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;border:1px solid var(--muted);color:var(--muted);font:600 10.5px/1 var(--mono);cursor:help;margin-left:6px;vertical-align:middle;flex:none;letter-spacing:0}
+.help:hover,.help:focus-visible{color:var(--accent);border-color:var(--accent);outline:none}
+.tip{position:fixed;z-index:50;background:var(--fg);color:var(--bg);font:400 12.5px/1.4 var(--sans);padding:8px 10px;border-radius:6px;box-shadow:0 4px 14px rgba(0,0,0,.18);max-width:min(340px,calc(100vw - 32px));text-align:left;pointer-events:none}
+body{overflow-x:clip}
+h2 .help{margin-left:2px}
+label .help{margin-left:4px}
 footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)}
 @media(prefers-reduced-motion:no-preference){.chip,button{transition:background .12s,color .12s}}
 </style>
@@ -118,8 +129,7 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
 </div>
 
 <section class="step">
-  <h2><span class="n">1</span>Understand the assignment</h2>
-  <p class="hint">Gather full details before discussing pricing.</p>
+  <h2><span class="n">1</span>Understand the assignment<span class="help" tabindex="0" role="note" data-tip="Gather full details before discussing pricing.">?</span></h2>
   <div class="grid">
     <div class="f full"><label>Assignment type</label>
       <div class="chips" id="asgChips">
@@ -131,8 +141,7 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
       <div class="decide" id="decide">Pick an assignment type → Event/Temporary moves forward; Long-term/multi-week follows full protocol.</div>
     </div>
     <div class="f"><label for="svcType">Type of service required</label><select class="sel" id="svcType"><option value="">Select…</option><option>Unarmed Security Guards</option><option>Event Security Guards</option><option>Fireguard / FLSD</option><option>Doorman / Concierge</option><option>Armed Guard</option><option>Patrol Service</option><option>Other</option></select></div>
-    <div class="f full"><label>Shifts / guards — days &amp; hours</label>
-      <p class="hint" id="shiftHint" style="margin:0 0 4px">Pick an assignment type above: Temporary/Event gives date ranges, Ongoing/Multi-week gives days of the week.</p>
+    <div class="f full"><label>Shifts / guards — days &amp; hours <span class="help" tabindex="0" role="note" id="shiftHint" data-tip="Pick an assignment type above: Temporary/Event gives date ranges, Ongoing/Multi-week gives days of the week.">?</span></label>
       <div id="shifts"></div>
       <div class="bar" style="margin-top:8px"><button id="addShift">+ Add shift/guard</button></div>
     </div>
@@ -150,8 +159,7 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
 </section>
 
 <section class="step">
-  <h2><span class="n">3</span>Pricing calculator</h2>
-  <p class="hint">Officers, days and hours come from step 1. Rate and minimum are adjustable here. Billed hours = max(actual, minimum); each shift/guard is calculated separately, then summed.</p>
+  <h2><span class="n">3</span>Pricing calculator<span class="help" tabindex="0" role="note" data-tip="Officers, days and hours come from step 1. Rate and minimum are adjustable here. Billed hours = max(actual, minimum); each shift/guard is calculated separately, then summed.">?</span></h2>
   <div class="grid" style="margin-bottom:10px">
     <div class="f full"><label for="taxMode">Tax</label>
       <div class="chips" id="taxChips">
@@ -167,8 +175,7 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
 </section>
 
 <section class="step">
-  <h2><span class="n">4</span>Confirm site conditions</h2>
-  <p class="hint">Verification required before approval.</p>
+  <h2><span class="n">4</span>Confirm site conditions<span class="help" tabindex="0" role="note" data-tip="Verification required before approval.">?</span></h2>
   <div class="checks">
     <label><input type="checkbox" id="shelter"> Officers have access to shelter</label>
     <label><input type="checkbox" id="bathroom"> Officers have bathroom access</label>
@@ -179,8 +186,7 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
 </section>
 
 <section class="step">
-  <h2><span class="n">5</span>Client information (for the service agreement)</h2>
-  <p class="hint">Auto-filled from the steps above. Anything you type here stays as typed and doesn't change the rest of the page.</p>
+  <h2><span class="n">5</span>Client information (for the service agreement)<span class="help" tabindex="0" role="note" data-tip="Auto-filled from the steps above. Anything you type here stays as typed and doesn&#x27;t change the rest of the page.">?</span></h2>
   <div class="grid">
     <div class="f full"><label for="clientName">Client name</label><input type="text" id="clientName"></div>
     <div class="f"><label for="svcStart">Start date &amp; time</label><input type="datetime-local" id="svcStart"></div>
@@ -195,8 +201,7 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
 </section>
 
 <section class="step">
-  <h2><span class="n">6</span>Email to sales</h2>
-  <p class="hint">Built live from everything above. Copy it or open in your mail app (to sales@securityusainc.com, cc yk@securityusainc.com).</p>
+  <h2><span class="n">6</span>Email to sales<span class="help" tabindex="0" role="note" data-tip="Built live from everything above. Copy it or open in your mail app (to sales@securityusainc.com, cc yk@securityusainc.com).">?</span></h2>
   <div class="grid">
     <div class="f"><label for="leadStatus">Status</label><input type="text" id="leadStatus" placeholder="Quote sent / awaiting agreement"></div>
     <div class="f full"><label for="notes">Notes</label><textarea id="notes"></textarea></div>
@@ -213,8 +218,7 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
 </section>
 
 <section class="step">
-  <h2><span class="n">7</span>CMS entry</h2>
-  <p class="hint">One click opens the CMS New Client page with every field filled. You review and press Save Client. Needs the one-time Tampermonkey script installed in Chrome.</p>
+  <h2><span class="n">7</span>CMS entry<span class="help" tabindex="0" role="note" data-tip="One click opens the CMS New Client page with every field filled. You review and press Save Client. Needs the one-time Tampermonkey script installed in Chrome.">?</span></h2>
   <div class="grid">
     <div class="f"><label for="leadSource">How did client hear about us?</label>
       <select id="leadSource"><option value="">leave blank</option><option>Google</option><option>Repeat Client</option><option>Referral</option><option>LinkedIn</option><option>Other</option></select></div>
@@ -230,6 +234,19 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
     <textarea id="cmsOut" rows="22" spellcheck="false" readonly></textarea>
     <div class="bar" style="margin-top:8px"><button id="copyCms">Copy prompt</button></div>
   </details>
+</section>
+
+<section class="step">
+  <h2><span class="n">8</span>Email to client (optional)<span class="help" tabindex="0" role="note" data-tip="Follow-up to the prospect asking them to confirm scope, location, dates and site conditions, with our rates. Built live from the form. Goes to the client's email, cc sales@securityusainc.com and yk@securityusainc.com.">?</span></h2>
+  <div class="out">
+    <label for="clientOut">Email body</label>
+    <textarea id="clientOut" rows="22" spellcheck="false" readonly></textarea>
+    <div class="bar" style="margin-top:8px">
+      <button class="primary" id="copyClient">Copy email</button>
+      <a class="btn" id="mailtoClient" href="#" target="_blank" rel="noopener">Open in mail app</a>
+      <span class="toast" id="clientToast"></span>
+    </div>
+  </div>
 </section>
 
 <details class="step setup-wrap">
@@ -255,7 +272,7 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
 <script>
 (function(){
   var KEY='sc-cheat-v2';
-  var fields=[].slice.call(document.querySelectorAll('input,textarea,select')).filter(function(f){return !f.closest('#sites')&&!f.closest('#shifts')&&f.id!=='emailOut'&&f.id!=='cmsOut'});
+  var fields=[].slice.call(document.querySelectorAll('input,textarea,select')).filter(function(f){return !f.closest('#sites')&&!f.closest('#shifts')&&f.id!=='emailOut'&&f.id!=='cmsOut'&&f.id!=='clientOut'});
   var chips=[].slice.call(document.querySelectorAll('#asgChips .chip'));
   var respChips=[].slice.call(document.querySelectorAll('#respChips .chip'));
   function respText(){ var a=(state.resp||[]); var t=a.join(', '); var o=(state.respOther||'').trim(); return t+(t&&o?'; ':'')+o; }
@@ -318,7 +335,7 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
   function mode(){ var a=state.asg||''; return (a==='Ongoing'||a==='Multi-week')?'long':(a==='Temporary'||a==='Event')?'short':''; }
   function P(){ if(!state.pricing) state.pricing={tax:'nyc',sites:[]}; if(!state.pricing.sites.length) state.pricing.sites.push(newSite()); return state.pricing; }
   function newSite(){ var t='standard', st=state.svcType||''; if(/Patrol/.test(st)) t='mobile'; else if(/Event/.test(st)) t='event'; return {name:'',type:t,rate:RATES[t],officers:1,min:6,tStart:'',tEnd:'',dStart:'',dEnd:'',days:[]}; }
-  function hoursBetween(a,b){ if(!a||!b) return null; var m=function(t){var p=t.split(':');return (+p[0])*60+(+p[1]);}; var d=m(b)-m(a); if(d<=0) d+=1440; return Math.round(d/60*4)/4; }
+  function hoursBetween(a,b){ if(!a||!b) return null; var m=function(t){var p=t.split(':');return (+p[0])*60+(+p[1]);}; var d=m(b)-m(a); if(d===0) return null; if(d<0) d+=1440; return Math.round(d/60*4)/4; }
   function num(x,d){ var n=parseFloat(x); return isNaN(n)?d:n; }
   function money(n){ return '$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
   function hoursOf(s){ return hoursBetween(s.tStart,s.tEnd)||0; }
@@ -346,7 +363,7 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
   // Step 1: schedule rows
   function renderShifts(){
     var p=P(), m=mode(), box=document.getElementById('shifts'); box.innerHTML='';
-    document.getElementById('shiftHint').textContent = m==='long' ? 'Recurring: pick the days of the week each guard works, plus start/end times. Pricing is per week.' : m==='short' ? 'One-off: pick the date range and start/end times per guard. Each day in the range is one shift.' : 'Pick an assignment type above: Temporary/Event gives date ranges, Ongoing/Multi-week gives days of the week.';
+    document.getElementById('shiftHint').dataset.tip = m==='long' ? 'Recurring: pick the days of the week each guard works, plus start/end times. Pricing is per week.' : m==='short' ? 'One-off: pick the date range and start/end times per guard. Each day in the range is one shift.' : 'Pick an assignment type above: Temporary/Event gives date ranges, Ongoing/Multi-week gives days of the week.';
     p.sites.forEach(function(s,i){
       var el=document.createElement('div'); el.className='site'; el.dataset.i=i;
       var when = m==='long'
@@ -497,7 +514,32 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
     var rep=(state.repActions||'').trim()||'Took the sales call and forwarded an email to sales. Client is awaiting contact for further info and the service agreement.';
     return {contact_name:(state.contactName||'').trim(),phone:(state.leadPhone||'').trim(),company:(state.leadName||'').trim(),email:(state.leadEmail||'').trim(),office:'New York',services:services,status:'In Progress',lead_source:(state.leadSource||'').trim(),sales_rep:(state.salesRep||'').trim(),notes:notes,scope:(state.scope||'').trim(),rep_actions:rep};
   }
+  var RATE_NAME={standard:'Unarmed security officer',mobile:'Mobile / patrol service',event:'Event security officer'};
+  function clientEmail(){
+    var p=P(), first=((state.contactName||'').trim().split(/\s+/)[0])||'there';
+    var sched=p.sites.map(function(s,i){ return '- '+(s.name?s.name+': ':'')+num(s.officers,0)+' officer(s), '+schedText(s)+(hoursOf(s)?' ('+hoursOf(s)+' hrs/shift'+(calcSite(s).n>1?', '+calcSite(s).n+' '+shiftWord():'')+')':''); });
+    var seen={}, rates=[]; p.sites.forEach(function(s){ var k=s.type+'|'+num(s.rate,0)+'|'+num(s.min,0); if(seen[k]) return; seen[k]=1;
+      rates.push(RATE_NAME[s.type]+' – $'+money2(num(s.rate,0))+(p.tax==='exempt'?'':' (+tax)')+' per hour, per officer, with a minimum of '+num(s.min,0)+' hours per shift.'); });
+    var scope=(state.scope||'').trim()||'[scope to be confirmed]';
+    var loc=(state.addr||'').trim(); var siteT=(state.siteType||'').trim();
+    return ['Dear '+first+',','',
+      'It was nice speaking with you earlier.','',
+      'Based on our conversation, I have summarized the details of the service you are requesting below. To help us prepare an accurate proposal, please review each item and confirm it, or add/adjust any details as needed or that have been missed.','',
+      '1. Scope of services and any special instructions:',scope,'',
+      '2. Please confirm the exact service location'+(siteT?' ('+siteT.toLowerCase()+')':'')+':',loc||'[please provide the full address]','',
+      '3. Date(s) and hours:'].concat(sched.length?sched:['[to be confirmed]']).concat(['',
+      '4. Please confirm that restroom access and shelter will be available for our officers during the shift.','',
+      'Our rates are as follows:'].concat(rates).concat(['',
+      'Thank you, and I look forward to your response.','',
+      ((state.salesRep||'').trim()||'Security USA Inc.'),
+      ((state.salesRep||'').trim()?'Security USA Inc.':'')])).filter(function(x,i,a){ return !(x===''&&a[i-1]===''); }).join('\n');
+  }
+  function clientMailto(){
+    var subject='Security Services Quote – '+((state.leadName||'').trim()||'[Company]');
+    return 'mailto:'+encodeURIComponent((state.leadEmail||'').trim())+'?cc='+encodeURIComponent('sales@securityusainc.com,yk@securityusainc.com')+'&subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(document.getElementById('clientOut').value);
+  }
   function renderOut(force){
+    document.getElementById('clientOut').value=clientEmail(); document.getElementById('mailtoClient').href=clientMailto();
     document.getElementById('sendCms').href='https://www.securityusacms.com/clients/new#lead='+encodeURIComponent(JSON.stringify(cmsPayload()));
     var e=document.getElementById('emailOut'), c=document.getElementById('cmsOut');
     e.value=emailBody(); c.value=cmsPrompt();
@@ -511,6 +553,7 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
   }
   document.getElementById('copyEmail').addEventListener('click',function(){ copyText(document.getElementById('emailOut').value,'emailToast'); });
   document.getElementById('copyCms').addEventListener('click',function(){ copyText(document.getElementById('cmsOut').value,'cmsToast'); });
+  document.getElementById('copyClient').addEventListener('click',function(){ copyText(document.getElementById('clientOut').value,'clientToast'); });
 
   function v(id){return (state[id]||'').toString().trim()||'—'}
   function ck(id){return state[id]?'[x]':'[ ]'}
@@ -557,6 +600,26 @@ footer{margin-top:22px;font-size:12px;color:var(--muted);font-family:var(--mono)
     setTimeout(function(){ clearBtn.textContent='New call'; delete clearBtn.dataset.arm; },4000);
   });
 
+  // ---- Tooltips for ? bubbles ----
+  (function(){
+    var tip=null, cur=null, shownAt=0;
+    function hide(){ if(tip){ tip.remove(); tip=null; } cur=null; }
+    function show(el){
+      hide(); var txt=el.dataset.tip; if(!txt) return; shownAt=Date.now();
+      tip=document.createElement('div'); tip.className='tip'; tip.textContent=txt; document.body.appendChild(tip); cur=el;
+      var r=el.getBoundingClientRect(), tw=tip.offsetWidth, th=tip.offsetHeight, vw=window.innerWidth;
+      var left=Math.min(Math.max(8, r.left+r.width/2-tw/2), vw-tw-8);
+      var top=r.top-th-8; if(top<70) top=r.bottom+8;
+      tip.style.left=left+'px'; tip.style.top=top+'px';
+    }
+    var touch=false; document.addEventListener('touchstart',function(){ touch=true; },{passive:true});
+    document.addEventListener('mouseover',function(e){ if(touch) return; var h=e.target.closest&&e.target.closest('.help'); if(h&&h!==cur) show(h); });
+    document.addEventListener('mouseout',function(e){ if(touch) return; var h=e.target.closest&&e.target.closest('.help'); if(h&&!(e.relatedTarget&&h.contains(e.relatedTarget))) hide(); });
+    document.addEventListener('click',function(e){ var h=e.target.closest&&e.target.closest('.help'); if(h){ e.preventDefault(); if(cur===h&&tip){ if(Date.now()-shownAt>400) hide(); } else show(h); } else hide(); });
+    document.addEventListener('focusin',function(e){ var h=e.target.closest&&e.target.closest('.help'); if(h) show(h); });
+    document.addEventListener('focusout',function(e){ if(e.target.closest&&e.target.closest('.help')) hide(); });
+    window.addEventListener('scroll',function(){ if(Date.now()-shownAt>400) hide(); },{passive:true});
+  })();
   load(); apply();
 })();
 </script>
