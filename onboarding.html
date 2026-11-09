@@ -46,6 +46,10 @@
   .step-link svg { width: 11px; height: 11px; flex-shrink: 0; }
   .step-link-outline { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; background: transparent; border: 1.5px solid var(--gold); color: var(--gold); font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; padding: 7px 14px; border-radius: 6px; text-decoration: none; transition: all 0.2s; margin-right: 8px; }
   .step-link-outline:hover { background: rgba(201,168,76,0.1); }
+  .inbox-note { margin-top: 12px; background: rgba(201,168,76,0.1); border: 1.5px solid rgba(201,168,76,0.45); border-radius: 8px; padding: 12px 14px; font-size: 12.5px; color: #e8c97a; line-height: 1.7; }
+  .inbox-note strong { color: #f5e3b0; }
+  @keyframes notePulse { 0%,100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(201,168,76,0); } 30% { transform: scale(1.18); box-shadow: 0 0 0 8px rgba(201,168,76,0.45); } }
+  .inbox-note.pulse { animation: notePulse 0.9s ease 2; }
   .notice-box { margin-top: 12px; background: rgba(201,168,76,0.08); border: 1px solid rgba(201,168,76,0.3); border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #c9b47a; line-height: 1.6; }
   .notice-box strong { color: var(--gold-light); }
   .reimburse-box { margin-top: 12px; background: rgba(39,174,96,0.08); border: 1.5px solid rgba(39,174,96,0.4); border-radius: 8px; padding: 12px 14px; font-size: 12px; color: #8fe0b5; line-height: 1.7; }
@@ -156,6 +160,7 @@
         <div class="step-body">
           <div class="step-title">Prepare Direct Deposit</div>
           <div class="step-desc">Have a voided check or a completed direct deposit form ready. Direct deposit takes 3 weeks to process — email it to <strong style="color:var(--white)">Moshe@securityusainc.com</strong></div>
+          <a class="step-link" href="mailto:Moshe@securityusainc.com?subject=Direct%20Deposit%20Form&body=First%20Name%3A%20%0D%0ALast%20Name%3A%20%0D%0A%0D%0A(Please%20attach%20your%20voided%20check%20or%20direct%20deposit%20form)">&#128231; Email Direct Deposit Form</a>
         </div>
       </div>
 
@@ -163,7 +168,8 @@
         <div class="step-num">4</div>
         <div class="step-body">
           <div class="step-title">Sign Your DocuSign Paperwork</div>
-          <div class="step-desc">Check your inbox for a message with the subject line <strong style="color:var(--white)">"Moshe Sabaah Via DocuSign."</strong> If you have not received it yet, please contact us at <strong style="color:var(--white)">frontdesk@securityusainc.com</strong> directly. Once you have the email, open it and complete all documents before your start date.</div>
+          <div class="step-desc">We have already emailed your paperwork to you. Open the email and complete all documents before your start date.</div>
+          <div class="inbox-note" id="inbox-note-1"><strong>&#128229; Check your email</strong> for <strong>"Moshe Sabaah Via DocuSign"</strong> (check spam too). Didn't get it? Contact <strong>frontdesk@securityusainc.com</strong>.</div>
         </div>
       </div>
 
@@ -300,6 +306,7 @@
         <div class="step-body">
           <div class="step-title">Prepare Direct Deposit</div>
           <div class="step-desc">Have a voided check or a completed direct deposit form ready. Direct deposit takes 3 weeks to process — email it to <strong style="color:var(--white)">Payroll@securityusainc.com</strong></div>
+          <a class="step-link" href="mailto:Payroll@securityusainc.com?subject=Direct%20Deposit%20Form&body=First%20Name%3A%20%0D%0ALast%20Name%3A%20%0D%0A%0D%0A(Please%20attach%20your%20voided%20check%20or%20direct%20deposit%20form)">&#128231; Email Direct Deposit Form</a>
         </div>
       </div>
 
@@ -387,7 +394,8 @@
         <div class="step-num">6</div>
         <div class="step-body">
           <div class="step-title">Sign Your DocuSign Paperwork</div>
-          <div class="step-desc">Check your inbox for a message with the subject line <strong style="color:var(--white)">"Moshe Sabaah Via DocuSign."</strong> If you have not received it yet, please contact us at <strong style="color:var(--white)">frontdesk@securityusainc.com</strong> directly. Once you have the email, open it and complete all documents before your start date.</div>
+          <div class="step-desc">We have already emailed your paperwork to you. Open the email and complete all documents before your start date.</div>
+          <div class="inbox-note" id="inbox-note-2"><strong>&#128229; Check your email</strong> for <strong>"Moshe Sabaah Via DocuSign"</strong> (check spam too). Didn't get it? Contact <strong>frontdesk@securityusainc.com</strong>.</div>
         </div>
       </div>
 
@@ -449,6 +457,7 @@
         <div class="step-body">
           <div class="step-title">Prepare Direct Deposit</div>
           <div class="step-desc">Have a voided check or a completed direct deposit form ready. Direct deposit takes 3 weeks to process — email it to <strong style="color:var(--white)">Moshe@securityusainc.com</strong></div>
+          <a class="step-link" href="mailto:Moshe@securityusainc.com?subject=Direct%20Deposit%20Form&body=First%20Name%3A%20%0D%0ALast%20Name%3A%20%0D%0A%0D%0A(Please%20attach%20your%20voided%20check%20or%20direct%20deposit%20form)">&#128231; Email Direct Deposit Form</a>
         </div>
       </div>
 
@@ -456,7 +465,8 @@
         <div class="step-num">3</div>
         <div class="step-body">
           <div class="step-title">Sign Your DocuSign Paperwork</div>
-          <div class="step-desc">Check your inbox for a message with the subject line <strong style="color:var(--white)">"Moshe Sabaah Via DocuSign."</strong> If you have not received it yet, please contact us at <strong style="color:var(--white)">frontdesk@securityusainc.com</strong> directly. Once you have the email, open it and complete all documents before your start date.</div>
+          <div class="step-desc">We have already emailed your paperwork to you. Open the email and complete all documents before your start date.</div>
+          <div class="inbox-note" id="inbox-note-3"><strong>&#128229; Check your email</strong> for <strong>"Moshe Sabaah Via DocuSign"</strong> (check spam too). Didn't get it? Contact <strong>frontdesk@securityusainc.com</strong>.</div>
         </div>
       </div>
 
@@ -744,6 +754,20 @@
     document.addEventListener('mouseup', onEnd);
     document.addEventListener('touchend', onEnd);
   })();
+
+  // Tapping a DocuSign step pulses its inbox notice so the instructions get noticed
+  document.querySelectorAll('.inbox-note').forEach(note => {
+    const card = note.closest('.step');
+    if (!card) return;
+    card.style.cursor = 'pointer';
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('a')) return;
+      note.classList.remove('pulse');
+      void note.offsetWidth;
+      note.classList.add('pulse');
+      note.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+  });
 </script>
 </body>
 </html>
