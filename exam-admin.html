@@ -9,7 +9,12 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root { --navy:#0a1628; --gold:#c9a84c; --gold-light:#e8c97a; --white:#f5f5f0; --muted:#8899aa; --step-bg:#0d1f3c; --border:rgba(201,168,76,0.25); }
   body { font-family:'DM Sans',sans-serif; background:var(--navy); color:var(--white); min-height:100vh; }
-  .page { max-width:760px; margin:0 auto; padding:48px 24px 80px; }
+  .page { max-width:1150px; margin:0 auto; padding:48px 24px 80px; }
+  .split { display:grid; grid-template-columns:1fr 1fr; gap:16px; align-items:start; }
+  .split .card { margin-bottom:0; }
+  .chat-card { grid-column:1; grid-row:1; }
+  #results { grid-column:2; grid-row:1; }
+  @media (max-width:820px) { .split { display:block; } .split .card { margin-bottom:16px; } }
   .header { text-align:center; margin-bottom:32px; }
   .badge { display:inline-flex; align-items:center; gap:8px; background:rgba(201,168,76,0.12); border:1px solid var(--border); border-radius:100px; padding:6px 16px; font-size:12px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--gold); margin-bottom:20px; }
   .logo-text { font-family:'Bebas Neue',sans-serif; font-size:44px; letter-spacing:0.06em; color:var(--white); }
@@ -40,7 +45,6 @@
   .msg.show { display:block; }
   .msg.ok { background:rgba(39,174,96,0.08); border:1px solid rgba(39,174,96,0.35); color:#7dd9a8; }
   .msg.bad { background:rgba(192,57,43,0.1); border:1px solid rgba(192,57,43,0.4); color:#e88; }
-  #results { display:none; }
   .session-row { background:#0a1628; border:1px solid var(--border); border-radius:10px; padding:12px 14px; margin-bottom:8px; cursor:pointer; transition:border-color 0.15s; }
   .session-row:hover { border-color:var(--gold); }
   .pill.new { background:rgba(201,168,76,0.18); color:var(--gold-light); border:1px solid var(--gold); }
@@ -57,23 +61,22 @@
     <div class="tagline">Onboarding Exam — Results</div>
   </div>
 
-  <div class="card">
-    <button class="btn" id="load-btn" onclick="loadResults()">&#8635; Refresh</button>
+  <div style="margin-bottom:16px;">
+    <button class="btn" id="load-btn" onclick="refreshAll()">&#8635; Refresh</button>
     <div class="msg" id="msg"></div>
   </div>
 
+  <div class="split">
+
   <div class="card" id="results">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-      <h3 style="font-size:14px; font-weight:600;">Submissions (<span id="count">0</span>)</h3>
+      <h3 style="font-size:14px; font-weight:600;">&#128221; Test Submissions (<span id="count">0</span>)</h3>
     </div>
-    <div id="rows"></div>
+    <div id="rows"><p style="font-size:13px; color:var(--muted);">Loading&hellip;</p></div>
   </div>
 
-  <div class="card">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-      <h3 style="font-size:14px; font-weight:600;">&#128172; Live Chat</h3>
-      <button class="btn btn-sm" onclick="loadSessions()">&#8635; Refresh</button>
-    </div>
+  <div class="card chat-card">
+    <h3 style="font-size:14px; font-weight:600; margin-bottom:14px;">&#128172; Live Chat</h3>
     <div id="chat-sessions"><p style="font-size:13px; color:var(--muted);">Loading&hellip;</p></div>
     <div id="chat-thread" style="display:none;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
@@ -87,6 +90,7 @@
         <button class="btn" onclick="sendReply()">Send</button>
       </div>
     </div>
+  </div>
   </div>
 </div>
 
@@ -187,9 +191,13 @@ const QUESTIONS = [
   const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0dmFneWpjam94bmJzbGFmbXlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NTcxNTIsImV4cCI6MjA4OTQzMzE1Mn0.da_l4ogYdc_XL7DqmK_RmmR6cC_X6Lq102ddnN7QYY4';
   let rows = [];
 
-  window.addEventListener('DOMContentLoaded', () => {
+  function refreshAll() {
     loadResults();
     loadSessions();
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    refreshAll();
     setInterval(loadSessions, 10000);
   });
 
