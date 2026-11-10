@@ -52,7 +52,7 @@
   </div>
 
   <div class="card">
-    <button class="btn" id="load-btn" onclick="loadResults()">Load Results</button>
+    <button class="btn" id="load-btn" onclick="loadResults()">&#8635; Refresh</button>
     <div class="msg" id="msg"></div>
   </div>
 
@@ -160,6 +160,8 @@ const QUESTIONS = [
   const FN_URL = 'https://stvagyjcjoxnbslafmyf.supabase.co/functions/v1/exam';
   const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0dmFneWpjam94bmJzbGFmbXlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NTcxNTIsImV4cCI6MjA4OTQzMzE1Mn0.da_l4ogYdc_XL7DqmK_RmmR6cC_X6Lq102ddnN7QYY4';
   let rows = [];
+
+  window.addEventListener('DOMContentLoaded', loadResults);
 
   function msg(text, ok) {
     const el = document.getElementById('msg');
