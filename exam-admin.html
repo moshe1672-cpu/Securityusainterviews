@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exam Results — Admin</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --navy:#0a1628; --gold:#c9a84c; --gold-light:#e8c97a; --white:#f5f5f0; --muted:#8899aa; --step-bg:#0d1f3c; --border:rgba(201,168,76,0.25); }
+  body { font-family:'DM Sans',sans-serif; background:var(--navy); color:var(--white); min-height:100vh; }
+  .page { max-width:760px; margin:0 auto; padding:48px 24px 80px; }
+  .header { text-align:center; margin-bottom:32px; }
+  .badge { display:inline-flex; align-items:center; gap:8px; background:rgba(201,168,76,0.12); border:1px solid var(--border); border-radius:100px; padding:6px 16px; font-size:12px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--gold); margin-bottom:20px; }
+  .logo-text { font-family:'Bebas Neue',sans-serif; font-size:44px; letter-spacing:0.06em; color:var(--white); }
+  .logo-text span { color:var(--gold); }
+  .tagline { font-size:14px; color:var(--muted); margin-top:6px; }
+  .card { background:var(--step-bg); border:1px solid var(--border); border-radius:12px; padding:24px; margin-bottom:16px; }
+  label { display:block; font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); margin:14px 0 6px; }
+  input { width:100%; background:#0a1628; border:1.5px solid var(--border); border-radius:8px; padding:11px 14px; font-size:14px; color:var(--white); font-family:'DM Sans',sans-serif; outline:none; color-scheme:dark; }
+  input:focus { border-color:var(--gold); }
+  .controls { display:grid; grid-template-columns:1fr 1fr; gap:12px; align-items:end; }
+  .btn { display:inline-flex; align-items:center; gap:6px; background:var(--gold); color:var(--navy); font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; padding:10px 16px; border-radius:7px; border:none; cursor:pointer; font-family:'DM Sans',sans-serif; transition:background 0.2s; text-decoration:none; }
+  .btn:hover { background:var(--gold-light); }
+  .btn:disabled { opacity:0.5; cursor:wait; }
+  .btn-sm { padding:7px 12px; font-size:11px; }
+  .btn-outline { background:transparent; border:1.5px solid var(--gold); color:var(--gold); }
+  .btn-outline:hover { background:rgba(201,168,76,0.1); }
+  .row-card { background:#0a1628; border:1px solid var(--border); border-radius:10px; padding:14px 16px; margin-bottom:10px; }
+  .row-top { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
+  .row-name { font-size:14px; font-weight:600; color:var(--white); }
+  .row-meta { font-size:12px; color:var(--muted); margin-top:2px; }
+  .pill { display:inline-block; font-size:10px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; border-radius:4px; padding:3px 8px; margin-left:8px; }
+  .pill.pass { background:rgba(39,174,96,0.15); color:#7dd9a8; border:1px solid rgba(39,174,96,0.4); }
+  .pill.fail { background:rgba(192,57,43,0.15); color:#e88; border:1px solid rgba(192,57,43,0.4); }
+  .row-actions { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .msg { display:none; margin-top:14px; border-radius:8px; padding:10px 14px; font-size:12px; line-height:1.6; }
+  .msg.show { display:block; }
+  .msg.ok { background:rgba(39,174,96,0.08); border:1px solid rgba(39,174,96,0.35); color:#7dd9a8; }
+  .msg.bad { background:rgba(192,57,43,0.1); border:1px solid rgba(192,57,43,0.4); color:#e88; }
+  #results { display:none; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="badge">Admin Only</div>
+    <div class="logo-text">Security <span>USA</span></div>
+    <div class="tagline">Onboarding Exam — Results</div>
+  </div>
+
+  <div class="card">
+    <div class="controls">
+      <div>
+        <label>From Date</label>
+        <input id="start" type="date" />
+      </div>
+      <div>
+        <label>To Date</label>
+        <input id="end" type="date" />
+      </div>
+    </div>
+    <button class="btn" id="load-btn" onclick="loadResults()" style="margin-top:16px;">Load Results</button>
+    <div class="msg" id="msg"></div>
+  </div>
+
+  <div class="card" id="results">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+      <h3 style="font-size:14px; font-weight:600;">Submissions (<span id="count">0</span>)</h3>
+    </div>
+    <div id="rows"></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const QUESTIONS = [
+  { n: 1, multi: false, q: "What is Security USA Policy for checking in and out of your shift?", opts: {
+    a: "Answers B, C and E are all correct",
+    b: "You must clock in at the start of the shift and you must clock out at end of the shift",
+    c: "You can either use your Ehub app or an authorized phone at the site and call 833.343.1773 to clock in or out",
+    d: "It is important to clock in, but you do not have to clock out",
+    e: "Failure to clock out or in may result in disciplinary action, including up to a termination"
+  }, correct: "a" },
+  { n: 2, multi: false, q: "You are about to end your shift and your relief arrived 15 minutes early. Is it acceptable to leave early since your relief is already on post?", opts: {
+    a: "Yes, you can leave early since there is another guard that can cover the post",
+    b: "No! You must wait until the end of your shift and you must clock out at the end of your shift",
+    c: "You can leave whenever.",
+    d: "You can leave early as long as you make sure to log in the command log book that you are leaving early"
+  }, correct: "b" },
+  { n: 3, multi: false, q: "What must you do if you cannot clock in or out using the Ehub App and you cannot clock in or out by calling 833.343.1773 from an authorized, registered phone?", opts: {
+    a: "Wait until the next day to report the issue to your supervisor",
+    b: "Call the Command Center at 212-594-4475 and report the issue",
+    c: "Call 833.343.1773 on your personal phone from anywhere and no need for a registered site phone",
+    d: "If you cannot clock in or out, you can abandon the post and go home"
+  }, correct: "b" },
+  { n: 4, multi: false, q: "You are working at a post where there is a \"Face to Face Relief\" and your shift is from 8am to 4pm. It is now 4:15pm and your relief has not arrived. What should you do?", opts: {
+    a: "Make a log entry in the command log book that your relief has not arrived, and proceed to lock the post and clock out",
+    b: "Stay on duty until your relief arrives, and while waiting, you may contact the Security USA command center to report the issue awaiting further instructions.",
+    c: "Wait until your relief arrives, and once they arrive, you can leave without clocking out",
+    d: "You can leave as soon as your shift ended. It is not your problem that no one showed up at 4pm to relieve you."
+  }, correct: "b" },
+  { n: 5, multi: false, q: "You are working at a post that is a \"face to face relief\". It is now 8am, you are tired and want to leave, but your relief has not shown up yet. What will happen if you leave without waiting on your relief?", opts: {
+    a: "Both answers B and C are correct",
+    b: "You may face immediate termination",
+    c: "Working in a \"Face to Face Relief\" post means that your post continues beyond your shift time, and you must wait for relief",
+    d: "Since you are tired, you can leave your post and clock out."
+  }, correct: "a" },
+  { n: 6, multi: false, q: "You are scheduled to work at 4pm today. It is now 8am and you just woke up sick. How many hours in advance must you call out sick?", opts: {
+    a: "As long as you are not being admitted to the hospital, you must report to work.",
+    b: "You may send a text or email to your manager",
+    c: "You must call the command center at least 6 hours in advance and advise that you cannot come in.",
+    d: "You must email a doctor note or text your supervisor a photo of the note at least 3 hours in advance"
+  }, correct: "c" },
+  { n: 7, multi: false, q: "What happens if you arrive at work under the influence of alcohol or drugs?", opts: {
+    a: "Both answers B and C are correct",
+    b: "You may be terminated immediately",
+    c: "Even if you have a prescription for medical marijuana, you are not allowed to come to work under the influence of the drug",
+    d: "If you have a medical prescription for marijuana, you are allowed to work under the influence of that drug"
+  }, correct: "a" },
+  { n: 8, multi: false, q: "You have some questions regarding your last pay check, or you need a proof of income document, or you believe the hours you were paid for are not correct. Whom should you contact?", opts: {
+    a: "Call the Security USA command center and ask for the operator's help.",
+    b: "Call your account manager and ask for his assistance",
+    c: "Send an email to payroll@securityusainc.com and provide details about your request",
+    d: "Call the Security USA command center and ask to speak with someone from the payroll department"
+  }, correct: "c" },
+  { n: 9, multi: false, q: "What is the uniform policy for your work site?", opts: {
+    a: "All the answers are correct",
+    b: "You must be in compliance with the uniform guidelines for your work site.",
+    c: "If you are about to receive a new assignment, you must make sure you have the proper uniform attire.",
+    d: "If you are missing a uniform item or you are in need of new uniform, you must contact Help@securityusa.info.",
+    e: "All employees must wear solid black shoes to work."
+  }, correct: "a" },
+  { n: 10, multi: false, q: "Complete the sentence: When you work at a Face-to-face relief post…", opts: {
+    a: "…writing an email is not an acceptable form for call outs",
+    b: "…at the end of your shift",
+    c: "…you must stay on post until the next guard relieves you.",
+    d: "…6 hours in advance before your shift starts."
+  }, correct: "c" },
+  { n: 11, multi: false, q: "Complete the sentence: If you are sick, you must call out at least…", opts: {
+    a: "…sending a text or writing an email is not an acceptable form for call outs",
+    b: "…at the end of your shift",
+    c: "…you must stay on post until the next guard relieves you.",
+    d: "…6 hours in advance before your shift starts."
+  }, correct: "d" },
+  { n: 12, multi: false, q: "Complete the sentence: Sending a text…", opts: {
+    a: "…or writing an email is not an acceptable form for call outs",
+    b: "…at the end of your shift",
+    c: "…you must stay on post until the next guard relieves you.",
+    d: "…6 hours in advance before your shift starts."
+  }, correct: "a" },
+  { n: 13, multi: false, q: "Complete the sentence: You must clock out…", opts: {
+    a: "…or writing an email is not an acceptable form for call outs",
+    b: "…at the end of your shift",
+    c: "…you must stay on post until the next guard relieves you.",
+    d: "…6 hours in advance before your shift starts."
+  }, correct: "b" },
+  { n: 14, multi: true, q: "During work it is expected that field supervisors and account managers will stop by from time to time to conduct quality control inspections. What is expected during these inspections? Select ALL the correct answers.", opts: {
+    a: "The supervisor / manager will take a photo showing that you are on post in the correct uniform.",
+    b: "The supervisor / manager will review and sign the command log book",
+    c: "The supervisor / manager may ask you to take a short electronic exam about the post duties.",
+    d: "The supervisor / manager may allow you to go and take a nap in the break room."
+  }, correct: ["a","b","c"] }
+];
+
+</script>
+<script>
+  const FN_URL = 'https://stvagyjcjoxnbslafmyf.supabase.co/functions/v1/exam';
+  const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0dmFneWpjam94bmJzbGFmbXlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NTcxNTIsImV4cCI6MjA4OTQzMzE1Mn0.da_l4ogYdc_XL7DqmK_RmmR6cC_X6Lq102ddnN7QYY4';
+  let rows = [];
+
+  (function() {
+    const today = new Date();
+    const month = new Date(today.getTime() - 29 * 86400000);
+    document.getElementById('end').value = today.toISOString().slice(0, 10);
+    document.getElementById('start').value = month.toISOString().slice(0, 10);
+  })();
+
+  function msg(text, ok) {
+    const el = document.getElementById('msg');
+    el.textContent = text;
+    el.className = 'msg show ' + (ok ? 'ok' : 'bad');
+  }
+
+  async function loadResults() {
+    const btn = document.getElementById('load-btn');
+    btn.disabled = true;
+    document.getElementById('msg').className = 'msg';
+    try {
+      const r = await fetch(FN_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + ANON },
+        body: JSON.stringify({
+          action: 'list',
+          admin_key: 'SUSA-DD-2026',
+          start_date: document.getElementById('start').value || null,
+          end_date: document.getElementById('end').value || null,
+        }),
+      });
+      const data = await r.json();
+      if (!r.ok || data.error) throw new Error(data.error || ('HTTP ' + r.status));
+      rows = data.rows || [];
+      renderRows();
+    } catch (e) {
+      msg('⚠ ' + e.message, false);
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  function fmtDate(iso) {
+    return new Date(iso).toLocaleString('en-US', { timeZone: 'America/New_York', month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+  }
+
+  function renderRows() {
+    const wrap = document.getElementById('rows');
+    document.getElementById('results').style.display = 'block';
+    document.getElementById('count').textContent = rows.length;
+    if (!rows.length) { wrap.innerHTML = '<p style="font-size:13px; color:var(--muted);">No submissions in this date range.</p>'; return; }
+    wrap.innerHTML = rows.map((r, i) =>
+      '<div class="row-card">' +
+        '<div class="row-top"><div>' +
+          '<span class="row-name">' + esc(r.first_name) + ' ' + esc(r.last_name) + '</span>' +
+          '<span class="pill ' + (r.passed ? 'pass' : 'fail') + '">' + (r.passed ? 'Pass' : 'Fail') + ' · ' + r.score + '%</span>' +
+          '<div class="row-meta">' + esc(r.email) + ' · ' + fmtDate(r.created_at) + ' · ' + r.correct_count + '/' + r.total_questions + ' correct</div>' +
+        '</div></div>' +
+        '<div class="row-actions">' +
+          '<button class="btn btn-sm" onclick="downloadTest(' + i + ')">&#11015; Download Test</button>' +
+          (r.incorrect && r.incorrect.length ? '<a class="btn btn-sm btn-outline" href="' + mailtoLink(r) + '">&#128231; Email Incorrect Answers</a>' : '') +
+        '</div>' +
+      '</div>'
+    ).join('');
+  }
+
+  function esc(s) { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; }
+
+  function mailtoLink(r) {
+    const wrong = (r.incorrect || []);
+    let body = 'Hello ' + r.first_name + ',\n\nYou scored ' + r.score + '% on the Security USA Onboarding Exam (' + r.correct_count + '/' + r.total_questions + ' correct). A score of 80% or higher is required to pass.\n\nQuestions to review:\n';
+    wrong.forEach(w => {
+      body += '\n- Question ' + w.n + ': ' + w.q.slice(0, 90) + (w.q.length > 90 ? '...' : '') + '\n  Your answer: ' + String(w.given).toUpperCase() + '\n';
+    });
+    body += '\nPlease review the onboarding materials and retake the exam at https://securityusainterviews.vercel.app/exam.html\n\nSecurity USA HR';
+    return 'mailto:' + encodeURIComponent(r.email) + '?subject=' + encodeURIComponent('Security USA Onboarding Exam — Review Incorrect Answers') + '&body=' + encodeURIComponent(body);
+  }
+
+  async function downloadTest(i) {
+    const r = rows[i];
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'pt', format: 'letter' });
+    const W = 612, M = 54, LH = 14;
+    let y = 60;
+
+    function line(text, opts = {}) {
+      const { bold = false, size = 10, color = [20,20,20], indent = 0 } = opts;
+      doc.setFont('helvetica', bold ? 'bold' : 'normal');
+      doc.setFontSize(size);
+      doc.setTextColor(...color);
+      const wrapped = doc.splitTextToSize(text, W - M * 2 - indent);
+      wrapped.forEach(t => {
+        if (y > 740) { doc.addPage(); y = 60; }
+        doc.text(t, M + indent, y);
+        y += LH;
+      });
+    }
+
+    line('SECURITY USA — ONBOARDING EXAM', { bold: true, size: 14 });
+    y += 4;
+    line('Name: ' + r.first_name + ' ' + r.last_name, { size: 11 });
+    line('Email: ' + r.email, { size: 11 });
+    line('Date: ' + fmtDate(r.created_at), { size: 11 });
+    line('Score: ' + r.score + '%  (' + r.correct_count + '/' + r.total_questions + ' correct)  —  ' + (r.passed ? 'PASS' : 'FAIL'), { bold: true, size: 12, color: r.passed ? [30,130,70] : [180,40,35] });
+    y += 8;
+
+    const wrongNums = new Set((r.incorrect || []).map(w => w.n));
+    QUESTIONS.forEach(q => {
+      const given = r.answers ? r.answers[q.n] : null;
+      const givenStr = Array.isArray(given) ? given.join(', ') : (given || '—');
+      const correctStr = Array.isArray(q.correct) ? q.correct.join(', ') : q.correct;
+      const isWrong = wrongNums.has(q.n);
+      y += 4;
+      line('Q' + q.n + '. ' + q.q, { bold: true, size: 10 });
+      line('Answer given: ' + String(givenStr).toUpperCase() + (isWrong ? '  ✘ INCORRECT' : '  ✓ Correct'), { size: 10, indent: 12, color: isWrong ? [180,40,35] : [30,130,70] });
+      if (isWrong) line('Correct answer: ' + String(correctStr).toUpperCase(), { size: 10, indent: 12 });
+    });
+
+    const fname = (r.first_name + '_' + r.last_name + '_Onboarding_Exam_' + r.created_at.slice(0, 10) + '.pdf').replace(/\s+/g, '_');
+    const blob = doc.output('blob');
+
+    if (window.showSaveFilePicker) {
+      try {
+        const handle = await window.showSaveFilePicker({
+          suggestedName: fname,
+          types: [{ description: 'PDF', accept: { 'application/pdf': ['.pdf'] } }],
+        });
+        const w = await handle.createWritable();
+        await w.write(blob);
+        await w.close();
+        msg('Saved ' + fname, true);
+        return;
+      } catch (e) {
+        if (e.name === 'AbortError') return;
+      }
+    }
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = fname;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+</script>
+</body>
+</html>

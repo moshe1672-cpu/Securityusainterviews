@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Security USA — Onboarding Exam</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --navy:#0a1628; --gold:#b08c33; --gold-bg:#faf5e8; --text:#111827; --muted:#4b5563; --border:#d1d5db; --green:#1e8e4e; --red:#c0392b; }
+  body { font-family:'DM Sans',sans-serif; background:#f3f5f8; color:var(--text); min-height:100vh; }
+  .page { max-width:680px; margin:0 auto; padding:40px 20px 80px; }
+  .header { text-align:center; margin-bottom:28px; }
+  .badge { display:inline-flex; align-items:center; gap:8px; background:var(--gold-bg); border:1px solid var(--gold); border-radius:100px; padding:6px 16px; font-size:12px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:#8a6d2b; margin-bottom:18px; }
+  .logo-text { font-family:'Bebas Neue',sans-serif; font-size:44px; letter-spacing:0.06em; color:var(--navy); }
+  .logo-text span { color:var(--gold); }
+  .tagline { font-size:15px; color:var(--muted); margin-top:6px; font-weight:500; }
+  .card { background:#ffffff; border:1px solid var(--border); border-radius:12px; padding:26px; margin-bottom:16px; box-shadow:0 2px 8px rgba(10,22,40,0.06); }
+  .card h3 { font-size:18px; font-weight:700; margin-bottom:10px; color:var(--navy); }
+  .card p { font-size:15px; color:#374151; line-height:1.65; }
+  label { display:block; font-size:12px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); margin:16px 0 6px; }
+  input { width:100%; background:#ffffff; border:1.5px solid var(--border); border-radius:8px; padding:12px 14px; font-size:16px; color:var(--text); font-family:'DM Sans',sans-serif; outline:none; }
+  input:focus { border-color:var(--navy); }
+  .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; margin-top:20px; background:var(--navy); color:#ffffff; font-size:15px; font-weight:700; letter-spacing:0.04em; padding:14px 26px; border-radius:8px; border:none; cursor:pointer; font-family:'DM Sans',sans-serif; transition:background 0.2s; }
+  .btn:hover { background:#16294a; }
+  .btn:disabled { opacity:0.5; cursor:wait; }
+  .btn-outline { background:#ffffff; border:1.5px solid var(--navy); color:var(--navy); }
+  .btn-outline:hover { background:#eef1f6; }
+  .btn-gold { background:var(--gold); color:#ffffff; }
+  .btn-gold:hover { background:#8a6d2b; }
+  .progress-wrap { margin-bottom:14px; }
+  .progress-label { display:flex; justify-content:space-between; font-size:14px; font-weight:700; color:var(--navy); margin-bottom:8px; }
+  .progress-bar { height:8px; background:#e2e6ec; border-radius:100px; overflow:hidden; }
+  .progress-fill { height:100%; background:var(--gold); border-radius:100px; transition:width 0.3s ease; }
+  .question { background:#ffffff; border:1px solid var(--border); border-radius:12px; padding:24px; margin-bottom:14px; box-shadow:0 2px 8px rgba(10,22,40,0.06); display:none; }
+  .question.active { display:block; }
+  .question.unanswered { border-color:var(--red); }
+  .q-num { display:inline-flex; align-items:center; justify-content:center; min-width:32px; height:32px; background:var(--navy); border-radius:8px; font-family:'Bebas Neue',sans-serif; font-size:17px; color:#ffffff; margin-right:12px; flex-shrink:0; }
+  .q-text { font-size:18px; font-weight:700; color:var(--text); line-height:1.5; display:flex; align-items:flex-start; margin-bottom:16px; }
+  .q-multi { display:inline-block; font-size:13px; font-weight:700; color:#8a6d2b; background:var(--gold-bg); border:1px solid var(--gold); border-radius:6px; padding:4px 10px; letter-spacing:0.05em; text-transform:uppercase; margin:0 0 14px 44px; }
+  .opt { display:flex; gap:12px; align-items:flex-start; background:#ffffff; border:2px solid var(--border); border-radius:10px; padding:14px 15px; margin-bottom:10px; cursor:pointer; transition:border-color 0.15s, background 0.15s; font-size:16px; font-weight:400; color:var(--text); line-height:1.55; text-transform:none; letter-spacing:normal; margin-top:0; }
+  .opt:hover { border-color:#8fa0b8; }
+  .opt input { width:auto; margin-top:3px; accent-color:var(--navy); flex-shrink:0; transform:scale(1.25); }
+  .opt.sel { border-color:var(--navy); background:#eef3fb; }
+  .nav-row { display:flex; gap:12px; }
+  .nav-row .btn { flex:1; margin-top:8px; }
+  .result-card { text-align:center; padding:36px 24px; }
+  .result-icon { font-size:52px; margin-bottom:12px; }
+  .result-score { font-family:'Bebas Neue',sans-serif; font-size:60px; letter-spacing:0.05em; line-height:1; }
+  .result-score.pass { color:var(--green); }
+  .result-score.fail { color:var(--red); }
+  .result-label { font-size:15px; color:#374151; margin-top:10px; line-height:1.7; }
+  .wrong-list { text-align:left; margin-top:18px; display:none; }
+  .wrong-list.show { display:block; }
+  .wrong-item { background:#fdf2f1; border:1px solid #e8b4ae; border-radius:8px; padding:14px 15px; margin-bottom:10px; font-size:15px; line-height:1.6; }
+  .wrong-item .wq { font-weight:700; color:var(--text); }
+  .wrong-item .wa { color:var(--red); font-weight:600; }
+  .err { display:none; margin-top:14px; background:#fdf2f1; border:1px solid #e8b4ae; border-radius:8px; padding:11px 14px; font-size:14px; font-weight:600; color:var(--red); }
+  .err.show { display:block; }
+  #quiz-screen, #result-screen { display:none; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="badge">Onboarding Exam</div>
+    <div class="logo-text">Security <span>USA</span></div>
+    <div class="tagline">14 questions &middot; 80% or higher to pass</div>
+  </div>
+
+  <div class="card" id="start-screen">
+    <h3>Before you begin</h3>
+    <p>Enter your name and email, then answer all 14 questions &mdash; one at a time. You need a score of <strong>80% or above</strong> to pass. If you don't pass, you can retake the exam.</p>
+    <label>First Name</label>
+    <input id="first" type="text" placeholder="First name" />
+    <label>Last Name</label>
+    <input id="last" type="text" placeholder="Last name" />
+    <label>Email</label>
+    <input id="email" type="email" placeholder="you@example.com" />
+    <button class="btn" onclick="startExam()">Start Exam &rarr;</button>
+    <div class="err" id="start-err"></div>
+  </div>
+
+  <div id="quiz-screen">
+    <div class="progress-wrap">
+      <div class="progress-label"><span id="progress-text">Question 1 of 14</span><span id="progress-pct"></span></div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:7%"></div></div>
+    </div>
+    <div id="questions"></div>
+    <div class="nav-row">
+      <button class="btn btn-outline" id="back-btn" onclick="prevQ()">&larr; Back</button>
+      <button class="btn" id="next-btn" onclick="nextQ()">Next &rarr;</button>
+      <button class="btn btn-gold" id="submit-btn" onclick="submitExam()" style="display:none;">Submit Exam</button>
+    </div>
+    <div class="err" id="quiz-err"></div>
+  </div>
+
+  <div class="card result-card" id="result-screen">
+    <div class="result-icon" id="result-icon"></div>
+    <div class="result-score" id="result-score"></div>
+    <div class="result-label" id="result-label"></div>
+    <div id="result-actions"></div>
+    <div class="wrong-list" id="wrong-list"></div>
+  </div>
+</div>
+<script>
+const QUESTIONS = [
+  { n: 1, multi: false, q: "What is Security USA Policy for checking in and out of your shift?", opts: {
+    a: "Answers B, C and E are all correct",
+    b: "You must clock in at the start of the shift and you must clock out at end of the shift",
+    c: "You can either use your Ehub app or an authorized phone at the site and call 833.343.1773 to clock in or out",
+    d: "It is important to clock in, but you do not have to clock out",
+    e: "Failure to clock out or in may result in disciplinary action, including up to a termination"
+  }, correct: "a" },
+  { n: 2, multi: false, q: "You are about to end your shift and your relief arrived 15 minutes early. Is it acceptable to leave early since your relief is already on post?", opts: {
+    a: "Yes, you can leave early since there is another guard that can cover the post",
+    b: "No! You must wait until the end of your shift and you must clock out at the end of your shift",
+    c: "You can leave whenever.",
+    d: "You can leave early as long as you make sure to log in the command log book that you are leaving early"
+  }, correct: "b" },
+  { n: 3, multi: false, q: "What must you do if you cannot clock in or out using the Ehub App and you cannot clock in or out by calling 833.343.1773 from an authorized, registered phone?", opts: {
+    a: "Wait until the next day to report the issue to your supervisor",
+    b: "Call the Command Center at 212-594-4475 and report the issue",
+    c: "Call 833.343.1773 on your personal phone from anywhere and no need for a registered site phone",
+    d: "If you cannot clock in or out, you can abandon the post and go home"
+  }, correct: "b" },
+  { n: 4, multi: false, q: "You are working at a post where there is a \"Face to Face Relief\" and your shift is from 8am to 4pm. It is now 4:15pm and your relief has not arrived. What should you do?", opts: {
+    a: "Make a log entry in the command log book that your relief has not arrived, and proceed to lock the post and clock out",
+    b: "Stay on duty until your relief arrives, and while waiting, you may contact the Security USA command center to report the issue awaiting further instructions.",
+    c: "Wait until your relief arrives, and once they arrive, you can leave without clocking out",
+    d: "You can leave as soon as your shift ended. It is not your problem that no one showed up at 4pm to relieve you."
+  }, correct: "b" },
+  { n: 5, multi: false, q: "You are working at a post that is a \"face to face relief\". It is now 8am, you are tired and want to leave, but your relief has not shown up yet. What will happen if you leave without waiting on your relief?", opts: {
+    a: "Both answers B and C are correct",
+    b: "You may face immediate termination",
+    c: "Working in a \"Face to Face Relief\" post means that your post continues beyond your shift time, and you must wait for relief",
+    d: "Since you are tired, you can leave your post and clock out."
+  }, correct: "a" },
+  { n: 6, multi: false, q: "You are scheduled to work at 4pm today. It is now 8am and you just woke up sick. How many hours in advance must you call out sick?", opts: {
+    a: "As long as you are not being admitted to the hospital, you must report to work.",
+    b: "You may send a text or email to your manager",
+    c: "You must call the command center at least 6 hours in advance and advise that you cannot come in.",
+    d: "You must email a doctor note or text your supervisor a photo of the note at least 3 hours in advance"
+  }, correct: "c" },
+  { n: 7, multi: false, q: "What happens if you arrive at work under the influence of alcohol or drugs?", opts: {
+    a: "Both answers B and C are correct",
+    b: "You may be terminated immediately",
+    c: "Even if you have a prescription for medical marijuana, you are not allowed to come to work under the influence of the drug",
+    d: "If you have a medical prescription for marijuana, you are allowed to work under the influence of that drug"
+  }, correct: "a" },
+  { n: 8, multi: false, q: "You have some questions regarding your last pay check, or you need a proof of income document, or you believe the hours you were paid for are not correct. Whom should you contact?", opts: {
+    a: "Call the Security USA command center and ask for the operator's help.",
+    b: "Call your account manager and ask for his assistance",
+    c: "Send an email to payroll@securityusainc.com and provide details about your request",
+    d: "Call the Security USA command center and ask to speak with someone from the payroll department"
+  }, correct: "c" },
+  { n: 9, multi: false, q: "What is the uniform policy for your work site?", opts: {
+    a: "All the answers are correct",
+    b: "You must be in compliance with the uniform guidelines for your work site.",
+    c: "If you are about to receive a new assignment, you must make sure you have the proper uniform attire.",
+    d: "If you are missing a uniform item or you are in need of new uniform, you must contact Help@securityusa.info.",
+    e: "All employees must wear solid black shoes to work."
+  }, correct: "a" },
+  { n: 10, multi: false, q: "Complete the sentence: When you work at a Face-to-face relief post…", opts: {
+    a: "…writing an email is not an acceptable form for call outs",
+    b: "…at the end of your shift",
+    c: "…you must stay on post until the next guard relieves you.",
+    d: "…6 hours in advance before your shift starts."
+  }, correct: "c" },
+  { n: 11, multi: false, q: "Complete the sentence: If you are sick, you must call out at least…", opts: {
+    a: "…sending a text or writing an email is not an acceptable form for call outs",
+    b: "…at the end of your shift",
+    c: "…you must stay on post until the next guard relieves you.",
+    d: "…6 hours in advance before your shift starts."
+  }, correct: "d" },
+  { n: 12, multi: false, q: "Complete the sentence: Sending a text…", opts: {
+    a: "…or writing an email is not an acceptable form for call outs",
+    b: "…at the end of your shift",
+    c: "…you must stay on post until the next guard relieves you.",
+    d: "…6 hours in advance before your shift starts."
+  }, correct: "a" },
+  { n: 13, multi: false, q: "Complete the sentence: You must clock out…", opts: {
+    a: "…or writing an email is not an acceptable form for call outs",
+    b: "…at the end of your shift",
+    c: "…you must stay on post until the next guard relieves you.",
+    d: "…6 hours in advance before your shift starts."
+  }, correct: "b" },
+  { n: 14, multi: true, q: "During work it is expected that field supervisors and account managers will stop by from time to time to conduct quality control inspections. What is expected during these inspections? Select ALL the correct answers.", opts: {
+    a: "The supervisor / manager will take a photo showing that you are on post in the correct uniform.",
+    b: "The supervisor / manager will review and sign the command log book",
+    c: "The supervisor / manager may ask you to take a short electronic exam about the post duties.",
+    d: "The supervisor / manager may allow you to go and take a nap in the break room."
+  }, correct: ["a","b","c"] }
+];
+
+</script>
+<script>
+  const FN_URL = 'https://stvagyjcjoxnbslafmyf.supabase.co/functions/v1/exam';
+  const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0dmFneWpjam94bmJzbGFmbXlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NTcxNTIsImV4cCI6MjA4OTQzMzE1Mn0.da_l4ogYdc_XL7DqmK_RmmR6cC_X6Lq102ddnN7QYY4';
+  const PASS_MARK = 80;
+  let taker = {};
+  let currentQ = 0;
+
+  function showErr(id, msg) {
+    const el = document.getElementById(id);
+    el.textContent = '⚠ ' + msg;
+    el.classList.add('show');
+  }
+  function hideErr(id) { document.getElementById(id).classList.remove('show'); }
+
+  function startExam() {
+    hideErr('start-err');
+    const first = document.getElementById('first').value.trim();
+    const last = document.getElementById('last').value.trim();
+    const email = document.getElementById('email').value.trim();
+    let missing = false;
+    [['first', first], ['last', last], ['email', email]].forEach(([id, v]) => {
+      document.getElementById(id).style.borderColor = v ? '#d1d5db' : '#c0392b';
+      if (!v) missing = true;
+    });
+    if (missing) return;
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      document.getElementById('email').style.borderColor = '#c0392b';
+      showErr('start-err', 'Please enter a valid email address.');
+      return;
+    }
+    taker = { first_name: first, last_name: last, email: email };
+    renderQuestions();
+    document.getElementById('start-screen').style.display = 'none';
+    document.getElementById('quiz-screen').style.display = 'block';
+    showQ(0);
+    window.scrollTo({ top: 0 });
+  }
+
+  function renderQuestions() {
+    const wrap = document.getElementById('questions');
+    wrap.innerHTML = '';
+    QUESTIONS.forEach(q => {
+      const div = document.createElement('div');
+      div.className = 'question';
+      div.id = 'q-' + q.n;
+      let html = '<div class="q-text"><span class="q-num">' + q.n + '</span><span>' + q.q + '</span></div>';
+      if (q.multi) html += '<div class="q-multi">Select all that apply</div>';
+      for (const [letter, text] of Object.entries(q.opts)) {
+        const type = q.multi ? 'checkbox' : 'radio';
+        html += '<label class="opt"><input type="' + type + '" name="q' + q.n + '" value="' + letter + '" onchange="markSel(this)"><span><strong>' + letter.toUpperCase() + '.</strong> ' + text + '</span></label>';
+      }
+      div.innerHTML = html;
+      wrap.appendChild(div);
+    });
+  }
+
+  function showQ(i) {
+    currentQ = i;
+    QUESTIONS.forEach((q, idx) => {
+      document.getElementById('q-' + q.n).classList.toggle('active', idx === i);
+    });
+    document.getElementById('progress-text').textContent = 'Question ' + (i + 1) + ' of ' + QUESTIONS.length;
+    document.getElementById('progress-pct').textContent = Math.round(((i + 1) / QUESTIONS.length) * 100) + '%';
+    document.getElementById('progress-fill').style.width = (((i + 1) / QUESTIONS.length) * 100) + '%';
+    document.getElementById('back-btn').style.display = i === 0 ? 'none' : 'inline-flex';
+    const last = i === QUESTIONS.length - 1;
+    document.getElementById('next-btn').style.display = last ? 'none' : 'inline-flex';
+    document.getElementById('submit-btn').style.display = last ? 'inline-flex' : 'none';
+    hideErr('quiz-err');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function answeredCurrent() {
+    const q = QUESTIONS[currentQ];
+    const a = getAnswer(q);
+    const empty = q.multi ? a.length === 0 : !a;
+    document.getElementById('q-' + q.n).classList.toggle('unanswered', empty);
+    if (empty) showErr('quiz-err', 'Please select an answer before continuing.');
+    return !empty;
+  }
+
+  function nextQ() {
+    if (!answeredCurrent()) return;
+    if (currentQ < QUESTIONS.length - 1) showQ(currentQ + 1);
+  }
+
+  function prevQ() {
+    if (currentQ > 0) showQ(currentQ - 1);
+  }
+
+  function markSel(input) {
+    const name = input.name;
+    document.querySelectorAll('input[name="' + name + '"]').forEach(i => {
+      i.closest('.opt').classList.toggle('sel', i.checked);
+    });
+    input.closest('.question').classList.remove('unanswered');
+    hideErr('quiz-err');
+  }
+
+  function getAnswer(q) {
+    const checked = [...document.querySelectorAll('input[name="q' + q.n + '"]:checked')].map(i => i.value);
+    if (q.multi) return checked;
+    return checked[0] || null;
+  }
+
+  async function submitExam() {
+    hideErr('quiz-err');
+    if (!answeredCurrent()) return;
+    // Safety check: all answered (Back navigation can't skip, but double-check)
+    let firstMissing = -1;
+    QUESTIONS.forEach((q, idx) => {
+      const a = getAnswer(q);
+      const empty = q.multi ? a.length === 0 : !a;
+      if (empty && firstMissing === -1) firstMissing = idx;
+    });
+    if (firstMissing !== -1) {
+      showQ(firstMissing);
+      document.getElementById('q-' + QUESTIONS[firstMissing].n).classList.add('unanswered');
+      showErr('quiz-err', 'Please answer this question.');
+      return;
+    }
+
+    // Grade
+    const answers = {};
+    const incorrect = [];
+    let correctCount = 0;
+    QUESTIONS.forEach(q => {
+      const a = getAnswer(q);
+      answers[q.n] = a;
+      let ok;
+      if (q.multi) {
+        const want = [...q.correct].sort().join(',');
+        ok = [...a].sort().join(',') === want;
+      } else {
+        ok = a === q.correct;
+      }
+      if (ok) correctCount++;
+      else incorrect.push({ n: q.n, q: q.q, given: q.multi ? a.join(', ') : a, correct: q.multi ? q.correct.join(', ') : q.correct });
+    });
+    const score = Math.round((correctCount / QUESTIONS.length) * 100);
+    const passed = score >= PASS_MARK;
+
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true; btn.textContent = 'Submitting…';
+    try {
+      await fetch(FN_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + ANON },
+        body: JSON.stringify({ action: 'submit', ...taker, score, passed, correct_count: correctCount, total_questions: QUESTIONS.length, answers, incorrect }),
+      });
+    } catch (e) { /* result still shown even if logging fails */ }
+    btn.disabled = false; btn.textContent = 'Submit Exam';
+
+    showResult(score, passed, correctCount, incorrect);
+  }
+
+  function showResult(score, passed, correctCount, incorrect) {
+    document.getElementById('quiz-screen').style.display = 'none';
+    const rs = document.getElementById('result-screen');
+    rs.style.display = 'block';
+    document.getElementById('result-icon').textContent = passed ? '✅' : '❌';
+    const scoreEl = document.getElementById('result-score');
+    scoreEl.textContent = score + '%';
+    scoreEl.className = 'result-score ' + (passed ? 'pass' : 'fail');
+    document.getElementById('result-label').innerHTML = passed
+      ? 'Congratulations, ' + taker.first_name + '! You passed with ' + correctCount + ' out of ' + QUESTIONS.length + ' correct.<br>Your result has been recorded — continue to the next step.'
+      : 'You scored ' + correctCount + ' out of ' + QUESTIONS.length + '. You need 80% or higher to pass.<br>Review your incorrect answers and try again.';
+
+    const actions = document.getElementById('result-actions');
+    if (passed) {
+      actions.innerHTML = '<a class="btn" href="onboarding.html?state=ny&goto=docusign" style="text-decoration:none;">Continue to Step 6 &rarr;</a>';
+    } else {
+      actions.innerHTML =
+        '<button class="btn btn-outline" onclick="toggleWrong()" style="margin-right:10px;">View Incorrect Answers</button>' +
+        '<button class="btn" onclick="retake()">Retake Exam</button>';
+      const wl = document.getElementById('wrong-list');
+      wl.innerHTML = '<h3 style="font-size:16px; margin-bottom:10px; color:#111827;">Questions you missed:</h3>' + incorrect.map(w =>
+        '<div class="wrong-item"><div class="wq">Q' + w.n + '. ' + w.q + '</div><div class="wa">Your answer: ' + String(w.given).toUpperCase() + '</div></div>'
+      ).join('');
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function toggleWrong() {
+    document.getElementById('wrong-list').classList.toggle('show');
+  }
+
+  function retake() {
+    document.getElementById('result-screen').style.display = 'none';
+    document.getElementById('wrong-list').classList.remove('show');
+    renderQuestions();
+    document.getElementById('quiz-screen').style.display = 'block';
+    showQ(0);
+  }
+</script>
+</body>
+</html>
