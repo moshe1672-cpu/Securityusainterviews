@@ -110,6 +110,28 @@
   .slider-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); pointer-events: none; }
   .slider-knob { position: absolute; left: 3px; top: 3px; width: 46px; height: 46px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: grab; touch-action: none; font-size: 18px; color: var(--navy); box-shadow: 0 2px 12px rgba(201,168,76,0.4); }
   .accepted-msg { display: none; margin-top: 16px; font-size: 13px; font-weight: 600; color: #7dd9a8; }
+  /* Sticky help bar + live chat */
+  body { padding-bottom: 64px; }
+  .help-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 90; background: rgba(10,22,40,0.97); border-top: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 10px 16px; backdrop-filter: blur(6px); text-align: center; }
+  .help-bar-text { font-size: 13px; color: var(--muted); font-weight: 600; text-align: center; }
+  .help-bar-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; padding: 9px 16px; border-radius: 100px; border: 1.5px solid var(--gold); color: var(--gold); background: transparent; cursor: pointer; text-decoration: none; font-family: 'DM Sans', sans-serif; }
+  .help-bar-btn.solid { background: var(--gold); color: var(--navy); }
+  
+  .chat-panel { position: fixed; right: 12px; bottom: 70px; z-index: 95; width: min(360px, calc(100vw - 24px)); height: min(460px, calc(100vh - 110px)); background: #0d1f3c; border: 1.5px solid var(--gold); border-radius: 14px; display: none; flex-direction: column; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+  .chat-panel.open { display: flex; }
+  .chat-head { background: rgba(201,168,76,0.12); border-bottom: 1px solid var(--border); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); }
+  .chat-head button { background: none; border: none; color: var(--muted); font-size: 16px; cursor: pointer; }
+  .chat-msgs { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+  .chat-bubble { max-width: 82%; padding: 9px 12px; border-radius: 12px; font-size: 13.5px; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word; }
+  .chat-bubble.me { align-self: flex-end; background: var(--gold); color: var(--navy); border-bottom-right-radius: 4px; }
+  .chat-bubble.them { align-self: flex-start; background: #0a1628; border: 1px solid var(--border); color: var(--white); border-bottom-left-radius: 4px; }
+  .chat-note { text-align: center; font-size: 11.5px; color: var(--muted); padding: 0 10px; }
+  .chat-inputrow { display: flex; gap: 8px; padding: 10px; border-top: 1px solid var(--border); }
+  .chat-inputrow input { flex: 1; background: #0a1628; border: 1.5px solid var(--border); border-radius: 8px; padding: 10px 12px; font-size: 16px; color: var(--white); font-family: 'DM Sans', sans-serif; outline: none; }
+  .chat-inputrow button { background: var(--gold); color: var(--navy); border: none; border-radius: 8px; padding: 0 16px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .chat-start { padding: 18px 16px; }
+  .chat-start p { font-size: 13px; color: #b0bec5; line-height: 1.6; margin-bottom: 10px; }
+  .chat-start input { width: 100%; background: #0a1628; border: 1.5px solid var(--border); border-radius: 8px; padding: 11px 13px; font-size: 16px; color: var(--white); font-family: 'DM Sans', sans-serif; outline: none; }
 </style>
 </head>
 <body>
@@ -784,6 +806,98 @@
       note.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     });
   });
+</script>
+
+<!-- Sticky help bar + live chat -->
+<div class="help-bar">
+  <span class="help-bar-text">Stuck? We're here to help</span>
+  <button class="help-bar-btn solid" onclick="toggleChat()">&#128172; Need Help? Live Chat</button>
+</div>
+
+<div class="chat-panel" id="chat-panel">
+  <div class="chat-head">Live Chat — Security USA<button onclick="toggleChat()">&#10005;</button></div>
+  <div class="chat-start" id="chat-start">
+    <p>Enter your first name to start a chat with the HR team. Replies usually come within a few minutes during office hours.</p>
+    <input id="chat-name" type="text" placeholder="Your first name" />
+    <button class="help-bar-btn solid" style="margin-top:12px; width:100%; justify-content:center;" onclick="startChat()">Start Chat</button>
+  </div>
+  <div class="chat-msgs" id="chat-msgs" style="display:none;"></div>
+  <div class="chat-inputrow" id="chat-inputrow" style="display:none;">
+    <input id="chat-input" type="text" placeholder="Type a message&hellip;" onkeydown="if(event.key==='Enter')sendChat()" />
+    <button onclick="sendChat()">Send</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const CHAT_FN = 'https://stvagyjcjoxnbslafmyf.supabase.co/functions/v1/chat';
+  const CHAT_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0dmFneWpjam94bmJzbGFmbXlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NTcxNTIsImV4cCI6MjA4OTQzMzE1Mn0.da_l4ogYdc_XL7DqmK_RmmR6cC_X6Lq102ddnN7QYY4';
+  let pollTimer = null;
+  let lastCount = -1;
+
+  function cid() {
+    let id = localStorage.getItem('susa_chat_id');
+    if (!id) { id = 'c-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10); localStorage.setItem('susa_chat_id', id); }
+    return id;
+  }
+  function cname() { return localStorage.getItem('susa_chat_name') || ''; }
+
+  async function api(payload) {
+    const r = await fetch(CHAT_FN, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + CHAT_ANON }, body: JSON.stringify(payload) });
+    return r.json();
+  }
+
+  function escC(s) { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; }
+
+  function showChatUI() {
+    document.getElementById('chat-start').style.display = 'none';
+    document.getElementById('chat-msgs').style.display = 'flex';
+    document.getElementById('chat-inputrow').style.display = 'flex';
+  }
+
+  function render(msgs) {
+    const box = document.getElementById('chat-msgs');
+    let html = '<div class="chat-note">Chat with Security USA HR &mdash; replies may take a few minutes.</div>';
+    msgs.forEach(m => { html += '<div class="chat-bubble ' + (m.sender === 'visitor' ? 'me' : 'them') + '">' + escC(m.message) + '</div>'; });
+    box.innerHTML = html;
+    if (msgs.length !== lastCount) { box.scrollTop = box.scrollHeight; lastCount = msgs.length; }
+  }
+
+  async function refresh() {
+    try { const d = await api({ action: 'history', session_id: cid() }); if (d.messages) render(d.messages); } catch (e) {}
+  }
+
+  window.toggleChat = function() {
+    const p = document.getElementById('chat-panel');
+    const open = !p.classList.contains('open');
+    p.classList.toggle('open', open);
+    clearInterval(pollTimer);
+    if (open) {
+      if (cname()) { showChatUI(); refresh(); pollTimer = setInterval(refresh, 4000); }
+    }
+  };
+
+  window.startChat = function() {
+    const inp = document.getElementById('chat-name');
+    const n = inp.value.trim();
+    if (!n) { inp.style.borderColor = '#c0392b'; return; }
+    localStorage.setItem('susa_chat_name', n);
+    showChatUI();
+    refresh();
+    pollTimer = setInterval(refresh, 4000);
+  };
+
+  window.sendChat = async function() {
+    const inp = document.getElementById('chat-input');
+    const m = inp.value.trim();
+    if (!m) return;
+    inp.value = '';
+    const box = document.getElementById('chat-msgs');
+    box.insertAdjacentHTML('beforeend', '<div class="chat-bubble me">' + escC(m) + '</div>');
+    box.scrollTop = box.scrollHeight;
+    try { await api({ action: 'send', session_id: cid(), name: cname(), message: m }); refresh(); } catch (e) {}
+  };
+})();
 </script>
 </body>
 </html>
