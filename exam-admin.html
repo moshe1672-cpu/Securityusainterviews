@@ -26,6 +26,8 @@
   .btn-sm { padding:7px 12px; font-size:11px; }
   .btn-outline { background:transparent; border:1.5px solid var(--gold); color:var(--gold); }
   .btn-outline:hover { background:rgba(201,168,76,0.1); }
+  .btn-danger { background:transparent; border:1.5px solid #c0392b; color:#e88; }
+  .btn-danger:hover { background:rgba(192,57,43,0.15); }
   .row-card { background:#0a1628; border:1px solid var(--border); border-radius:10px; padding:14px 16px; margin-bottom:10px; }
   .row-top { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
   .row-name { font-size:14px; font-weight:600; color:var(--white); }
@@ -50,17 +52,7 @@
   </div>
 
   <div class="card">
-    <div class="controls">
-      <div>
-        <label>From Date</label>
-        <input id="start" type="date" />
-      </div>
-      <div>
-        <label>To Date</label>
-        <input id="end" type="date" />
-      </div>
-    </div>
-    <button class="btn" id="load-btn" onclick="loadResults()" style="margin-top:16px;">Load Results</button>
+    <button class="btn" id="load-btn" onclick="loadResults()">Load Results</button>
     <div class="msg" id="msg"></div>
   </div>
 
@@ -169,13 +161,6 @@ const QUESTIONS = [
   const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0dmFneWpjam94bmJzbGFmbXlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NTcxNTIsImV4cCI6MjA4OTQzMzE1Mn0.da_l4ogYdc_XL7DqmK_RmmR6cC_X6Lq102ddnN7QYY4';
   let rows = [];
 
-  (function() {
-    const today = new Date();
-    const month = new Date(today.getTime() - 29 * 86400000);
-    document.getElementById('end').value = today.toISOString().slice(0, 10);
-    document.getElementById('start').value = month.toISOString().slice(0, 10);
-  })();
-
   function msg(text, ok) {
     const el = document.getElementById('msg');
     el.textContent = text;
@@ -193,8 +178,6 @@ const QUESTIONS = [
         body: JSON.stringify({
           action: 'list',
           admin_key: 'SUSA-DD-2026',
-          start_date: document.getElementById('start').value || null,
-          end_date: document.getElementById('end').value || null,
         }),
       });
       const data = await r.json();
@@ -227,6 +210,7 @@ const QUESTIONS = [
         '<div class="row-actions">' +
           '<button class="btn btn-sm" onclick="downloadTest(' + i + ')">&#11015; Download Test</button>' +
           (r.incorrect && r.incorrect.length ? '<a class="btn btn-sm btn-outline" href="' + mailtoLink(r) + '">&#128231; Email Incorrect Answers</a>' : '') +
+          '<button class="btn btn-sm btn-danger" onclick="deleteSub(' + i + ')">&#128465; Delete</button>' +
         '</div>' +
       '</div>'
     ).join('');
@@ -234,13 +218,31 @@ const QUESTIONS = [
 
   function esc(s) { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; }
 
+  async function deleteSub(i) {
+    const r = rows[i];
+    if (!confirm('Delete the submission from ' + r.first_name + ' ' + r.last_name + ' (' + r.score + '%)? This cannot be undone.')) return;
+    try {
+      const resp = await fetch(FN_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + ANON },
+        body: JSON.stringify({ action: 'delete', admin_key: 'SUSA-DD-2026', id: r.id }),
+      });
+      const data = await resp.json();
+      if (!resp.ok || data.error) throw new Error(data.error || ('HTTP ' + resp.status));
+      rows.splice(i, 1);
+      renderRows();
+      msg('Deleted submission from ' + r.first_name + ' ' + r.last_name + '.', true);
+    } catch (e) {
+      msg('⚠ ' + e.message, false);
+    }
+  }
+
   function mailtoLink(r) {
     const wrong = (r.incorrect || []);
     let body = 'Hello ' + r.first_name + ',\n\nYou scored ' + r.score + '% on the Security USA Onboarding Exam (' + r.correct_count + '/' + r.total_questions + ' correct). A score of 80% or higher is required to pass.\n\nQuestions to review:\n';
     wrong.forEach(w => {
       body += '\n- Question ' + w.n + ': ' + w.q.slice(0, 90) + (w.q.length > 90 ? '...' : '') + '\n  Your answer: ' + String(w.given).toUpperCase() + '\n';
     });
-    body += '\nPlease review the onboarding materials and retake the exam at https://securityusainterviews.vercel.app/exam.html\n\nSecurity USA HR';
     return 'mailto:' + encodeURIComponent(r.email) + '?subject=' + encodeURIComponent('Security USA Onboarding Exam — Review Incorrect Answers') + '&body=' + encodeURIComponent(body);
   }
 
