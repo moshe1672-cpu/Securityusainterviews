@@ -59,6 +59,8 @@
   .err.show { display:block; }
   #quiz-screen, #result-screen { display:none; }
   .help-card { margin-top:28px; text-align:center; }
+  @keyframes docPulse { 0%,100% { transform:scale(1); box-shadow:0 0 0 0 rgba(176,140,51,0); } 30% { transform:scale(1.18); box-shadow:0 0 0 8px rgba(176,140,51,0.45); } }
+  #doc-btn.pulse { animation: docPulse 0.9s ease 3; }
   .help-hint { font-size:14px; color:var(--muted); margin-bottom:4px; font-weight:500; }
   .policy-doc { display:none; text-align:left; background:#ffffff; border:1px solid var(--border); border-radius:12px; padding:26px; margin-top:16px; box-shadow:0 2px 8px rgba(10,22,40,0.06); }
   .policy-doc.show { display:block; }
@@ -118,7 +120,7 @@
 
   <div class="help-card">
     <div class="help-hint">Need help? All answers are in the policies document.</div>
-    <button class="btn btn-outline" onclick="toggleDoc()" style="margin-top:10px;">&#128196; Read Full Policies Document</button>
+    <button class="btn btn-outline" id="doc-btn" onclick="toggleDoc()" style="margin-top:10px;">&#128196; Read Full Policies Document</button>
     <div class="policy-doc" id="policy-doc">
       <h2>Information Sheet for New Employees</h2>
       <p>Welcome to Security USA. We're excited to have you join our team. Please find this list as a helpful resource to get you started.</p>
@@ -454,6 +456,11 @@ const QUESTIONS = [
     renderQuestions();
     document.getElementById('quiz-screen').style.display = 'block';
     showQ(0);
+    const btn = document.getElementById('doc-btn');
+    setTimeout(() => {
+      btn.classList.add('pulse');
+      setTimeout(() => btn.classList.remove('pulse'), 3000);
+    }, 400);
   }
 </script>
 </body>
