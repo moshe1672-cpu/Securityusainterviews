@@ -111,10 +111,10 @@
   .slider-knob { position: absolute; left: 3px; top: 3px; width: 46px; height: 46px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: grab; touch-action: none; font-size: 18px; color: var(--navy); box-shadow: 0 2px 12px rgba(201,168,76,0.4); }
   .accepted-msg { display: none; margin-top: 16px; font-size: 13px; font-weight: 600; color: #7dd9a8; }
   /* Sticky help bar + live chat */
-  body { padding-bottom: 64px; }
-  .help-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 90; background: rgba(10,22,40,0.97); border-top: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 10px 16px; backdrop-filter: blur(6px); text-align: center; }
-  .help-bar-text { font-size: 13px; color: var(--muted); font-weight: 600; text-align: center; }
-  .help-bar-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; padding: 9px 16px; border-radius: 100px; border: 1.5px solid var(--gold); color: var(--gold); background: transparent; cursor: pointer; text-decoration: none; font-family: 'DM Sans', sans-serif; }
+  body { padding-bottom: 50px; }
+  .help-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 90; background: rgba(10,22,40,0.97); border-top: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 7px 12px; backdrop-filter: blur(6px); text-align: center; }
+  .help-bar-text { font-size: 10px; color: var(--muted); font-weight: 600; text-align: center; }
+  .help-bar-btn { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; padding: 7px 12px; border-radius: 100px; border: 1.5px solid var(--gold); color: var(--gold); background: transparent; cursor: pointer; text-decoration: none; font-family: 'DM Sans', sans-serif; }
   .help-bar-btn.solid { background: var(--gold); color: var(--navy); }
   
   .chat-panel { position: fixed; right: 12px; bottom: 70px; z-index: 95; width: min(360px, calc(100vw - 24px)); height: min(460px, calc(100vh - 110px)); background: #0d1f3c; border: 1.5px solid var(--gold); border-radius: 14px; display: none; flex-direction: column; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
