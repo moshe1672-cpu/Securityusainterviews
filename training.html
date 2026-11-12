@@ -25,6 +25,10 @@
   .bottombar { background: #ffffff; border-top: 1px solid var(--border); padding: 10px 16px; display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
   .bottombar .hint { font-size: 13px; color: #5a6b7e; font-weight: 600; }
   @media (max-width: 480px) { .topbar .note { display: none; } }
+  .checks { display: flex; flex-direction: column; gap: 6px; }
+  .check { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: #15202e; cursor: pointer; }
+  .check input { width: 18px; height: 18px; accent-color: var(--gold); cursor: pointer; }
+  .btn.disabled { opacity: 0.45; cursor: not-allowed; }
 </style>
 </head>
 <body>
@@ -46,8 +50,11 @@
   </div>
 
   <div class="bottombar">
-    <span class="hint">Screenshot your completion certificate, then:</span>
-    <a class="btn gold" href="onboarding.html?state=ny">&#10003; I Finished &mdash; Continue to Step 2</a>
+    <div class="checks">
+      <label class="check"><input type="checkbox" id="ck-done" onchange="syncFinish()"> I completed the full training</label>
+      <label class="check"><input type="checkbox" id="ck-shot" onchange="syncFinish()"> Did you screenshot your certificate?</label>
+    </div>
+    <a class="btn gold disabled" id="finish-btn" href="onboarding.html?state=ny" onclick="return finishGuard(event)">&#10003; I Finished &mdash; Continue to Step 2</a>
   </div>
 
 <script>
@@ -74,6 +81,19 @@
       }
     }, 10000);
   })();
+
+
+  function syncFinish() {
+    const ok = document.getElementById('ck-done').checked && document.getElementById('ck-shot').checked;
+    document.getElementById('finish-btn').classList.toggle('disabled', !ok);
+  }
+  function finishGuard(e) {
+    if (document.getElementById('finish-btn').classList.contains('disabled')) {
+      e.preventDefault();
+      return false;
+    }
+    return true;
+  }
 </script>
 </body>
 </html>
