@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sexual Harassment Prevention Training — Security USA</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --navy: #0a1628; --gold: #a8842e; --border: #d6dbe4; }
+  html, body { height: 100%; }
+  body { font-family: 'DM Sans', sans-serif; background: #eceff4; display: flex; flex-direction: column; }
+  .topbar { background: #ffffff; border-bottom: 1px solid var(--border); padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .topbar .brand { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.06em; color: var(--navy); }
+  .topbar .brand span { color: var(--gold); }
+  .topbar .note { font-size: 13px; color: #5a6b7e; font-weight: 500; }
+  .frame-wrap { flex: 1; position: relative; }
+  .frame-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; background: #ffffff; }
+  .fallback { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .fallback-card { background: #ffffff; border: 1px solid var(--border); border-radius: 14px; padding: 30px 26px; max-width: 420px; text-align: center; box-shadow: 0 4px 16px rgba(10,22,40,0.08); }
+  .fallback-card h3 { font-size: 18px; color: var(--navy); margin-bottom: 10px; }
+  .fallback-card p { font-size: 15px; color: #4b5a6b; line-height: 1.65; margin-bottom: 16px; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: var(--navy); color: #ffffff; font-size: 14px; font-weight: 700; letter-spacing: 0.04em; padding: 12px 22px; border-radius: 8px; border: none; cursor: pointer; text-decoration: none; font-family: 'DM Sans', sans-serif; }
+  .btn.gold { background: var(--gold); }
+  .bottombar { background: #ffffff; border-top: 1px solid var(--border); padding: 10px 16px; display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+  .bottombar .hint { font-size: 13px; color: #5a6b7e; font-weight: 600; }
+  @media (max-width: 480px) { .topbar .note { display: none; } }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand">Security <span>USA</span></div>
+    <div class="note">Step 1 &middot; Sexual Harassment Prevention Training</div>
+    <a class="btn" style="font-size:12px; padding:9px 14px;" href="https://www.nyc.gov/assets/cchr/training/english/index.html" target="_blank" rel="noopener">Open in New Tab &#8599;</a>
+  </div>
+
+  <div class="frame-wrap">
+    <div class="fallback" id="fallback" style="display:none;">
+      <div class="fallback-card">
+        <h3>The course can't be shown here</h3>
+        <p>No problem — open it in a new tab, complete it there, then come back to this page and continue.</p>
+        <a class="btn" href="https://www.nyc.gov/assets/cchr/training/english/index.html" target="_blank" rel="noopener">Open the Training &#8599;</a>
+      </div>
+    </div>
+    <iframe id="course" src="https://www.nyc.gov/assets/cchr/training/english/index.html" allow="autoplay; fullscreen" allowfullscreen></iframe>
+  </div>
+
+  <div class="bottombar">
+    <span class="hint">Screenshot your completion certificate, then:</span>
+    <a class="btn gold" href="onboarding.html?state=ny">&#10003; I Finished &mdash; Continue to Step 2</a>
+  </div>
+
+<script>
+  // If nyc.gov refuses to be embedded, the iframe stays blank — show the fallback card.
+  (function() {
+    const frame = document.getElementById('course');
+    let loaded = false;
+    frame.addEventListener('load', () => {
+      loaded = true;
+      // A blocked frame often still fires load with an empty document we can't inspect.
+      // Heuristic: cross-origin access throws = genuinely loaded; about:blank = blocked.
+      try {
+        const doc = frame.contentDocument;
+        if (doc && doc.location && doc.location.href === 'about:blank') {
+          document.getElementById('fallback').style.display = 'flex';
+          frame.style.display = 'none';
+        }
+      } catch (e) { /* cross-origin exception = the course actually loaded */ }
+    });
+    setTimeout(() => {
+      if (!loaded) {
+        document.getElementById('fallback').style.display = 'flex';
+        frame.style.display = 'none';
+      }
+    }, 10000);
+  })();
+</script>
+</body>
+</html>
