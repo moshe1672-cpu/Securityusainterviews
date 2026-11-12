@@ -112,6 +112,15 @@
   .accepted-msg { display: none; margin-top: 16px; font-size: 13px; font-weight: 600; color: #7dd9a8; }
   /* Sticky help bar + live chat */
   body { padding-bottom: 50px; }
+  /* Return reminder overlay */
+  .return-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(5,10,20,0.88); display: none; align-items: center; justify-content: center; padding: 24px; backdrop-filter: blur(4px); }
+  .return-overlay.show { display: flex; }
+  .return-card { background: #0d1f3c; border: 2px solid var(--gold); border-radius: 16px; padding: 32px 26px; max-width: 420px; text-align: center; box-shadow: 0 24px 80px rgba(0,0,0,0.6); }
+  .return-card .big { font-size: 44px; margin-bottom: 12px; }
+  .return-card h3 { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 0.06em; color: var(--gold); margin-bottom: 10px; }
+  .return-card p { font-size: 15px; color: #d5dce6; line-height: 1.65; }
+  .return-card p strong { color: var(--white); }
+  .return-card button { margin-top: 20px; background: var(--gold); color: var(--navy); border: none; border-radius: 100px; padding: 13px 28px; font-size: 14px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; font-family: 'DM Sans', sans-serif; }
   .help-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 90; background: rgba(10,22,40,0.97); border-top: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 7px 12px; backdrop-filter: blur(6px); text-align: center; }
   .help-bar-text { font-size: 10px; color: var(--muted); font-weight: 600; text-align: center; }
   .help-bar-btn { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; padding: 7px 12px; border-radius: 100px; border: 1.5px solid var(--gold); color: var(--gold); background: transparent; cursor: pointer; text-decoration: none; font-family: 'DM Sans', sans-serif; }
@@ -140,11 +149,10 @@
   <div class="header">
     <div class="badge"><span class="badge-dot"></span> New Employee Portal</div>
     <div class="logo-text">Security <span>USA</span></div>
-    <div class="tagline">Welcome aboard — let's get you set up</div>
+    <div class="tagline">Welcome aboard — Let's get started</div>
   </div>
 
   <div class="selector-section">
-    <div class="intro-box">Welcome to Security USA! Please select your position below and complete all steps to finish your onboarding. Reach out to Moshe if you have any questions along the way.</div>
     <div class="section-label">Select Your Position</div>
     <div class="state-grid">
       <button class="state-btn" id="btn-nj" onclick="selectState('nj', this)"><span class="flag">🗽</span>New Jersey</button>
@@ -191,7 +199,7 @@
         <div class="step-body">
           <div class="step-title">Sign Your DocuSign Paperwork</div>
           <div class="step-desc">We have already emailed your paperwork to you. Open the email and complete all documents before your start date.</div>
-          <div class="inbox-note" id="inbox-note-1"><strong><img src="https://www.google.com/s2/favicons?domain=docusign.com&amp;sz=32" alt="DocuSign" style="width:16px;height:16px;vertical-align:-3px;margin-right:5px;border-radius:3px;">Check your email</strong> for <strong>"Moshe Sabaah Via DocuSign"</strong> (check spam too). Didn't get it? Contact <strong>frontdesk@securityusainc.com</strong>.</div>
+          <div class="inbox-note" id="inbox-note-1"><strong><img src="https://www.google.com/s2/favicons?domain=docusign.com&amp;sz=64" alt="DocuSign" style="width:24px;height:24px;vertical-align:-6px;margin-right:6px;border-radius:4px;">Check your email</strong> for <strong>"Moshe Sabaah Via DocuSign"</strong> (check spam too). Didn't get it? Contact <strong>frontdesk@securityusainc.com</strong>.</div>
         </div>
       </div>
 
@@ -413,7 +421,7 @@
         <div class="step-body">
           <div class="step-title">Sign Your DocuSign Paperwork</div>
           <div class="step-desc">We have already emailed your paperwork to you. Open the email and complete all documents before your start date.</div>
-          <div class="inbox-note" id="inbox-note-2"><strong><img src="https://www.google.com/s2/favicons?domain=docusign.com&amp;sz=32" alt="DocuSign" style="width:16px;height:16px;vertical-align:-3px;margin-right:5px;border-radius:3px;">Check your email</strong> for <strong>"Moshe Sabaah Via DocuSign"</strong> (check spam too). Didn't get it? Contact <strong>frontdesk@securityusainc.com</strong>.</div>
+          <div class="inbox-note" id="inbox-note-2"><strong><img src="https://www.google.com/s2/favicons?domain=docusign.com&amp;sz=64" alt="DocuSign" style="width:24px;height:24px;vertical-align:-6px;margin-right:6px;border-radius:4px;">Check your email</strong> for <strong>"Moshe Sabaah Via DocuSign"</strong> (check spam too). Didn't get it? Contact <strong>frontdesk@securityusainc.com</strong>.</div>
         </div>
       </div>
 
@@ -484,7 +492,7 @@
         <div class="step-body">
           <div class="step-title">Sign Your DocuSign Paperwork</div>
           <div class="step-desc">We have already emailed your paperwork to you. Open the email and complete all documents before your start date.</div>
-          <div class="inbox-note" id="inbox-note-3"><strong><img src="https://www.google.com/s2/favicons?domain=docusign.com&amp;sz=32" alt="DocuSign" style="width:16px;height:16px;vertical-align:-3px;margin-right:5px;border-radius:3px;">Check your email</strong> for <strong>"Moshe Sabaah Via DocuSign"</strong> (check spam too). Didn't get it? Contact <strong>frontdesk@securityusainc.com</strong>.</div>
+          <div class="inbox-note" id="inbox-note-3"><strong><img src="https://www.google.com/s2/favicons?domain=docusign.com&amp;sz=64" alt="DocuSign" style="width:24px;height:24px;vertical-align:-6px;margin-right:6px;border-radius:4px;">Check your email</strong> for <strong>"Moshe Sabaah Via DocuSign"</strong> (check spam too). Didn't get it? Contact <strong>frontdesk@securityusainc.com</strong>.</div>
         </div>
       </div>
 
@@ -804,6 +812,24 @@
       void note.offsetWidth;
       note.classList.add('pulse');
       note.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+  });
+</script>
+
+<!-- Return reminder overlay -->
+<div class="return-overlay" id="return-overlay">
+  <div class="return-card">
+    <div class="big">&#128204;</div>
+    <h3>Keep This Page Open!</h3>
+    <p>That step just opened in a <strong>new tab</strong>.<br>When you finish it, <strong>come back to this page</strong> to complete the rest of your onboarding steps.</p>
+    <button onclick="document.getElementById('return-overlay').classList.remove('show')">Got It &mdash; I'll Come Back</button>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('a.step-link[target="_blank"]').forEach(a => {
+    a.addEventListener('click', () => {
+      setTimeout(() => document.getElementById('return-overlay').classList.add('show'), 400);
     });
   });
 </script>
