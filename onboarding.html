@@ -126,15 +126,6 @@
   .accepted-msg { display: none; margin-top: 16px; font-size: 14px; font-weight: 600; color: var(--green-text); }
   /* Sticky help bar + live chat */
   body { padding-bottom: 50px; }
-  /* Return reminder overlay */
-  .return-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(5,10,20,0.88); display: none; align-items: center; justify-content: center; padding: 24px; backdrop-filter: blur(4px); }
-  .return-overlay.show { display: flex; }
-  .return-card { background: var(--panel); border: 2px solid var(--gold); border-radius: 16px; padding: 32px 26px; max-width: 420px; text-align: center; box-shadow: 0 24px 80px rgba(0,0,0,0.6); }
-  .return-card .big { font-size: 45px; margin-bottom: 12px; }
-  .return-card h3 { font-family: 'Bebas Neue', sans-serif; font-size: 29px; letter-spacing: 0.06em; color: var(--gold); margin-bottom: 10px; }
-  .return-card p { font-size: 16px; color: var(--soft); line-height: 1.65; }
-  .return-card p strong { color: var(--white); }
-  .return-card button { margin-top: 20px; background: var(--gold); color: var(--btn-text); border: none; border-radius: 100px; padding: 13px 28px; font-size: 15px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; font-family: 'DM Sans', sans-serif; }
   .help-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 90; background: var(--bar-bg); border-top: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 7px 12px; backdrop-filter: blur(6px); text-align: center; }
   .help-bar-text { font-size: 11px; color: var(--muted); font-weight: 600; text-align: center; }
   .help-bar-btn { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; padding: 7px 12px; border-radius: 100px; border: 1.5px solid var(--gold); color: var(--gold); background: transparent; cursor: pointer; text-decoration: none; font-family: 'DM Sans', sans-serif; }
@@ -848,24 +839,6 @@
       void note.offsetWidth;
       note.classList.add('pulse');
       note.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    });
-  });
-</script>
-
-<!-- Return reminder overlay -->
-<div class="return-overlay" id="return-overlay">
-  <div class="return-card">
-    <div class="big">&#128204;</div>
-    <h3>Keep This Page Open!</h3>
-    <p>That step just opened in a <strong>new tab</strong>.<br>When you finish it, <strong>come back to this page</strong> to complete the rest of your onboarding steps.</p>
-    <button onclick="document.getElementById('return-overlay').classList.remove('show')">Got It &mdash; I'll Come Back</button>
-  </div>
-</div>
-
-<script>
-  document.querySelectorAll('a.step-link[target="_blank"]').forEach(a => {
-    a.addEventListener('click', () => {
-      setTimeout(() => document.getElementById('return-overlay').classList.add('show'), 400);
     });
   });
 </script>
