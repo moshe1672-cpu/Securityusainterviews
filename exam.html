@@ -265,6 +265,16 @@ const QUESTIONS = [
   const PASS_MARK = 80;
   let taker = {};
   let currentQ = 0;
+  let examSession = null;
+
+  function sendProgress() {
+    if (!examSession) return;
+    fetch(FN_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + ANON },
+      body: JSON.stringify({ action: 'progress', session_id: examSession, ...taker, current_q: currentQ + 1, total_questions: QUESTIONS.length }),
+    }).catch(() => {});
+  }
 
   function showErr(id, msg) {
     const el = document.getElementById(id);
@@ -290,6 +300,7 @@ const QUESTIONS = [
       return;
     }
     taker = { first_name: first, last_name: last, email: email };
+    examSession = 'e-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
     renderQuestions();
     document.getElementById('start-screen').style.display = 'none';
     document.getElementById('quiz-screen').style.display = 'block';
@@ -329,6 +340,7 @@ const QUESTIONS = [
     document.getElementById('submit-btn').style.display = last ? 'inline-flex' : 'none';
     hideErr('quiz-err');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    sendProgress();
   }
 
   function answeredCurrent() {
@@ -407,7 +419,7 @@ const QUESTIONS = [
       await fetch(FN_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + ANON },
-        body: JSON.stringify({ action: 'submit', ...taker, score, passed, correct_count: correctCount, total_questions: QUESTIONS.length, answers, incorrect }),
+        body: JSON.stringify({ action: 'submit', session_id: examSession, ...taker, score, passed, correct_count: correctCount, total_questions: QUESTIONS.length, answers, incorrect }),
       });
     } catch (e) { /* result still shown even if logging fails */ }
     btn.disabled = false; btn.textContent = 'Submit Exam';

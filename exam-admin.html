@@ -45,6 +45,8 @@
   .msg.show { display:block; }
   .msg.ok { background:rgba(39,174,96,0.08); border:1px solid rgba(39,174,96,0.35); color:#7dd9a8; }
   .msg.bad { background:rgba(192,57,43,0.1); border:1px solid rgba(192,57,43,0.4); color:#e88; }
+  .pending-row { background:rgba(201,168,76,0.07); border:1px dashed var(--gold); border-radius:10px; padding:11px 14px; margin-bottom:8px; }
+  .pending-row .row-meta { margin-top:2px; }
   .session-row { background:#0a1628; border:1px solid var(--border); border-radius:10px; padding:12px 14px; margin-bottom:8px; cursor:pointer; transition:border-color 0.15s; }
   .session-row:hover { border-color:var(--gold); }
   .pill.new { background:rgba(201,168,76,0.18); color:var(--gold-light); border:1px solid var(--gold); }
@@ -71,6 +73,10 @@
   <div class="card" id="results">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
       <h3 style="font-size:14px; font-weight:600;">&#128221; Test Submissions (<span id="count">0</span>)</h3>
+    </div>
+    <div id="pending-wrap" style="display:none; margin-bottom:16px;">
+      <div style="font-size:12px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--gold); margin-bottom:8px;">&#9203; Taking the Exam Right Now</div>
+      <div id="pending-rows"></div>
     </div>
     <div id="rows"><p style="font-size:13px; color:var(--muted);">Loading&hellip;</p></div>
   </div>
@@ -194,12 +200,42 @@ const QUESTIONS = [
   function refreshAll() {
     loadResults();
     loadSessions();
+    loadPending();
   }
 
   window.addEventListener('DOMContentLoaded', () => {
     refreshAll();
-    setInterval(loadSessions, 10000);
+    setInterval(() => { loadSessions(); loadPending(); }, 10000);
   });
+
+  function fmtAgo(ts) {
+    const m = Math.round((Date.now() - new Date(ts).getTime()) / 60000);
+    if (m < 1) return 'just now';
+    if (m === 1) return '1 min ago';
+    if (m < 60) return m + ' min ago';
+    return Math.round(m / 60) + ' hr ago';
+  }
+
+  async function loadPending() {
+    try {
+      const resp = await fetch(FN_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + ANON },
+        body: JSON.stringify({ action: 'pending', admin_key: 'SUSA-DD-2026' }),
+      });
+      const d = await resp.json();
+      const wrap = document.getElementById('pending-wrap');
+      if (!d.rows || !d.rows.length) { wrap.style.display = 'none'; return; }
+      wrap.style.display = 'block';
+      document.getElementById('pending-rows').innerHTML = d.rows.map(r =>
+        '<div class="pending-row">' +
+          '<span class="row-name">' + esc((r.first_name || '') + ' ' + (r.last_name || '')) + '</span>' +
+          '<span class="pill" style="background:rgba(201,168,76,0.15); color:var(--gold-light); border:1px solid var(--gold);">Question ' + r.current_q + ' of ' + r.total_questions + '</span>' +
+          '<div class="row-meta">' + esc(r.email || '') + ' &middot; active ' + fmtAgo(r.updated_at) + '</div>' +
+        '</div>'
+      ).join('');
+    } catch (e) {}
+  }
 
   // ---- Live chat ----
   const CHAT_FN = 'https://stvagyjcjoxnbslafmyf.supabase.co/functions/v1/chat';
