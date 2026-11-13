@@ -521,9 +521,13 @@ const QUESTIONS = [
     showQ(0);
     const btn = document.getElementById('doc-btn');
     setTimeout(() => {
+      btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
       btn.classList.add('pulse');
-      setTimeout(() => btn.classList.remove('pulse'), 6000);
-    }, 400);
+      setTimeout(() => {
+        btn.classList.remove('pulse');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 6000);
+    }, 500);
   }
 </script>
 </body>
