@@ -249,6 +249,7 @@ const QUESTIONS = [
           '<span class="row-name">' + esc((r.first_name || '') + ' ' + (r.last_name || '')) + '</span>' +
           '<span class="pill" style="background:rgba(201,168,76,0.15); color:var(--gold-light); border:1px solid var(--gold);">Question ' + r.current_q + ' of ' + r.total_questions + '</span>' +
           '<div class="row-meta">' + esc(r.email || '') + ' &middot; active ' + fmtAgo(r.updated_at) + '</div>' +
+          '<button class="btn btn-sm" style="margin-top:8px; margin-right:8px;" onclick="chatWithPending(' + i + ')">&#128172; Chat</button>' +
           '<button class="btn btn-sm btn-danger" style="margin-top:8px;" onclick="deletePending(' + i + ')">&#128465; Delete</button>' +
         '</div>'
       ).join('');
@@ -286,8 +287,18 @@ const QUESTIONS = [
     ).join('');
   }
 
-  async function openThread(i) {
-    openSession = sessions[i];
+  async function openThread(i) { openChatObj(sessions[i]); }
+
+  function chatWithPending(i) {
+    const r = pendingRows[i];
+    if (!r) return;
+    openChatObj({ session_id: r.chat_id || ('exam-' + r.session_id), name: ((r.first_name || '') + ' ' + (r.last_name || '')).trim() || 'Exam taker' });
+    document.getElementById('chat-thread').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    document.getElementById('thread-input').focus();
+  }
+
+  async function openChatObj(sess) {
+    openSession = sess;
     document.getElementById('chat-sessions').style.display = 'none';
     document.getElementById('chat-thread').style.display = 'block';
     document.getElementById('thread-title').textContent = openSession.name || 'Visitor';
