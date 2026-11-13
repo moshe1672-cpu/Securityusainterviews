@@ -61,22 +61,6 @@
   .err.show { display:block; }
   #quiz-screen, #result-screen { display:none; }
   .help-card { margin-top:28px; text-align:center; }
-  .chat-fab { position:fixed; right:14px; bottom:14px; z-index:60; width:52px; height:52px; border-radius:50%; background:var(--navy); color:#fff; border:none; font-size:22px; cursor:pointer; box-shadow:0 4px 14px rgba(10,22,40,0.3); display:none; }
-  .chat-fab.show { display:block; }
-  .chat-fab .dot { position:absolute; top:2px; right:2px; width:14px; height:14px; background:#c0392b; border-radius:50%; border:2px solid #fff; display:none; }
-  .chat-fab .dot.show { display:block; }
-  .chat-panel { position:fixed; right:12px; bottom:76px; z-index:70; width:min(340px, calc(100vw - 24px)); height:min(420px, calc(100vh - 110px)); background:#fff; border:1.5px solid var(--navy); border-radius:14px; display:none; flex-direction:column; overflow:hidden; box-shadow:0 20px 60px rgba(10,22,40,0.25); }
-  .chat-panel.open { display:flex; }
-  .chat-head { background:var(--navy); color:#fff; padding:11px 14px; font-size:14px; font-weight:700; display:flex; justify-content:space-between; align-items:center; }
-  .chat-head button { background:none; border:none; color:#fff; font-size:16px; cursor:pointer; }
-  .chat-msgs { flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:8px; background:#f7f8fa; }
-  .chat-b { max-width:82%; padding:8px 11px; border-radius:11px; font-size:14px; line-height:1.5; white-space:pre-wrap; word-wrap:break-word; }
-  .chat-b.me { align-self:flex-end; background:var(--navy); color:#fff; border-bottom-right-radius:4px; }
-  .chat-b.them { align-self:flex-start; background:#fff; border:1px solid var(--border); color:var(--text); border-bottom-left-radius:4px; }
-  .chat-note2 { text-align:center; font-size:12px; color:var(--muted); }
-  .chat-inrow { display:flex; gap:8px; padding:10px; border-top:1px solid var(--border); background:#fff; }
-  .chat-inrow input { flex:1; }
-  .chat-inrow button { background:var(--navy); color:#fff; border:none; border-radius:8px; padding:0 16px; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; }
   @keyframes docPulse { 0%,100% { transform:scale(1); box-shadow:0 0 0 0 rgba(176,140,51,0); } 30% { transform:scale(1.18); box-shadow:0 0 0 8px rgba(176,140,51,0.45); } }
   #doc-btn.pulse { animation: docPulse 0.9s ease 3; }
   .help-hint { font-size:14px; color:var(--muted); margin-bottom:4px; font-weight:500; }
@@ -188,16 +172,6 @@
   </div>
 </div>
 
-<button class="chat-fab" id="chat-fab" onclick="toggleExamChat()">&#128172;<span class="dot" id="chat-dot"></span></button>
-<div class="chat-panel" id="chat-panel">
-  <div class="chat-head">Security USA HR<button onclick="toggleExamChat()">&#10005;</button></div>
-  <div class="chat-msgs" id="chat-msgs"></div>
-  <div class="chat-inrow">
-    <input id="chat-input" type="text" placeholder="Type a message&hellip;" onkeydown="if(event.key==='Enter')sendExamChat()" />
-    <button onclick="sendExamChat()">Send</button>
-  </div>
-</div>
-
 <script>
 const QUESTIONS = [
   { n: 1, multi: false, q: "What is Security USA Policy for checking in and out of your shift?", opts: {
@@ -297,12 +271,7 @@ const QUESTIONS = [
   let currentQ = 0;
   let examSession = null;
 
-  // ---- live chat with HR during the exam ----
-  const CHAT_FN = 'https://stvagyjcjoxnbslafmyf.supabase.co/functions/v1/chat';
-  let chatPoll = null;
-  let lastAdminCount = 0;
-  let lastMsgCount = -1;
-
+  // shared chat identity with the main onboarding page
   function chatSid() {
     let id = null;
     try {
@@ -310,61 +279,6 @@ const QUESTIONS = [
       if (!id) { id = 'c-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10); localStorage.setItem('susa_chat_id', id); }
     } catch (e) { id = 'exam-' + examSession; }
     return id;
-  }
-
-  async function chatApi(payload) {
-    const r = await fetch(CHAT_FN, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + ANON }, body: JSON.stringify(payload) });
-    return r.json();
-  }
-
-  function escC(x) { const d = document.createElement('div'); d.textContent = x ?? ''; return d.innerHTML; }
-
-  function renderChat(msgs) {
-    const box = document.getElementById('chat-msgs');
-    let html = '<div class="chat-note2">Chat with Security USA HR</div>';
-    msgs.forEach(m => { html += '<div class="chat-b ' + (m.sender === 'visitor' ? 'me' : 'them') + '">' + escC(m.message) + '</div>'; });
-    box.innerHTML = html;
-    if (msgs.length !== lastMsgCount) { box.scrollTop = box.scrollHeight; lastMsgCount = msgs.length; }
-  }
-
-  async function pollChat() {
-    if (!examSession) return;
-    try {
-      const d = await chatApi({ action: 'history', session_id: chatSid() });
-      const msgs = d.messages || [];
-      renderChat(msgs);
-      const adminCount = msgs.filter(m => m.sender === 'admin').length;
-      const panelOpen = document.getElementById('chat-panel').classList.contains('open');
-      if (adminCount > lastAdminCount && !panelOpen) {
-        document.getElementById('chat-panel').classList.add('open');
-        document.getElementById('chat-dot').classList.remove('show');
-      }
-      lastAdminCount = adminCount;
-    } catch (e) {}
-  }
-
-  function startChatPolling() {
-    document.getElementById('chat-fab').classList.add('show');
-    if (chatPoll) return;
-    pollChat();
-    chatPoll = setInterval(pollChat, 6000);
-  }
-
-  function toggleExamChat() {
-    const p = document.getElementById('chat-panel');
-    p.classList.toggle('open');
-    if (p.classList.contains('open')) { document.getElementById('chat-dot').classList.remove('show'); pollChat(); }
-  }
-
-  async function sendExamChat() {
-    const inp = document.getElementById('chat-input');
-    const m = inp.value.trim();
-    if (!m || !examSession) return;
-    inp.value = '';
-    const box = document.getElementById('chat-msgs');
-    box.insertAdjacentHTML('beforeend', '<div class="chat-b me">' + escC(m) + '</div>');
-    box.scrollTop = box.scrollHeight;
-    try { await chatApi({ action: 'send', session_id: chatSid(), name: (taker.first_name + ' ' + taker.last_name).trim(), message: m }); pollChat(); } catch (e) {}
   }
 
   function sendProgress() {
@@ -402,7 +316,6 @@ const QUESTIONS = [
     taker = { first_name: first, last_name: last, email: email };
     examSession = 'e-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
     try { if (!localStorage.getItem('susa_chat_name')) localStorage.setItem('susa_chat_name', first); } catch (e) {}
-    startChatPolling();
     renderQuestions();
     document.getElementById('start-screen').style.display = 'none';
     document.getElementById('quiz-screen').style.display = 'block';
