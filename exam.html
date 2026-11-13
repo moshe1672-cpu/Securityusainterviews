@@ -55,6 +55,7 @@
   .wrong-item { background:#fdf2f1; border:1px solid #e8b4ae; border-radius:8px; padding:14px 15px; margin-bottom:10px; font-size:15px; line-height:1.6; }
   .wrong-item .wq { font-weight:700; color:var(--text); }
   .wrong-item .wa { color:var(--red); font-weight:600; }
+  .wrong-item .wa-text { color:#8a2b20; margin-top:3px; line-height:1.55; }
   .doc-hl { background:#fdf0c0; box-shadow:0 0 0 6px #fdf0c0; border-radius:4px; }
   .find-help { display:block; margin:14px auto 0; background:none; border:none; color:#1a56db; font-size:14px; font-weight:600; cursor:pointer; text-decoration:underline; padding:0; font-family:'DM Sans',sans-serif; }
   .err { display:none; margin-top:14px; background:#fdf2f1; border:1px solid #e8b4ae; border-radius:8px; padding:11px 14px; font-size:14px; font-weight:600; color:var(--red); }
@@ -62,7 +63,7 @@
   #quiz-screen, #result-screen { display:none; }
   .help-card { margin-top:28px; text-align:center; }
   @keyframes docPulse { 0%,100% { transform:scale(1); box-shadow:0 0 0 0 rgba(176,140,51,0); } 30% { transform:scale(1.18); box-shadow:0 0 0 8px rgba(176,140,51,0.45); } }
-  #doc-btn.pulse { animation: docPulse 0.9s ease 3; }
+  #doc-btn.pulse { animation: docPulse 0.9s ease 6; }
   .help-hint { font-size:14px; color:var(--muted); margin-bottom:4px; font-weight:500; }
   .policy-doc { display:none; text-align:left; background:#ffffff; border:1px solid var(--border); border-radius:12px; padding:26px; margin-top:16px; box-shadow:0 2px 8px rgba(10,22,40,0.06); }
   .policy-doc.show { display:block; }
@@ -440,7 +441,10 @@ const QUESTIONS = [
         ok = a === q.correct;
       }
       if (ok) correctCount++;
-      else incorrect.push({ n: q.n, q: q.q, given: q.multi ? a.join(', ') : a, correct: q.multi ? q.correct.join(', ') : q.correct });
+      else {
+        const picked = (q.multi ? a : [a]).map(l => l.toUpperCase() + '. ' + q.opts[l]).join('\n');
+        incorrect.push({ n: q.n, q: q.q, given: q.multi ? a.join(', ') : a, given_text: picked, correct: q.multi ? q.correct.join(', ') : q.correct });
+      }
     });
     const score = Math.round((correctCount / QUESTIONS.length) * 100);
     const passed = score >= PASS_MARK;
@@ -480,7 +484,7 @@ const QUESTIONS = [
         '<button class="btn" onclick="retake()">Retake Exam</button>';
       const wl = document.getElementById('wrong-list');
       wl.innerHTML = '<h3 style="font-size:16px; margin-bottom:10px; color:#111827;">Questions you missed:</h3>' + incorrect.map(w =>
-        '<div class="wrong-item"><div class="wq">Q' + w.n + '. ' + w.q + '</div><div class="wa">Your answer: ' + String(w.given).toUpperCase() + '</div></div>'
+        '<div class="wrong-item"><div class="wq">Q' + w.n + '. ' + w.q + '</div><div class="wa">Your answer:</div><div class="wa-text">' + (w.given_text || String(w.given).toUpperCase()).replace(/\n/g, '<br>') + '</div></div>'
       ).join('');
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -518,7 +522,7 @@ const QUESTIONS = [
     const btn = document.getElementById('doc-btn');
     setTimeout(() => {
       btn.classList.add('pulse');
-      setTimeout(() => btn.classList.remove('pulse'), 3000);
+      setTimeout(() => btn.classList.remove('pulse'), 6000);
     }, 400);
   }
 </script>
