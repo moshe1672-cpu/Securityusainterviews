@@ -83,6 +83,10 @@
 
   <div class="card chat-card">
     <h3 style="font-size:14px; font-weight:600; margin-bottom:14px;">&#128172; Live Chat</h3>
+    <div id="online-wrap" style="display:none; margin-bottom:14px;">
+      <div style="font-size:12px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#7dd9a8; margin-bottom:8px;">&#128994; Online Now</div>
+      <div id="online-rows"></div>
+    </div>
     <div id="chat-sessions"><p style="font-size:13px; color:var(--muted);">Loading&hellip;</p></div>
     <div id="chat-thread" style="display:none;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
@@ -201,11 +205,12 @@ const QUESTIONS = [
     loadResults();
     loadSessions();
     loadPending();
+    loadOnline();
   }
 
   window.addEventListener('DOMContentLoaded', () => {
     refreshAll();
-    setInterval(() => { loadSessions(); loadPending(); }, 10000);
+    setInterval(() => { loadSessions(); loadPending(); loadOnline(); }, 10000);
   });
 
   function fmtAgo(ts) {
@@ -267,6 +272,37 @@ const QUESTIONS = [
     return r.json();
   }
 
+  let onlineRows = [];
+
+  async function loadOnline() {
+    try {
+      const d = await chatApi({ action: 'online' });
+      if (d.rows) { onlineRows = d.rows; renderOnline(); }
+    } catch (e) {}
+  }
+
+  function renderOnline() {
+    if (openSession) return;
+    const wrap = document.getElementById('online-wrap');
+    if (!onlineRows.length) { wrap.style.display = 'none'; return; }
+    wrap.style.display = 'block';
+    document.getElementById('online-rows').innerHTML = onlineRows.map((r, i) =>
+      '<div class="session-row" style="cursor:default;">' +
+        '<span class="row-name">' + esc(r.name || 'Visitor') + '</span>' +
+        '<span class="pill" style="background:rgba(39,174,96,0.15); color:#7dd9a8; border:1px solid rgba(39,174,96,0.5);">Online</span>' +
+        '<div class="row-meta">' + esc(r.email || '') + (r.email ? ' &middot; ' : '') + 'seen ' + fmtAgo(r.updated_at) + '</div>' +
+        '<button class="btn btn-sm" style="margin-top:8px;" onclick="chatWithOnline(' + i + ')">&#128172; Chat</button>' +
+      '</div>'
+    ).join('');
+  }
+
+  function chatWithOnline(i) {
+    const r = onlineRows[i];
+    if (!r) return;
+    openChatObj({ session_id: r.chat_id, name: r.name || 'Visitor' });
+    document.getElementById('thread-input').focus();
+  }
+
   async function loadSessions() {
     try {
       const d = await chatApi({ action: 'admin_sessions' });
@@ -299,6 +335,7 @@ const QUESTIONS = [
 
   async function openChatObj(sess) {
     openSession = sess;
+    document.getElementById('online-wrap').style.display = 'none';
     document.getElementById('chat-sessions').style.display = 'none';
     document.getElementById('chat-thread').style.display = 'block';
     document.getElementById('thread-title').textContent = openSession.name || 'Visitor';
@@ -325,6 +362,7 @@ const QUESTIONS = [
     document.getElementById('chat-thread').style.display = 'none';
     document.getElementById('chat-sessions').style.display = 'block';
     loadSessions();
+    loadOnline();
   }
 
   async function sendReply() {

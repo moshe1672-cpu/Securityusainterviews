@@ -315,7 +315,11 @@ const QUESTIONS = [
     }
     taker = { first_name: first, last_name: last, email: email };
     examSession = 'e-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
-    try { if (!localStorage.getItem('susa_chat_name')) localStorage.setItem('susa_chat_name', first); } catch (e) {}
+    try {
+      if (!localStorage.getItem('susa_chat_name')) localStorage.setItem('susa_chat_name', first);
+      localStorage.setItem('susa_chat_fullname', (first + ' ' + last).trim());
+      localStorage.setItem('susa_chat_email', email);
+    } catch (e) {}
     renderQuestions();
     document.getElementById('start-screen').style.display = 'none';
     document.getElementById('quiz-screen').style.display = 'block';

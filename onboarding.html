@@ -924,6 +924,36 @@
     pollTimer = setInterval(refresh, 4000);
   };
 
+  function fullname() { try { return localStorage.getItem('susa_chat_fullname') || cname(); } catch (e) { return cname(); } }
+  function cemail() { try { return localStorage.getItem('susa_chat_email') || ''; } catch (e) { return ''; } }
+
+  function ping() {
+    api({ action: 'ping', chat_id: cid(), name: fullname(), email: cemail(), page: 'main' }).catch(() => {});
+  }
+  ping();
+  setInterval(ping, 20000);
+
+  let bgAdminCount = -1;
+  async function bgPoll() {
+    const p = document.getElementById('chat-panel');
+    if (p.classList.contains('open')) return;
+    try {
+      const d = await api({ action: 'history', session_id: cid() });
+      const msgs = d.messages || [];
+      const ac = msgs.filter(m => m.sender === 'admin').length;
+      if (bgAdminCount >= 0 && ac > bgAdminCount) {
+        p.classList.add('open');
+        showChatUI();
+        render(msgs);
+        clearInterval(pollTimer);
+        pollTimer = setInterval(refresh, 4000);
+      }
+      bgAdminCount = ac;
+    } catch (e) {}
+  }
+  bgPoll();
+  setInterval(bgPoll, 10000);
+
   window.sendChat = async function() {
     const inp = document.getElementById('chat-input');
     const m = inp.value.trim();
