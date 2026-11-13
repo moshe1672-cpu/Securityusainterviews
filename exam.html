@@ -55,6 +55,8 @@
   .wrong-item { background:#fdf2f1; border:1px solid #e8b4ae; border-radius:8px; padding:14px 15px; margin-bottom:10px; font-size:15px; line-height:1.6; }
   .wrong-item .wq { font-weight:700; color:var(--text); }
   .wrong-item .wa { color:var(--red); font-weight:600; }
+  .doc-hl { background:#fdf0c0; box-shadow:0 0 0 6px #fdf0c0; border-radius:4px; }
+  .find-help { display:block; margin:14px auto 0; background:none; border:none; color:#1a56db; font-size:14px; font-weight:600; cursor:pointer; text-decoration:underline; padding:0; font-family:'DM Sans',sans-serif; }
   .err { display:none; margin-top:14px; background:#fdf2f1; border:1px solid #e8b4ae; border-radius:8px; padding:11px 14px; font-size:14px; font-weight:600; color:var(--red); }
   .err.show { display:block; }
   #quiz-screen, #result-screen { display:none; }
@@ -124,7 +126,7 @@
     <div class="policy-doc" id="policy-doc">
       <h2>Information Sheet for New Employees</h2>
       <p>Welcome to Security USA. We're excited to have you join our team. Please find this list as a helpful resource to get you started.</p>
-      <h3>Payroll Process</h3>
+      <h3 id="sec-payroll">Payroll Process</h3>
       <ul>
         <li>Payday is every <strong>Friday</strong>. Each payroll period is Monday 12am to Sunday 11:59pm. You will be paid on the Friday of the following week.</li>
         <li><span class="star">&#10023;</span> Payroll questions: <a href="mailto:Payroll@securityusainc.com">Payroll@securityusainc.com</a></li>
@@ -132,23 +134,24 @@
         <li>Direct deposit: email a voided check or direct deposit form to <a href="mailto:Payroll@securityusainc.com">Payroll@securityusainc.com</a>. Takes <strong>3 weeks</strong> to process.</li>
         <li>Mailed checks go out on Fridays; USPS delivery typically 1&ndash;2 business days.</li>
       </ul>
-      <h3>Time and Attendance</h3>
+      <h3 id="sec-time">Time and Attendance</h3>
       <ul>
-        <li><span class="star">&#10023;</span> Clock in/out daily via the <strong>Ehub app</strong> or registered site phone. Issues? Call Command Center: <strong>212-594-4475</strong>.</li>
+        <li><span class="star">&#10023;</span> Clock in/out daily via the <strong>Ehub app</strong> or registered site phone. If you are having problems clocking in or out you may call Command Center: <strong>212-594-4475</strong>.</li>
         <li>You may also call <strong>833-343-1773</strong> from the registered site phone.</li>
+        <li>Failure to clock out or in may result in disciplinary action, including up to a termination.</li>
       </ul>
-      <h3>Shift End — Wait for Relief</h3>
-      <ul><li><span class="star">&#10023;</span> Remain at your post until properly relieved. If relief is more than 15 minutes late, contact the office immediately. Do not leave your site without being officially relieved.</li></ul>
+      <h3 id="sec-relief">Shift End — Wait for Relief</h3>
+      <ul><li><span class="star">&#10023;</span> Remain at your post until properly relieved. If relief is more than 15 minutes late, contact the office immediately. Do not leave your site without being officially relieved. You may face immediate termination.</li></ul>
       <h3>Lateness</h3>
       <ul><li>Be at your post in full uniform at your scheduled start time. No lateness or grace periods. If you anticipate being late, contact the Command Center immediately.</li></ul>
-      <h3>Call Out</h3>
+      <h3 id="sec-callout">Call Out</h3>
       <ul><li><span class="star">&#10023;</span> Call out at least <strong>6 hours before</strong> your shift. Acceptable reasons: illness, doctor's appointment, family emergency, or bereavement. All callouts must be made by <strong>calling</strong> the Command Center — texts and emails are not permitted.</li></ul>
-      <h3>Uniform / Personal Hygiene</h3>
-      <ul><li><span class="star">&#10023;</span> Full uniform required at all times — clean, pressed, and presentable. Proper footwear must be worn on duty. Uniform inquiries: <a href="mailto:help@securityusa.info">help@securityusa.info</a></li></ul>
-      <h3>Drug Policy</h3>
+      <h3 id="sec-uniform">Uniform / Personal Hygiene</h3>
+      <ul><li><span class="star">&#10023;</span> Full uniform required at all times — clean, pressed, and presentable. Proper footwear must be worn on duty. Uniform inquiries: <a href="mailto:help@securityusa.info">help@securityusa.info</a></li><li>If you are about to receive a new assignment, you must make sure you have the proper uniform attire.</li></ul>
+      <h3 id="sec-drug">Drug Policy</h3>
       <ul><li><span class="star">&#10023;</span> Use of illegal drugs or alcohol while working or reporting to work impaired is strictly prohibited. Violations may result in termination.</li></ul>
-      <h3>Field Inspection</h3>
-      <ul><li><span class="star">&#10023;</span> Routine inspections by Field Supervisors may include: a photo in proper uniform, review of the command logbook, and a brief electronic knowledge exam.</li></ul>
+      <h3 id="sec-inspect">Field Inspection</h3>
+      <ul><li><span class="star">&#10023;</span> Routine inspections by Field Supervisors may include: a photo in proper uniform, review of the command logbook, and a brief electronic knowledge exam about the post duties.</li></ul>
       <hr class="divider">
       <div class="isolved-header">Accessing Your Payroll — iSolved</div>
       <p>Your employee email is used to set up your payroll account in <strong>iSolved</strong> for paystubs and W-2s. Watch for an activation email from <strong>Accudata@myisolved.com</strong>.</p>
@@ -321,6 +324,7 @@ const QUESTIONS = [
         const type = q.multi ? 'checkbox' : 'radio';
         html += '<label class="opt"><input type="' + type + '" name="q' + q.n + '" value="' + letter + '" onchange="markSel(this)"><span><strong>' + letter.toUpperCase() + '.</strong> ' + text + '</span></label>';
       }
+      html += '<button type="button" class="find-help" onclick="openDocAt(' + q.n + ')">&#128214; Need help? See this rule in the policies</button>';
       div.innerHTML = html;
       wrap.appendChild(div);
     });
@@ -456,6 +460,21 @@ const QUESTIONS = [
 
   function toggleDoc() {
     document.getElementById('policy-doc').classList.toggle('show');
+  }
+
+  const HELP_MAP = { 1:'sec-time', 2:'sec-relief', 3:'sec-time', 4:'sec-relief', 5:'sec-relief', 6:'sec-callout', 7:'sec-drug', 8:'sec-payroll', 9:'sec-uniform', 10:'sec-relief', 11:'sec-callout', 12:'sec-callout', 13:'sec-time', 14:'sec-inspect' };
+
+  function openDocAt(n) {
+    const id = HELP_MAP[n];
+    if (!id) return;
+    document.getElementById('policy-doc').classList.add('show');
+    document.querySelectorAll('.doc-hl').forEach(el => el.classList.remove('doc-hl'));
+    const h = document.getElementById(id);
+    const parts = [h];
+    let el = h.nextElementSibling;
+    while (el && el.tagName !== 'H3' && el.tagName !== 'HR' && !el.classList.contains('isolved-header')) { parts.push(el); el = el.nextElementSibling; }
+    parts.forEach(e => e.classList.add('doc-hl'));
+    setTimeout(() => h.scrollIntoView({ behavior: 'smooth', block: 'center' }), 150);
   }
 
   function toggleWrong() {
