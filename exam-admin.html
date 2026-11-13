@@ -216,6 +216,22 @@ const QUESTIONS = [
     return Math.round(m / 60) + ' hr ago';
   }
 
+  let pendingRows = [];
+
+  async function deletePending(i) {
+    const r = pendingRows[i];
+    if (!r) return;
+    if (!confirm('Delete the in-progress exam from ' + (r.first_name || '') + ' ' + (r.last_name || '') + '?')) return;
+    try {
+      await fetch(FN_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + ANON },
+        body: JSON.stringify({ action: 'pending_delete', admin_key: 'SUSA-DD-2026', session_id: r.session_id }),
+      });
+      loadPending();
+    } catch (e) {}
+  }
+
   async function loadPending() {
     try {
       const resp = await fetch(FN_URL, {
@@ -227,11 +243,13 @@ const QUESTIONS = [
       const wrap = document.getElementById('pending-wrap');
       if (!d.rows || !d.rows.length) { wrap.style.display = 'none'; return; }
       wrap.style.display = 'block';
-      document.getElementById('pending-rows').innerHTML = d.rows.map(r =>
+      pendingRows = d.rows;
+      document.getElementById('pending-rows').innerHTML = d.rows.map((r, i) =>
         '<div class="pending-row">' +
           '<span class="row-name">' + esc((r.first_name || '') + ' ' + (r.last_name || '')) + '</span>' +
           '<span class="pill" style="background:rgba(201,168,76,0.15); color:var(--gold-light); border:1px solid var(--gold);">Question ' + r.current_q + ' of ' + r.total_questions + '</span>' +
           '<div class="row-meta">' + esc(r.email || '') + ' &middot; active ' + fmtAgo(r.updated_at) + '</div>' +
+          '<button class="btn btn-sm btn-danger" style="margin-top:8px;" onclick="deletePending(' + i + ')">&#128465; Delete</button>' +
         '</div>'
       ).join('');
     } catch (e) {}
