@@ -75,7 +75,7 @@
       <h3 style="font-size:14px; font-weight:600;">&#128221; Test Submissions (<span id="count">0</span>)</h3>
     </div>
     <div id="pending-wrap" style="display:none; margin-bottom:16px;">
-      <div style="font-size:12px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--gold); margin-bottom:8px;">&#9203; Taking the Exam Right Now</div>
+      <div style="font-size:12px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--gold); margin-bottom:8px;">&#9203; In Progress Right Now</div>
       <div id="pending-rows"></div>
     </div>
     <div id="rows"><p style="font-size:13px; color:var(--muted);">Loading&hellip;</p></div>
@@ -252,7 +252,9 @@ const QUESTIONS = [
       document.getElementById('pending-rows').innerHTML = d.rows.map((r, i) =>
         '<div class="pending-row">' +
           '<span class="row-name">' + esc((r.first_name || '') + ' ' + (r.last_name || '')) + '</span>' +
-          '<span class="pill" style="background:rgba(201,168,76,0.15); color:var(--gold-light); border:1px solid var(--gold);">Question ' + r.current_q + ' of ' + r.total_questions + '</span>' +
+          (r.activity === 'training'
+            ? '<span class="pill" style="background:rgba(41,128,185,0.18); color:#7ec3e8; border:1px solid #2980b9;">Sexual Harassment Training</span>'
+            : '<span class="pill" style="background:rgba(201,168,76,0.15); color:var(--gold-light); border:1px solid var(--gold);">Exam &middot; Question ' + r.current_q + ' of ' + r.total_questions + '</span>') +
           '<div class="row-meta">' + esc(r.email || '') + ' &middot; active ' + fmtAgo(r.updated_at) + '</div>' +
           '<button class="btn btn-sm" style="margin-top:8px; margin-right:8px;" onclick="chatWithPending(' + i + ')">&#128172; Chat</button>' +
           '<button class="btn btn-sm btn-danger" style="margin-top:8px;" onclick="deletePending(' + i + ')">&#128465; Delete</button>' +

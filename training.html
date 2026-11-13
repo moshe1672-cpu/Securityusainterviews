@@ -29,6 +29,15 @@
   .check { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: #15202e; cursor: pointer; }
   .check input { width: 18px; height: 18px; accent-color: var(--gold); cursor: pointer; }
   .btn.disabled { opacity: 0.45; cursor: not-allowed; }
+  .gate { flex: 1; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .gate .fallback-card { text-align: left; width: 100%; max-width: 440px; }
+  .gate h3 { text-align: center; font-size: 20px; }
+  .gate p { text-align: center; }
+  .gate label { display: block; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #5a6b7e; margin: 14px 0 6px; }
+  .gate input { width: 100%; background: #ffffff; border: 1.5px solid var(--border); border-radius: 8px; padding: 12px 14px; font-size: 16px; color: #15202e; font-family: 'DM Sans', sans-serif; outline: none; }
+  .gate input:focus { border-color: var(--navy); }
+  .gate .btn { width: 100%; margin-top: 20px; }
+  .gate .err { display: none; margin-top: 12px; color: #c0392b; font-weight: 600; font-size: 14px; text-align: center; }
 </style>
 </head>
 <body>
@@ -38,7 +47,22 @@
     <a class="btn" style="font-size:12px; padding:9px 14px;" href="https://www.nyc.gov/assets/cchr/training/english/index.html" target="_blank" rel="noopener">Open in New Tab &#8599;</a>
   </div>
 
-  <div class="frame-wrap">
+  <div class="gate" id="gate">
+    <div class="fallback-card">
+      <h3>Before you begin</h3>
+      <p>Enter your name and email to start the training.</p>
+      <label>First Name</label>
+      <input id="g-first" type="text" placeholder="First name" />
+      <label>Last Name</label>
+      <input id="g-last" type="text" placeholder="Last name" />
+      <label>Email</label>
+      <input id="g-email" type="email" placeholder="you@example.com" />
+      <button class="btn gold" onclick="startTraining()">Start Training &rarr;</button>
+      <div class="err" id="g-err">Please fill in all fields with a valid email.</div>
+    </div>
+  </div>
+
+  <div class="frame-wrap" id="frame-area" style="display:none;">
     <div class="fallback" id="fallback" style="display:none;">
       <div class="fallback-card">
         <h3>The course can't be shown here</h3>
@@ -49,7 +73,7 @@
     <iframe id="course" src="https://www.nyc.gov/assets/cchr/training/english/index.html" allow="autoplay; fullscreen" allowfullscreen></iframe>
   </div>
 
-  <div class="bottombar">
+  <div class="bottombar" id="bottombar" style="display:none;">
     <div class="checks">
       <label class="check"><input type="checkbox" id="ck-done" onchange="syncFinish()"> I completed the full training</label>
       <label class="check"><input type="checkbox" id="ck-shot" onchange="syncFinish()"> Did you screenshot your certificate?</label>
@@ -83,6 +107,62 @@
   })();
 
 
+  // ---- progress tracking (shows on the admin page) ----
+  const FN_URL = 'https://stvagyjcjoxnbslafmyf.supabase.co/functions/v1/exam';
+  const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0dmFneWpjam94bmJzbGFmbXlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NTcxNTIsImV4cCI6MjA4OTQzMzE1Mn0.da_l4ogYdc_XL7DqmK_RmmR6cC_X6Lq102ddnN7QYY4';
+  let tSession = null;
+  let tTaker = {};
+
+  function cid() {
+    let id = null;
+    try {
+      id = localStorage.getItem('susa_chat_id');
+      if (!id) { id = 'c-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10); localStorage.setItem('susa_chat_id', id); }
+    } catch (e) { id = 't-anon'; }
+    return id;
+  }
+
+  function heartbeat(done) {
+    if (!tSession) return;
+    fetch(FN_URL, {
+      method: 'POST',
+      keepalive: !!done,
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + ANON },
+      body: JSON.stringify({ action: 'progress', session_id: tSession, chat_id: cid(), activity: 'training', ...tTaker, current_q: 1, total_questions: 1, done: !!done }),
+    }).catch(() => {});
+  }
+
+  function startTraining() {
+    const first = document.getElementById('g-first').value.trim();
+    const last = document.getElementById('g-last').value.trim();
+    const email = document.getElementById('g-email').value.trim();
+    let bad = false;
+    [['g-first', first], ['g-last', last], ['g-email', email]].forEach(([id, v]) => {
+      document.getElementById(id).style.borderColor = v ? '#d6dbe4' : '#c0392b';
+      if (!v) bad = true;
+    });
+    if (!bad && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      document.getElementById('g-email').style.borderColor = '#c0392b';
+      bad = true;
+    }
+    if (bad) { document.getElementById('g-err').style.display = 'block'; return; }
+    tTaker = { first_name: first, last_name: last, email: email };
+    try {
+      localStorage.setItem('susa_first', first);
+      localStorage.setItem('susa_last', last);
+      localStorage.setItem('susa_email', email);
+      if (!localStorage.getItem('susa_chat_name')) localStorage.setItem('susa_chat_name', first);
+      localStorage.setItem('susa_chat_fullname', (first + ' ' + last).trim());
+      localStorage.setItem('susa_chat_email', email);
+    } catch (e) {}
+    tSession = 't-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+    heartbeat();
+    setInterval(() => heartbeat(), 30000);
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('frame-area').style.display = '';
+    document.getElementById('bottombar').style.display = '';
+  }
+
   function syncFinish() {
     const ok = document.getElementById('ck-done').checked && document.getElementById('ck-shot').checked;
     document.getElementById('finish-btn').classList.toggle('disabled', !ok);
@@ -92,6 +172,7 @@
       e.preventDefault();
       return false;
     }
+    heartbeat(true);
     return true;
   }
 </script>

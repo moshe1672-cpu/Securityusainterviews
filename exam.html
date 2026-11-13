@@ -290,6 +290,15 @@ const QUESTIONS = [
     }).catch(() => {});
   }
 
+  // prefill from the training page if they already entered their details there
+  window.addEventListener('DOMContentLoaded', () => {
+    try {
+      if (!document.getElementById('first').value) document.getElementById('first').value = localStorage.getItem('susa_first') || '';
+      if (!document.getElementById('last').value) document.getElementById('last').value = localStorage.getItem('susa_last') || '';
+      if (!document.getElementById('email').value) document.getElementById('email').value = localStorage.getItem('susa_email') || '';
+    } catch (e) {}
+  });
+
   function showErr(id, msg) {
     const el = document.getElementById(id);
     el.textContent = '⚠ ' + msg;
@@ -316,6 +325,9 @@ const QUESTIONS = [
     taker = { first_name: first, last_name: last, email: email };
     examSession = 'e-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
     try {
+      localStorage.setItem('susa_first', first);
+      localStorage.setItem('susa_last', last);
+      localStorage.setItem('susa_email', email);
       if (!localStorage.getItem('susa_chat_name')) localStorage.setItem('susa_chat_name', first);
       localStorage.setItem('susa_chat_fullname', (first + ' ' + last).trim());
       localStorage.setItem('susa_chat_email', email);
