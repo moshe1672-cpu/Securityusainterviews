@@ -12,8 +12,9 @@
   .page { max-width:1150px; margin:0 auto; padding:48px 24px 80px; }
   .split { display:grid; grid-template-columns:1fr 1fr; gap:16px; align-items:start; }
   .split .card { margin-bottom:0; }
-  .chat-card { grid-column:1; grid-row:1; }
-  #results { grid-column:2; grid-row:1; }
+  .chat-card { grid-column:1; grid-row:1 / span 2; }
+  #sh-card { grid-column:2; grid-row:1; }
+  #results { grid-column:2; grid-row:2; }
   @media (max-width:820px) { .split { display:block; } .split .card { margin-bottom:16px; } }
   .header { text-align:center; margin-bottom:32px; }
   .badge { display:inline-flex; align-items:center; gap:8px; background:rgba(201,168,76,0.12); border:1px solid var(--border); border-radius:100px; padding:6px 16px; font-size:12px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--gold); margin-bottom:20px; }
@@ -70,12 +71,17 @@
 
   <div class="split">
 
+  <div class="card" id="sh-card">
+    <h3 style="font-size:14px; font-weight:600; margin-bottom:14px;">&#128737;&#65039; Sexual Harassment Training</h3>
+    <div id="sh-rows"><p style="font-size:13px; color:var(--muted);">No one in training right now.</p></div>
+  </div>
+
   <div class="card" id="results">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
       <h3 style="font-size:14px; font-weight:600;">&#128221; Test Submissions (<span id="count">0</span>)</h3>
     </div>
     <div id="pending-wrap" style="display:none; margin-bottom:16px;">
-      <div style="font-size:12px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--gold); margin-bottom:8px;">&#9203; In Progress Right Now</div>
+      <div style="font-size:12px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--gold); margin-bottom:8px;">&#9203; Taking the Exam Right Now</div>
       <div id="pending-rows"></div>
     </div>
     <div id="rows"><p style="font-size:13px; color:var(--muted);">Loading&hellip;</p></div>
@@ -246,20 +252,27 @@ const QUESTIONS = [
       });
       const d = await resp.json();
       const wrap = document.getElementById('pending-wrap');
-      if (!d.rows || !d.rows.length) { wrap.style.display = 'none'; return; }
-      wrap.style.display = 'block';
+      const rows = d.rows || [];
+      const hasExam = rows.some(r => r.activity !== 'training');
+      wrap.style.display = hasExam ? 'block' : 'none';
+      if (!rows.length) { document.getElementById('sh-rows').innerHTML = '<p style="font-size:13px; color:var(--muted);">No one in training right now.</p>'; pendingRows = []; return; }
       pendingRows = d.rows;
-      document.getElementById('pending-rows').innerHTML = d.rows.map((r, i) =>
-        '<div class="pending-row">' +
-          '<span class="row-name">' + esc((r.first_name || '') + ' ' + (r.last_name || '')) + '</span>' +
-          (r.activity === 'training'
-            ? '<span class="pill" style="background:rgba(41,128,185,0.18); color:#7ec3e8; border:1px solid #2980b9;">Sexual Harassment Training</span>'
-            : '<span class="pill" style="background:rgba(201,168,76,0.15); color:var(--gold-light); border:1px solid var(--gold);">Exam &middot; Question ' + r.current_q + ' of ' + r.total_questions + '</span>') +
-          '<div class="row-meta">' + esc(r.email || '') + ' &middot; active ' + fmtAgo(r.updated_at) + '</div>' +
-          '<button class="btn btn-sm" style="margin-top:8px; margin-right:8px;" onclick="chatWithPending(' + i + ')">&#128172; Chat</button>' +
-          '<button class="btn btn-sm btn-danger" style="margin-top:8px;" onclick="deletePending(' + i + ')">&#128465; Delete</button>' +
-        '</div>'
-      ).join('');
+      let examHtml = '', trainHtml = '';
+      d.rows.forEach((r, i) => {
+        const html =
+          '<div class="pending-row">' +
+            '<span class="row-name">' + esc((r.first_name || '') + ' ' + (r.last_name || '')) + '</span>' +
+            (r.activity === 'training'
+              ? '<span class="pill" style="background:rgba(41,128,185,0.18); color:#7ec3e8; border:1px solid #2980b9;">In Progress</span>'
+              : '<span class="pill" style="background:rgba(201,168,76,0.15); color:var(--gold-light); border:1px solid var(--gold);">Question ' + r.current_q + ' of ' + r.total_questions + '</span>') +
+            '<div class="row-meta">' + esc(r.email || '') + ' &middot; active ' + fmtAgo(r.updated_at) + '</div>' +
+            '<button class="btn btn-sm" style="margin-top:8px; margin-right:8px;" onclick="chatWithPending(' + i + ')">&#128172; Chat</button>' +
+            '<button class="btn btn-sm btn-danger" style="margin-top:8px;" onclick="deletePending(' + i + ')">&#128465; Delete</button>' +
+          '</div>';
+        if (r.activity === 'training') trainHtml += html; else examHtml += html;
+      });
+      document.getElementById('pending-rows').innerHTML = examHtml;
+      document.getElementById('sh-rows').innerHTML = trainHtml || '<p style="font-size:13px; color:var(--muted);">No one in training right now.</p>';
     } catch (e) {}
   }
 
