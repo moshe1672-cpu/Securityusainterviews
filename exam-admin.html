@@ -480,7 +480,12 @@ const QUESTIONS = [
     const wrong = (r.incorrect || []);
     let body = 'Hello ' + r.first_name + ',\n\nYou scored ' + r.score + '% on the Security USA Onboarding Exam (' + r.correct_count + '/' + r.total_questions + ' correct). A score of 80% or higher is required to pass.\n\nQuestions to review:\n';
     wrong.forEach(w => {
-      body += '\n- Question ' + w.n + ': ' + w.q.slice(0, 90) + (w.q.length > 90 ? '...' : '') + '\n  Your answer: ' + String(w.given).toUpperCase() + '\n';
+      const q = QUESTIONS.find(x => x.n === w.n);
+      const letters = String(w.correct).split(',').map(x => x.trim()).filter(Boolean);
+      const correctText = q
+        ? letters.map(l => l.toUpperCase() + '. ' + q.opts[l]).join('\n                  ')
+        : String(w.correct).toUpperCase();
+      body += '\n- Question ' + w.n + ': ' + w.q.slice(0, 90) + (w.q.length > 90 ? '...' : '') + '\n  Your answer: ' + String(w.given).toUpperCase() + '\n  Correct answer: ' + correctText + '\n';
     });
     return 'mailto:' + encodeURIComponent(r.email) + '?subject=' + encodeURIComponent('Security USA Onboarding Exam — Review Incorrect Answers') + '&body=' + encodeURIComponent(body);
   }
